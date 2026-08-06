@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+# Abort on error:
+set -e
+
 # Return codes:
 EX_OK=0
 EX_USAGE=64
