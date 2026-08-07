@@ -60,12 +60,13 @@ sources/pkg-config-$(PKGCONVERS).tar.gz:
 ## Build tools
 
 .PHONY: tools
-tools: download-pkgconfig lib/pkg-config download-cppunit lib/cppunit
-
-lib/cppunit:
-	./scripts/cppunit.sh $(CPPUNITVERS)
+tools: download-pkgconfig lib/pkg-config download-cppunit lib/cppunit download-lapack lib/lapack
 
 lib/pkg-config:
 	./scripts/pkgconfig.sh $(PKGCONVERS)
 
-## Build lapack
+lib/cppunit:
+	./scripts/cppunit.sh $(CPPUNITVERS)
+
+lib/lapack:
+	./scripts/lapack.sh $(LAPACKVERS)

@@ -26,13 +26,13 @@ fi
 tar xf "sources/cppunit-$VERSION.tar.gz" -C "tmp"
 cd tmp/cppunit-$VERSION
 
-echo "\n** Building aarch64 cppunit **\n"
+echo "\n** Compiling cppunit-aarch64 **\n"
 ./configure --prefix=$WDIR/lib/cppunit
 make clean
 make -j $CORES
 make install DESTDIR="$WDIR/tmp/cppunit-aarch64"
 
-echo "\n** Building x86_64 cppunit **\n"
+echo "\n** Compiling cppunit-x86_64 **\n"
 ./configure \
   --host=x86_64-apple-darwin \
   --build=aarch64-apple-darwin \

@@ -8,6 +8,9 @@ EX_OK=0
 EX_USAGE=64
 EX_CONFIG=78
 
+## Eliminate homebrew etc path:
+export PATH=" /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
 ## Check we are on macOS >= 11:
 if [ "`echo $OSTYPE | grep 'darwin'`" = "" ]; then
 	echo "This script requires macOS" 1>&2 
@@ -43,16 +46,22 @@ if [ "$SDKROOT" = "" ]; then
   exit $EX_CONFIG
 fi
 
-## Check pkg-config is available:
-if [ `which pkg-config` = "" ]; then
-  echo "pkg-config not available:  install via e.g. homebrew and ensure it is on the path" 1>&2
-  exit $EX_CONFIG
-fi
-
 ## Check Simon's gfortran is installed:
 if ! [ -f "/opt/gfortran/bin/aarch64-apple-darwin20.0-gfortran" ]; then
   echo "CRAN build of gfortran not available:  install from https://mac.r-project.org/tools/" 1>&2
   exit $EX_CONFIG
 fi
+
+## Ensure that gfortran exists and is set up with the SDK correctly:
+if [ ! -f "/opt/gfortran/bin/gfortran" ]; then
+  echo "Error:  gfortran not found at /opt/gfortran" 1>&2 
+  exit $EX_USAGE
+fi
+GSDK=`readlink -f /opt/gfortran/SDK`
+if [ "$GSDK" != "$SDKROOT" ]; then
+  echo "Error: gfortran SDK is not configured for binary compatibility with official builds of R.\nYou should run the following command:\n\tsudo /opt/gfortran/bin/gfortran-update-sdk $SDKROOT" 1>&2 
+  echo "After re-running the compile script you can reset the gfortran SDK by running:\n\tsudo /opt/gfortran/bin/gfortran-update-sdk" 1>&2 
+  exit $EX_USAGE
+fi  
 
 exit $EX_OK
