@@ -53,15 +53,18 @@ for ff in "/lib/libcppunit-$VERSION.dylib" "/lib/libcppunit.dylib" "/lib/libcppu
   lipo "$WDIR/tmp/cppunit-universal/$IDIR/$ff" "$WDIR/tmp/cppunit-x86_64/$IDIR/$ff" -create -output "$WDIR/tmp/cppunit-universal/$IDIR/$ff"
 done
 
-
-
-exit 1
-
-cd universal
-ln -s $IDIR opt/cppunit/current
-mkdir -p usr/local/lib/pkgconfig
-ln -s /opt/cppunit/current/lib/pkgconfig/cppunit.pc usr/local/lib/pkgconfig/cppunit.pc
-tar zcf "../cppunit-universal-1.15.1.tar.gz" opt usr
-
+cd cppunit-universal
+tar zcf "../cppunit-universal-$VERSION.tar.gz" .
 cd ../
-sudo tar -xvf cppunit-universal-1.15.1.tar.gz -C /
+tar -xvf cppunit-universal-$VERSION.tar.gz -C /
+
+exit $EX_OK
+
+# For possible installation to /opt
+#cd universal
+#ln -s $IDIR opt/cppunit/current
+#mkdir -p usr/local/lib/pkgconfig
+#ln -s /opt/cppunit/current/lib/pkgconfig/cppunit.pc usr/local/lib/pkgconfig/cppunit.pc
+#tar zcf "../cppunit-universal-1.15.1.tar.gz" opt usr
+#cd ../
+#sudo tar -xvf cppunit-universal-1.15.1.tar.gz -C /

@@ -10,8 +10,7 @@ VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
 
 ## Complete build
 .PHONY: all
-all:
-	./scripts/cppunit.sh $(CPPUNITVERS)
+all: tools
 
 
 ## Create folders
@@ -60,15 +59,12 @@ sources/pkg-config-$(PKGCONVERS).tar.gz:
 	
 ## Build tools
 
-.PHONY: cppunit
-cppunit: lib/cppunit
+.PHONY: tools
+tools: download-pkgconfig lib/pkg-config download-cppunit lib/cppunit
 
 lib/cppunit:
-	./scripts/cppunit.sh
+	./scripts/cppunit.sh $(CPPUNITVERS)
 
-.PHONY: pkgconfig
-pkgconfig: download-pkgconfig lib/pkg-config
-	
 lib/pkg-config:
 	./scripts/pkgconfig.sh $(PKGCONVERS)
 
