@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # Abort on error:
-# set -e
+set -e
 
 # Return codes:
 EX_OK=0
@@ -15,7 +15,8 @@ VERSION="$1"
 export WDIR=`pwd`
 export SDKROOT=`readlink -f "/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk"`
 export MACOSX_DEPLOYMENT_TARGET="11.0"
-export CORES=12
+export CORES=$(sysctl -n hw.ncpu)
+export PATH=" /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 if ! [ -f sources/cppunit-$VERSION.tar.gz ]; then
   echo "Source file not found" 2>&1
@@ -27,21 +28,20 @@ cd tmp/cppunit-$VERSION
 
 echo "\n** Building aarch64 cppunit **\n"
 ./configure --prefix=$WDIR/lib/cppunit
+make clean
 make -j $CORES
 make install DESTDIR="$WDIR/tmp/cppunit-aarch64"
-make clean
 
 echo "\n** Building x86_64 cppunit **\n"
 ./configure \
   --host=x86_64-apple-darwin \
   --build=aarch64-apple-darwin \
   --prefix=$WDIR/lib/cppunit \
-  CFLAGS="-arch x86_64" \
-  CXXFLAGS="-arch x86_64" \
-  LDFLAGS="-arch x86_64"
+  CC="clang -arch x86_64" \
+  CXX="clang++ -arch x86_64"
+make clean
 make -j $CORES
 make install DESTDIR="$WDIR/tmp/cppunit-x86_64"
-make clean
 
 echo "\n** Installing bi-arch cppunit to $WDIR/lib/cppunit **\n"
 
@@ -55,7 +55,7 @@ done
 
 
 
-exit 0
+exit 1
 
 cd universal
 ln -s $IDIR opt/cppunit/current
