@@ -57,6 +57,7 @@ sources/cppunit-$(CPPUNITVERS).tar.gz:
 sources/pkg-config-$(PKGCONVERS).tar.gz: 
 	curl -OL --output-dir sources https://pkg-config.freedesktop.org/releases/pkg-config-$(PKGCONVERS).tar.gz
 	
+
 ## Build tools
 
 .PHONY: tools
@@ -70,3 +71,10 @@ lib/cppunit:
 
 lib/lapack:
 	./scripts/lapack.sh $(LAPACKVERS)
+
+
+## JAGS builds
+
+build/$(VERSION)-vecLib-gcd-aarch64:
+	./scripts/jags.sh $(VERSION) vecLib gcd aarch64
+
