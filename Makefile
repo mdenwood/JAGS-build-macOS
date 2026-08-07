@@ -1,10 +1,11 @@
 ## Versions of JAGS, CPPUNIT and LAPACK to use
-VERSION = 5.0.0
+JAGSVERSION := 5.0.0
 CPPUNITVERS = 1.15.1
 LAPACKVERS = 3.12.1
+PKGCONVERS = 0.29.2
 
 ## Extract JAGS major version from full version
-VERSMAJ = $(word 1,$(subst ., ,$(VERSION)))
+VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
 
 
 ## Complete build
@@ -31,10 +32,10 @@ build:
 ## Download source files
 
 .PHONY: download
-download: mkdirs download-jags download-lapack download-cppunit
+download: mkdirs download-jags download-lapack download-cppunit download-pkgconfig
 
 .PHONY: download-jags
-download-jags: sources sources/JAGS-$(VERSION).tar.gz
+download-jags: sources sources/JAGS-$(JAGSVERSION).tar.gz
 
 .PHONY: download-lapack
 download-lapack: sources sources/v$(LAPACKVERS).tar.gz
@@ -42,8 +43,11 @@ download-lapack: sources sources/v$(LAPACKVERS).tar.gz
 .PHONY: download-cppunit
 download-cppunit: sources sources/cppunit-$(CPPUNITVERS).tar.gz
 
-sources/JAGS-$(VERSION).tar.gz: 
-	curl -OL --output-dir sources https://sourceforge.net/projects/mcmc-jags/files/JAGS/$(VERSMAJ).x/Source/JAGS-$(VERSION).tar.gz
+.PHONY: download-pkgconfig
+download-pkgconfig: sources sources/pkg-config-$(PKGCONVERS).tar.gz
+
+sources/JAGS-$(JAGSVERSION).tar.gz: 
+	curl -OL --output-dir sources https://sourceforge.net/projects/mcmc-jags/files/JAGS/$(VERSMAJ).x/Source/JAGS-$(JAGSVERSION).tar.gz
 	
 sources/v$(LAPACKVERS).tar.gz:
 	curl -OL --output-dir sources https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.12.1.tar.gz
@@ -51,8 +55,10 @@ sources/v$(LAPACKVERS).tar.gz:
 sources/cppunit-$(CPPUNITVERS).tar.gz: 
 	curl -OL --output-dir sources http://dev-www.libreoffice.org/src/cppunit-$(CPPUNITVERS).tar.gz
 
-
-## Build cppunit
+sources/pkg-config-$(PKGCONVERS).tar.gz: 
+	curl -OL --output-dir sources https://pkg-config.freedesktop.org/releases/pkg-config-$(PKGCONVERS).tar.gz
+	
+## Build tools
 
 .PHONY: cppunit
 cppunit: lib/cppunit
@@ -60,5 +66,10 @@ cppunit: lib/cppunit
 lib/cppunit:
 	./scripts/cppunit.sh
 
+.PHONY: pkgconfig
+pkgconfig: download-pkgconfig lib/pkg-config
+	
+lib/pkg-config:
+	./scripts/pkgconfig.sh $(PKGCONVERS)
 
 ## Build lapack

@@ -26,11 +26,11 @@ if ! ( xcode-select -p >/dev/null ); then
   exit $EX_CONFIG
 fi
 
-## Check rosetta is available:
-if ! ( arch -arch x86_64 whoami > /dev/null ) ; then
-  echo "Rosetta not installed - run:\n /usr/sbin/softwareupdate --install-rosetta --agree-to-license" 1>&2 
-  exit $EX_CONFIG
-fi
+## Check rosetta is available (not actually needed):
+#if ! ( arch -arch x86_64 whoami > /dev/null ) ; then
+#  echo "Rosetta not installed - run:\n /usr/sbin/softwareupdate --install-rosetta --agree-to-license" 1>&2 
+#  exit $EX_CONFIG
+#fi
 
 ## Check SDK is available:
 if ! [ -d /Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk ]; then
