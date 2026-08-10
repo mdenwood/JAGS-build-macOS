@@ -8,6 +8,11 @@ EX_OK=0
 EX_USAGE=64
 EX_CONFIG=78
 
+if [ "$#" -ne 0 ]; then
+    echo "Error: 0 arguments required (got $#)."
+    exit $EX_USAGE
+fi
+
 ## Eliminate homebrew etc path:
 export PATH=" /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
@@ -20,6 +25,12 @@ minvers=11.0
 currvers=`sw_vers -productVersion | tr -d ' '`
 if [ "$(echo -e $minvers"\n"$currvers | sort -V | tail -1)" = "$minvers" ]; then
   echo "This script requires macOS 11 (Big Sur) or greater" 1>&2 
+	exit $EX_CONFIG
+fi
+
+## Check this is an Apple silicon mac
+if [[ ! "`uname -m`" == "arm64" ]]; then
+	echo "This script requires an Apple silicon (arm64/aarch64) mac" 1>&2 
 	exit $EX_CONFIG
 fi
 

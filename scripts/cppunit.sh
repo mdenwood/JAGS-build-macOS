@@ -11,7 +11,13 @@ EX_CONFIG=78
 # Note: this script is intended to be run from the root directory (by the Makefile)
 ./scripts/check_deps.sh
 
+if [ "$#" -ne 1 ]; then
+    echo "Error: 1 arguments required (got $#)."
+    echo "Usage: $0 <VERSION>"
+    exit $EX_USAGE
+fi
 VERSION="$1"
+
 export WDIR=`pwd`
 export SDKROOT=`readlink -f "/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk"`
 export MACOSX_DEPLOYMENT_TARGET="11.0"
@@ -19,11 +25,15 @@ export CORES=$(sysctl -n hw.ncpu)
 export PATH=" /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 if ! [ -f sources/cppunit-$VERSION.tar.gz ]; then
-  echo "Source file not found" 2>&1
+  echo "Source file not found" >&2
   exit $EX_CONFIG
 fi
 
-tar xf "sources/cppunit-$VERSION.tar.gz" -C "tmp"
+rm -rf tmp/cppunit-aarch64
+rm -rf tmp/cppunit-x86_64
+rm -rf tmp/cppunit-universal
+rm -rf lib/cppunit
+tar -xmf "sources/cppunit-$VERSION.tar.gz" -C "tmp"
 cd tmp/cppunit-$VERSION
 
 echo "\n** Compiling cppunit-aarch64 **\n"
@@ -54,9 +64,11 @@ for ff in "/lib/libcppunit-$VERSION.dylib" "/lib/libcppunit.dylib" "/lib/libcppu
 done
 
 cd cppunit-universal
-tar zcf "../cppunit-universal-$VERSION.tar.gz" .
+tar -zcf "../cppunit-universal-$VERSION.tar.gz" .
 cd ../
-tar -xvf cppunit-universal-$VERSION.tar.gz -C /
+tar -xmf cppunit-universal-$VERSION.tar.gz -C /
+
+touch "$WDIR/lib/cppunit/.stamp"
 
 exit $EX_OK
 

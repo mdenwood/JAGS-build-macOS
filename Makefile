@@ -10,7 +10,7 @@ VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
 
 ## Complete build
 .PHONY: all
-all: tools
+all: tools build/$(JAGSVERSION)-vecLib-gcd-aarch64
 
 
 ## Create folders
@@ -61,20 +61,20 @@ sources/pkg-config-$(PKGCONVERS).tar.gz:
 ## Build tools
 
 .PHONY: tools
-tools: download-pkgconfig lib/pkg-config download-cppunit lib/cppunit download-lapack lib/lapack
+tools: lib/pkg-config/.stamp lib/cppunit/.stamp lib/lapack/.stamp
 
-lib/pkg-config:
+lib/pkg-config/.stamp: sources/pkg-config-$(PKGCONVERS).tar.gz
 	./scripts/pkgconfig.sh $(PKGCONVERS)
 
-lib/cppunit:
+lib/cppunit/.stamp: sources/cppunit-$(CPPUNITVERS).tar.gz
 	./scripts/cppunit.sh $(CPPUNITVERS)
 
-lib/lapack:
+lib/lapack/.stamp: sources/v$(LAPACKVERS).tar.gz
 	./scripts/lapack.sh $(LAPACKVERS)
 
 
 ## JAGS builds
 
-build/$(VERSION)-vecLib-gcd-aarch64:
-	./scripts/jags.sh $(VERSION) vecLib gcd aarch64
+build/$(JAGSVERSION)-vecLib-gcd-aarch64: download-jags tools
+	./scripts/jags.sh $(JAGSVERSION) vecLib gcd aarch64
 

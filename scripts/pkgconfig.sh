@@ -11,17 +11,25 @@ EX_CONFIG=78
 # Note: this script is intended to be run from the root directory (by the Makefile)
 ./scripts/check_deps.sh
 
+if [ "$#" -ne 1 ]; then
+    echo "Error: 1 arguments required (got $#)."
+    echo "Usage: $0 <VERSION>"
+    exit $EX_USAGE
+fi
 VERSION="$1"
+
 export WDIR=`pwd`
 export CORES=$(sysctl -n hw.ncpu)
 export PATH=" /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 if ! [ -f sources/pkg-config-$VERSION.tar.gz ]; then
-  echo "Source file not found" 2>&1
+  echo "Source file not found" >&2
   exit $EX_CONFIG
 fi
 
-tar xf "sources/pkg-config-$VERSION.tar.gz" -C "tmp"
+rm -rf "lib/pkg-config/"
+rm -rf "tmp/pkg-config-$VERSION"
+tar -xmf "sources/pkg-config-$VERSION.tar.gz" -C "tmp"
 cd tmp/pkg-config-$VERSION
 
 echo "\n** Building pkg-config **\n"
@@ -29,5 +37,7 @@ LDFLAGS="-framework CoreFoundation -framework Carbon" CFLAGS="-Wno-int-conversio
 make clean
 make -j 12
 make install
+
+touch "$WDIR/lib/pkg-config/.stamp"
 
 exit 0
