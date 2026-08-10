@@ -12,7 +12,8 @@ VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
 .PHONY: all
 # all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
 # all: build/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg
-all: tmp/JAGS-$(JAGSVERSION)-vecLib-single-universal/.stamp
+# all: tmp/JAGS-$(JAGSVERSION)-vecLib-single-universal/.stamp
+all: build/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg
 
 ## Create folders
 

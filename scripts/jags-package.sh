@@ -152,9 +152,43 @@ for dd in $(find "opt" -type d -print); do
   done
 done
 
+## Sign binaries
+for dd in $(find "opt" -type d -print); do
+  for ff in $(ls "$dd"); do
+    ftype=$(file -I "$dd/$ff")
+    sign=0
+    if echo "$ftype" | grep -q "application/x-mach-binary"; then
+      sign=1
+    fi
+    if [[ "$ff" == "jags" ]] || [[ "$ff" == "jags-terminal" ]] || [[ "$ff" == "jags-switch" ]] || [[ "$ff" == "jags-uninstall" ]]; then
+      sign=1
+    fi
+    if [[ -d "$dd/$ff" ]]; then
+      sign=0
+    fi
+    if test ! -L "$dd/$ff"; then
+    fi
+    if [[ $sign -eq 1 ]]; then
+      echo "Signing: $dd/$ff"
+      xcrun codesign --force -o runtime --timestamp -s "$XCRUN_SIGN" "$dd/$ff"
+    fi
+  done
+done
+
+cd "$WDIR/tmp"
+
+pkgbuild \
+      --root "JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt" \
+      --identifier com.mattdenwood.pkg.JAGS \
+      --ownership recommended \
+      --version "$VERSION" \
+      --install-location /opt \
+      "$WDIR/build/JAGS-$VERSION-$BLAS-$THREAD-$ARCH.pkg"
+
+exit 0
+
 tar zcf "$bdir/JAGS-$version-$blas-$arch.tgz" opt
   
-exit 0
 
 if [[ "$ARCH" == "universal" ]]; then
   echo "Running lipo..."
