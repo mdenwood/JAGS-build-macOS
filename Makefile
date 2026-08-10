@@ -10,8 +10,9 @@ VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
 
 ## Complete build
 .PHONY: all
-all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
-
+# all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
+# all: build/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg
+all: tmp/JAGS-$(JAGSVERSION)-vecLib-single-universal/.stamp
 
 ## Create folders
 
@@ -75,23 +76,43 @@ lib/lapack/.stamp: sources/v$(LAPACKVERS).tar.gz
 	./scripts/lapack.sh $(LAPACKVERS)
 
 
-## JAGS builds
+## Compile JAGS
 
 tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
-	./scripts/jags.sh $(JAGSVERSION) vecLib gcd aarch64
+	./scripts/jags-compile.sh $(JAGSVERSION) vecLib gcd aarch64
 
 tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
-	./scripts/jags.sh $(JAGSVERSION) vecLib gcd x86_64
+	./scripts/jags-compile.sh $(JAGSVERSION) vecLib gcd x86_64
 
 tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
-	./scripts/jags.sh $(JAGSVERSION) vecLib single aarch64
+	./scripts/jags-compile.sh $(JAGSVERSION) vecLib single aarch64
 
 tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
-	./scripts/jags.sh $(JAGSVERSION) vecLib single x86_64
+	./scripts/jags-compile.sh $(JAGSVERSION) vecLib single x86_64
 
 tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz sources/v$(LAPACKVERS).tar.gz
-	./scripts/jags.sh $(JAGSVERSION) refBLAS single aarch64
+	./scripts/jags-compile.sh $(JAGSVERSION) refBLAS single aarch64
 
 tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz sources/v$(LAPACKVERS).tar.gz
-	./scripts/jags.sh $(JAGSVERSION) refBLAS single x86_64
+	./scripts/jags-compile.sh $(JAGSVERSION) refBLAS single x86_64
 
+
+## Lipo JAGS
+
+tmp/JAGS-$(JAGSVERSION)-refBLAS-single-universal/.stamp: tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
+	./scripts/jags-lipo.sh $(JAGSVERSION) refBLAS single
+
+tmp/JAGS-$(JAGSVERSION)-vecLib-single-universal/.stamp: tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp
+	./scripts/jags-lipo.sh $(JAGSVERSION) vecLib single
+
+tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-universal/.stamp: tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp
+	./scripts/jags-lipo.sh $(JAGSVERSION) vecLib gcd
+
+
+## Create JAGS installers
+
+build/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg: tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp
+	./scripts/jags-package.sh $(JAGSVERSION) vecLib gcd aarch64
+
+build/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg: tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp
+	./scripts/jags-package.sh $(JAGSVERSION) vecLib gcd universal
