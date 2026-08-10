@@ -3,7 +3,7 @@
 # Set only if not already set:
 : ${XCRUN_SIGN="Developer ID Application: Matt Denwood"}
 : ${PDBUILD_SIGN="Developer ID Installer: Matt Denwood"}
-: ${KEYCHAIN_PROFILE="Matt Denwood"}
+: ${KEYCHAIN_PROFILE="Developer ID: Matt Denwood"}
 
 # Abort on error, use of unset variable, or error within pipe:
 set -euo pipefail
