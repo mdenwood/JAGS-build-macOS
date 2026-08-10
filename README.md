@@ -23,3 +23,38 @@ BUT make sure homebrew gcc and fortran are not in the PATH!!!
 
 export PATH="/opt/homebrew/Cellar/pkgconf/2.5.1/bin:/opt/cppunit/current/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/Library/TeX/texbin:/Applications/iTerm.app/Contents/Resources/utilities:/opt/gfortran/bin:/usr/local/bin/"
 
+
+## Installation directory
+
+These installation scripts are designed for JAGS to use a versioned installation directory structure with symlinks under bin, lib and share as follows:
+
+/opt/
+└── jags/
+    ├── bin/
+    │   ├── jags
+    │   ├── jags-5
+    │   ├── jags-uninstall
+    │   └── jags-version
+    ├── lib
+    │   └── pkgconfig
+    │       └── jags.pc
+    ├── share
+    │   └── man
+    │       └── man1
+    │           ├── jags-uninstall.1
+    │           ├── jags-version.1
+    │           └── jags.1
+    │
+    └── versions/
+        ├── jags/
+        │   ├── 5.0.0-vecLib-gcd-aarch64
+        │   ├── ...
+        │   ├── 5.x-current
+        │   └── current
+        └── utilities/
+            ├── 1.0.0
+            ├── ...
+            └── current
+
+To fit within this structure, JAGS is configured with a prefix of /opt/jags/versions/jags/5.x-current (or 4.x-current, for JAGS 4.x), but the installed files are moved to an installation path under /opt/jags/versions/jags/VERSION-BLAS-THREAD-ARCH so that multiple installations can co-exist and be switched on/off using the jags-version utility.  Note that the tools required to build jags (pkg-config, cppunit and Netlib's LAPACK) are only installed within the self-contained repo directory (under lib).
+

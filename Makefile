@@ -10,7 +10,7 @@ VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
 
 ## Complete build
 .PHONY: all
-all: tools build/$(JAGSVERSION)-vecLib-gcd-aarch64
+all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
 
 
 ## Create folders
@@ -60,6 +60,8 @@ sources/pkg-config-$(PKGCONVERS).tar.gz:
 
 ## Build tools
 
+# TODO: move lib to tools and then replace .PHONY tools with tools/.stamp
+
 .PHONY: tools
 tools: lib/pkg-config/.stamp lib/cppunit/.stamp lib/lapack/.stamp
 
@@ -75,6 +77,21 @@ lib/lapack/.stamp: sources/v$(LAPACKVERS).tar.gz
 
 ## JAGS builds
 
-build/$(JAGSVERSION)-vecLib-gcd-aarch64: download-jags tools
+tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
 	./scripts/jags.sh $(JAGSVERSION) vecLib gcd aarch64
+
+tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
+	./scripts/jags.sh $(JAGSVERSION) vecLib gcd x86_64
+
+tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
+	./scripts/jags.sh $(JAGSVERSION) vecLib single aarch64
+
+tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
+	./scripts/jags.sh $(JAGSVERSION) vecLib single x86_64
+
+tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz sources/v$(LAPACKVERS).tar.gz
+	./scripts/jags.sh $(JAGSVERSION) refBLAS single aarch64
+
+tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz sources/v$(LAPACKVERS).tar.gz
+	./scripts/jags.sh $(JAGSVERSION) refBLAS single x86_64
 

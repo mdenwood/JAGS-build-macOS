@@ -1,7 +1,7 @@
 #!/bin/zsh
 
-# Abort on error:
-set -e
+# Abort on error, use of unset variable, or error within pipe:
+set -euo pipefail
 
 # Return codes:
 EX_OK=0
@@ -99,12 +99,15 @@ fi
 
 # Detect if this is an official build:
 VBSTRING="$VERSION ($BLAS-$THREAD-$ARCH build)"
+set +e  # Temporarily disable stop-on-error
 DEVELOPER_EMAIL=$(security find-generic-password -s "com.apple.gke.notary.tool" -a "JAGS_PROFILE" 2>/dev/null | grep '"acct"' | cut -d'"' -f4)
+set -e
 if [ -z "$DEVELOPER_EMAIL" ]; then
   if [[ $($DEVELOPER_EMAIL | shasum -a 256 | awk '{print $1}') == "7da19dd0e2664a65c66298ef8c37965baee4deecf01745743b9e13c082b860b3" ]]; then
     VBSTRING="$VERSION (official $BLAS-$THREAD-$ARCH binary)"
   fi
 fi
+
 
 export WDIR=`pwd`
 export SDKROOT=`readlink -f "/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk"`
@@ -136,7 +139,7 @@ if [[ "$BLAS" == "vecLib" ]]; then
   fflags="-O3 -static-libgfortran -static-libquadmath"
   flibs="/opt/gfortran/lib/gcc/$ARCH-apple-darwin20.0/14.2.0/libgcc.a /opt/gfortran/lib/gcc/$ARCH-apple-darwin20.0/14.2.0/libquadmath.a /opt/gfortran/lib/gcc/$ARCH-apple-darwin20.0/14.2.0/libgfortran.a"
   
-elif [[ "$blas" == "refBLAS" ]]; then
+elif [[ "$BLAS" == "refBLAS" ]]; then
   
   blasstr="$WDIR/lib/lapack/librefblas.a"
   lapkstr="$WDIR/lib/lapack/liblapack.a"
@@ -154,16 +157,18 @@ CPPUCNF="$("$WDIR/lib/pkg-config/bin/pkg-config" --cflags "$WDIR/lib/cppunit/lib
 # Configure according to THREAD:
 if [[ "$THREAD" == "single" ]]; then
   
-  PATH="$WDIR/lib/pkg-config/bin/:$PATH" CPPUNIT_CFLAGS="$CPPUCNF" FC="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FCLIBS="$flibs" \
-    CXXFLAGS="-O3 --target=$ARCH-apple-darwin20" F77="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FFLAGS="$fflags" FLIBS="$flibs" \
-    ./configure --prefix="/opt/jags/$VERSMAJ.x-current" --with-included-ltdl --with-blas="$blasstr" --with-lapack="$lapkstr" --disable-openmp \
+  PKG_CONFIG="$WDIR/lib/pkg-config/bin/pkg-config" PKG_CONFIG_PATH="$WDIR/lib/cppunit/lib/pkgconfig/" \
+    FC="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FCLIBS="$flibs" CFLAGS="-O3 --target=$ARCH-apple-darwin20" CXXFLAGS="-O3 --target=$ARCH-apple-darwin20" \
+    F77="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FFLAGS="$fflags" FLIBS="$flibs" \
+    ./configure --build="$ARCH-apple-darwin20" --prefix="/opt/jags/versions/jags/$VERSMAJ.x-current" --with-included-ltdl --with-blas="$blasstr" --with-lapack="$lapkstr" --disable-openmp \
     > configure.out >&2
   
 elif [[ "$THREAD" == "gcd" ]]; then
   
-  PATH="$WDIR/lib/pkg-config/bin/:$PATH" CPPUNIT_CFLAGS="$CPPUCNF" FC="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FCLIBS="$flibs" \
-    CXXFLAGS="-O3 --target=$ARCH-apple-darwin20" F77="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FFLAGS="$fflags" FLIBS="$flibs" \
-    ./configure --prefix="/opt/jags/$VERSMAJ.x-current" --with-included-ltdl --with-blas="$blasstr" --with-lapack="$lapkstr" --enable-gcd \
+  PKG_CONFIG="$WDIR/lib/pkg-config/bin/pkg-config" PKG_CONFIG_PATH="$WDIR/lib/cppunit/lib/pkgconfig/" \
+    FC="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FCLIBS="$flibs" CFLAGS="-O3 --target=$ARCH-apple-darwin20" CXXFLAGS="-O3 --target=$ARCH-apple-darwin20" \
+    F77="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FFLAGS="$fflags" FLIBS="$flibs" \
+    ./configure --build="$ARCH-apple-darwin20" --prefix="/opt/jags/versions/jags/$VERSMAJ.x-current" --with-included-ltdl --with-blas="$blasstr" --with-lapack="$lapkstr" --enable-gcd \
     > configure.out >&2
   
 else
@@ -180,57 +185,18 @@ fi
 # Remove spurious libquadmath dependency:
 find . -name 'Makefile' -type f -exec sed -i '' -e 's/libquadmath.a/libgfortran.a/' {} +
 find . -name 'Makefile' -type f -exec sed -i '' -e 's/-static-libquadmath//' {} +    
-  
+
+# Make and check  
 echo "\tRunning make..."
-make -j $CORES > make.out >&2
+make --jobs=$CORES > make.out 2>&1
 
 echo "\tRunning make check..."
-make -j $CORES check > make_check.out >&2
+make --jobs=$CORES check > make_check.out
 cat make_check.out | tail -n 17
 
-make install DESTDIR="$WDIR/build/JAGS-$VERSION-$BLAD-$THREAD-$ARCH" > make_install.out >&2    
-
-exit 1
-
-
-./configure --prefix=$WDIR/lib/cppunit
-make clean
-make -j $CORES
-make install DESTDIR="$WDIR/tmp/cppunit-aarch64"
-
-echo "\n** Compiling cppunit-x86_64 **\n"
-./configure \
-  --host=x86_64-apple-darwin \
-  --build=aarch64-apple-darwin \
-  --prefix=$WDIR/lib/cppunit \
-  CC="clang -arch x86_64" \
-  CXX="clang++ -arch x86_64"
-make clean
-make -j $CORES
-make install DESTDIR="$WDIR/tmp/cppunit-x86_64"
-
-echo "\n** Installing bi-arch cppunit to $WDIR/lib/cppunit **\n"
-
-cd $WDIR/tmp
-cp -r cppunit-aarch64 cppunit-universal
-IDIR="$WDIR/lib/cppunit"
-for ff in "/lib/libcppunit-$VERSION.dylib" "/lib/libcppunit.dylib" "/lib/libcppunit.a"; do
-  echo $ff
-  lipo "$WDIR/tmp/cppunit-universal/$IDIR/$ff" "$WDIR/tmp/cppunit-x86_64/$IDIR/$ff" -create -output "$WDIR/tmp/cppunit-universal/$IDIR/$ff"
-done
-
-cd cppunit-universal
-tar zcf "../cppunit-universal-$VERSION.tar.gz" .
-cd ../
-tar -xvf cppunit-universal-$VERSION.tar.gz -C /
+# Create correct directory structure:
+make install DESTDIR="$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH" > make_install.out
+mv "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSMAJ.x-current" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH"
+touch "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/.stamp"
 
 exit $EX_OK
-
-# For possible installation to /opt
-#cd universal
-#ln -s $IDIR opt/cppunit/current
-#mkdir -p usr/local/lib/pkgconfig
-#ln -s /opt/cppunit/current/lib/pkgconfig/cppunit.pc usr/local/lib/pkgconfig/cppunit.pc
-#tar zcf "../cppunit-universal-1.15.1.tar.gz" opt usr
-#cd ../
-#sudo tar -xvf cppunit-universal-1.15.1.tar.gz -C /
