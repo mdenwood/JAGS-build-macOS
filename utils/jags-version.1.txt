@@ -1,0 +1,19 @@
+.\" The line above is a comment.
+.TH jags-version 1 "April 26, 2026" "Version 1.0" "JAGS tools for macOS"
+.SH NAME
+yourcommand \- a brief one-line description
+.SH SYNOPSIS
+.B yourcommand
+.RI [ options ] " file"
+.SH DESCRIPTION
+.B yourcommand
+does something useful. This is the detailed description.
+.SH OPTIONS
+.TP
+.B \-h, \-\-help
+Show help message.
+.TP
+.B \-v, \-\-verbose
+Verbose output.
+.SH AUTHOR
+Written by Your Name.
