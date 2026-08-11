@@ -2,4 +2,7 @@
 sources/*
 tmp/*
 lib/*
-build/*
+tools/*
+tgz/*
+sign/*
+pkg/*

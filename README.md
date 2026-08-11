@@ -7,6 +7,22 @@ Most users will simply want to download one of the pre-built installers from sou
 Note that the scripts are NOT intended to be portable between platforms:  a recent build of macOS on an arm64/aarch64 machine is assumed.
 
 
+## Makefile
+
+TODO
+
+
+## Directory structure
+
+The "utils" folder contains the canonical versions of the macOS JAGS utilities (jags-version and jags-uninstall) as well as their man pages.
+
+The "build" folder contains files required to build the official macOS installers for JAGS
+
+The "scripts" folder contains zsh scripts that perform the steps necessary from downloading a JAGS source tarball through compilation and (if desired) to producing a .pkg installer.  This includes downloading, compiling and (locally) installing the required tools pkg-config, cppunit and Netlib's BLAS/LAPACK.  These are intended to be run by GNU make (see above for a description of the make targets).
+
+Additional folders will be created by make as needed.
+
+
 ## Pre-requisites
 
 Expand the MacOSX11.3 SDK into /Library/Developer/CommandLineTools/SDKs/ and then run:
@@ -51,7 +67,7 @@ These installation scripts are designed for JAGS to use a versioned installation
         │   ├── ...
         │   ├── 5.x-current
         │   └── current
-        └── utilities/
+        └── utils/
             ├── 1.0.0
             ├── ...
             └── current

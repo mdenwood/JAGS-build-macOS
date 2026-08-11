@@ -7,27 +7,34 @@ PKGCONVERS = 0.29.2
 ## Extract JAGS major version from full version
 VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
 
-
+## Save all intermediate targets even when not mentioned explicitly:
+.SECONDARY:
+	
 ## Complete build
 .PHONY: all
 # all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
 # all: build/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg
 # all: tmp/JAGS-$(JAGSVERSION)-vecLib-single-universal/.stamp
-all: build/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg
+all: pkg/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg
+
 
 ## Create folders
 
 .PHONY: mkdirs
-mkdirs: sources tmp lib build
+mkdirs: | sources tmp lib tgz sign pkg
 
-sources:
+sources:					# For downloading source files
 	mkdir sources
-tmp:
+tmp:							# Temp directory for compilation
 	mkdir tmp
-lib:
+lib:							# For built tools (TODO: change name to tools)
 	mkdir lib
-build:
-	mkdir build
+tgz:							# For (potentially lipo'd) unsigned tarballs
+	mkdir tgz
+sign:						  # Temp directory for signing and verifying dependencies
+	mkdir sign
+pkg:							# For finished installers
+	mkdir pkg
 
 
 ## Download source files
@@ -47,16 +54,16 @@ download-cppunit: sources sources/cppunit-$(CPPUNITVERS).tar.gz
 .PHONY: download-pkgconfig
 download-pkgconfig: sources sources/pkg-config-$(PKGCONVERS).tar.gz
 
-sources/JAGS-$(JAGSVERSION).tar.gz: 
+sources/JAGS-$(JAGSVERSION).tar.gz: | sources
 	curl -OL --output-dir sources https://sourceforge.net/projects/mcmc-jags/files/JAGS/$(VERSMAJ).x/Source/JAGS-$(JAGSVERSION).tar.gz
 	
-sources/v$(LAPACKVERS).tar.gz:
+sources/v$(LAPACKVERS).tar.gz: | sources
 	curl -OL --output-dir sources https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.12.1.tar.gz
 	
-sources/cppunit-$(CPPUNITVERS).tar.gz: 
+sources/cppunit-$(CPPUNITVERS).tar.gz: | sources
 	curl -OL --output-dir sources http://dev-www.libreoffice.org/src/cppunit-$(CPPUNITVERS).tar.gz
 
-sources/pkg-config-$(PKGCONVERS).tar.gz: 
+sources/pkg-config-$(PKGCONVERS).tar.gz: | sources
 	curl -OL --output-dir sources https://pkg-config.freedesktop.org/releases/pkg-config-$(PKGCONVERS).tar.gz
 	
 
@@ -67,47 +74,60 @@ sources/pkg-config-$(PKGCONVERS).tar.gz:
 .PHONY: tools
 tools: lib/pkg-config/.stamp lib/cppunit/.stamp lib/lapack/.stamp
 
-lib/pkg-config/.stamp: sources/pkg-config-$(PKGCONVERS).tar.gz
+lib/pkg-config/.stamp: sources/pkg-config-$(PKGCONVERS).tar.gz | lib
 	./scripts/pkgconfig.sh $(PKGCONVERS)
 
-lib/cppunit/.stamp: sources/cppunit-$(CPPUNITVERS).tar.gz
+lib/cppunit/.stamp: sources/cppunit-$(CPPUNITVERS).tar.gz | lib
 	./scripts/cppunit.sh $(CPPUNITVERS)
 
-lib/lapack/.stamp: sources/v$(LAPACKVERS).tar.gz
+lib/lapack/.stamp: sources/v$(LAPACKVERS).tar.gz | lib
 	./scripts/lapack.sh $(LAPACKVERS)
 
 
-## Compile JAGS
+## Compile JAGS:  TODO: use % and $* like for tgz (jags-compile will need to take two argumets only and split the BLAS-THREAD-ARCH
+												# although then I can't have LAPACK as a conditional dep ... but I can have a refBLAS (and/or openmp) specific rule that will match the shortest stem
 
-tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
+tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
 	./scripts/jags-compile.sh $(JAGSVERSION) vecLib gcd aarch64
 
-tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
+tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
 	./scripts/jags-compile.sh $(JAGSVERSION) vecLib gcd x86_64
 
-tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
+tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
 	./scripts/jags-compile.sh $(JAGSVERSION) vecLib single aarch64
 
-tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
+tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz
 	./scripts/jags-compile.sh $(JAGSVERSION) vecLib single x86_64
 
-tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz sources/v$(LAPACKVERS).tar.gz
+tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz sources/v$(LAPACKVERS).tar.gz
 	./scripts/jags-compile.sh $(JAGSVERSION) refBLAS single aarch64
 
-tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp: sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz sources/v$(LAPACKVERS).tar.gz
+tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz sources/v$(LAPACKVERS).tar.gz
 	./scripts/jags-compile.sh $(JAGSVERSION) refBLAS single x86_64
 
 
-## Lipo JAGS
+## Lipo JAGS:  TODO: use % and $* like for tgz (jags-lipo will need to take two argumets only)
 
-tmp/JAGS-$(JAGSVERSION)-refBLAS-single-universal/.stamp: tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
+tmp/JAGS-$(JAGSVERSION)-refBLAS-single-universal/.stamp: scripts/jags-lipo.sh tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
 	./scripts/jags-lipo.sh $(JAGSVERSION) refBLAS single
 
-tmp/JAGS-$(JAGSVERSION)-vecLib-single-universal/.stamp: tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp
+tmp/JAGS-$(JAGSVERSION)-vecLib-single-universal/.stamp: scripts/jags-lipo.sh tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp
 	./scripts/jags-lipo.sh $(JAGSVERSION) vecLib single
 
-tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-universal/.stamp: tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp
+tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-universal/.stamp: scripts/jags-lipo.sh tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp
 	./scripts/jags-lipo.sh $(JAGSVERSION) vecLib gcd
+
+
+## Make tgz files
+
+tgz/JAGS-%.tgz: tmp/JAGS-%/.stamp | tgz
+	tar -zcf tgz/JAGS-$*.tgz -C tmp/JAGS-$* opt
+
+
+## Sign, make dependency manifest and create pkg
+
+pkg/JAGS-%.pkg: scripts/jags-package.sh tgz/JAGS-%.tgz | sign pkg
+	./scripts/jags-package.sh $*
 
 
 ## Create JAGS installers

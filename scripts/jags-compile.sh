@@ -97,14 +97,15 @@ if [[ $VERSMAJ -eq 4 ]]; then
   fi
 fi
 
-# Detect if this is an official build:
+# Detect if this is an official build by finding my specific Developer ID Application string:
 VBSTRING="$VERSION ($BLAS-$THREAD-$ARCH build)"
 set +e  # Temporarily disable stop-on-error
-DEVELOPER_EMAIL=$(security find-generic-password -s "com.apple.gke.notary.tool" -a "JAGS_PROFILE" 2>/dev/null | grep '"acct"' | cut -d'"' -f4)
+DEVELOPER_IDENTITY=$(security find-identity -v -p codesigning | grep "Developer ID Application" | grep -m 1 -oE '"[^"]+"' | tr -d '"')
 set -e
-if [ -z "$DEVELOPER_EMAIL" ]; then
-  if [[ $($DEVELOPER_EMAIL | shasum -a 256 | awk '{print $1}') == "7da19dd0e2664a65c66298ef8c37965baee4deecf01745743b9e13c082b860b3" ]]; then
+if [ ! -z "$DEVELOPER_IDENTITY" ]; then
+  if [[ $(echo "$DEVELOPER_IDENTITY" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
     VBSTRING="$VERSION (official $BLAS-$THREAD-$ARCH binary)"
+    echo "\n\n *** Note: building official macOS binaries *** \n\n"
   fi
 fi
 
@@ -121,6 +122,7 @@ if ! [ -f sources/JAGS-$VERSION.tar.gz ]; then
 fi
 
 rm -rf "tmp/JAGS-$VERSION"
+rm -rf "tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH"
 tar -xmf "sources/JAGS-$VERSION.tar.gz" -C "tmp"
 cd "tmp/JAGS-$VERSION"
 
