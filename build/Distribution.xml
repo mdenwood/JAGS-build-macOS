@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+
+    <title>My Enterprise Application</title>
+    <organization>com.example</organization>
+
+    <background file="background.png"
+                mime-type="image/png"
+                alignment="center"
+                scaling="proportional"/>
+
+    <welcome file="welcome.html"/>
+    <license file="license.rtf"/>
+    <conclusion file="conclusion.html"/>
+
+    <domains
+        enable_anywhere="false"
+        enable_currentUserHome="false"
+        enable_localSystem="true"/>
+
+    <options
+        customize="always"
+        require-scripts="true"
+        hostArchitectures="arm64,x86_64"/>
+
+    <!-- Custom install validation -->
+    <installation-check script="checkSystem();"/>
+
+    <script>
+    <![CDATA[
+        function checkSystem() {
+
+            if (system.version.ProductVersion < '13.0') {
+                my.result.type = 'Fatal';
+                my.result.message =
+                    'macOS Ventura or later is required.';
+                return false;
+            }
+
+            var freeGB =
+                system.filesystem.availableSpace('/') /
+                (1024 * 1024 * 1024);
+
+            if (freeGB < 5) {
+                my.result.type = 'Fatal';
+                my.result.message =
+                    'At least 5GB of free disk space is required.';
+                return false;
+            }
+
+            return true;
+        }
+    ]]>
+    </script>
+
+    <choices-outline>
+        <line choice="app"/>
+        <line choice="helper"/>
+        <line choice="agent"/>
+    </choices-outline>
+
+    <choice
+        id="app"
+        title="Main Application"
+        description="Installs the primary application."
+        start_selected="true">
+        <pkg-ref id="com.example.myapp"/>
+    </choice>
+
+    <choice
+        id="helper"
+        title="Helper Tools"
+        description="Administrative helper binaries."
+        start_selected="true">
+        <pkg-ref id="com.example.helper"/>
+    </choice>
+
+    <choice
+        id="agent"
+        title="Launch Agent"
+        description="Automatically starts application services."
+        start_selected="true">
+        <pkg-ref id="com.example.agent"/>
+    </choice>
+
+    <pkg-ref
+        id="com.example.myapp"
+        version="2.0.0"
+        auth="Root">
+        packages/MyApp.pkg
+    </pkg-ref>
+
+    <pkg-ref
+        id="com.example.helper"
+        version="2.0.0"
+        auth="Root">
+        packages/HelperTools.pkg
+    </pkg-ref>
+
+    <pkg-ref
+        id="com.example.agent"
+        version="2.0.0"
+        auth="Root">
+        packages/LaunchAgent.pkg
+    </pkg-ref>
+
+</installer-gui-script>
