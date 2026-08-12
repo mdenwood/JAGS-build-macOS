@@ -38,31 +38,30 @@ if [[ $(echo "$DEVELOPER_INSTALLER" | shasum -a 256 | awk '{print $1}') == "bcf8
 fi
 
 # Create temporary folder and move postinstall script in
-mkdir -p "sign/transition/scripts"
-cp "build/postinstall-transition-$VERSION.sh" "sign/transition/scripts/postinstall"
-chmod +x "sign/transition/scripts/postinstall"
+mkdir -p "sign/transition"
+cp "build/postinstall-utils-$VERSION.sh" "sign/transition/postinstall"
+chmod +x "sign/transition/postinstall"
+
+exit 1
 
 # Package:
 pkgbuild --identifier "$PKG_IDENTIFIER" \
          --version "$VERSION" \
-         --scripts "sign/transition/scripts" \
+         --scripts "sign/transition" \
          --nopayload \
            "sign/transition-$VERSION.pkg"
 
 # Sign and notarise standalone version:
-rm -rf "sign/pkg"
-mkdir -p "sign/pkg"
-productsign --sign "$DEVELOPER_INSTALLER" "sign/transition-$VERSION.pkg" "sign/pkg/transition-$VERSION.pkg"
-cd "sign/pkg"
+productsign --sign "$DEVELOPER_INSTALLER" "sign/transition-$VERSION.pkg" "pkg/transition-$VERSION.pkg"
+cd "pkg"
 pkgutil --check-signature "transition-$VERSION.pkg"
 xcrun notarytool submit "transition-$VERSION.pkg" --keychain-profile "$PKG_KEYCHAIN" --wait
 xcrun stapler staple "transition-$VERSION.pkg"
 
 # Verify:
 xcrun stapler validate "transition-$VERSION.pkg"
-spctl -a -vv -t install "transition-$VERSION.pkg"
-
-# Move to pkg directory once verification is complete:
-mv "transition-$VERSION.pkg" "$WDIR/pkg/transition-$VERSION.pkg"
+# No code objects so not relevant:
+#codesign --verify -vvvv "transition-$VERSION.pkg"
+#spctl -vvv --assess --type exec "transition-$VERSION.pkg"
 
 exit $EX_OK

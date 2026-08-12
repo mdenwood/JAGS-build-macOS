@@ -31,16 +31,22 @@ tar -xf "tgz/JAGS-$BUILD.tgz" -C "sign/JAGS-$BUILD"
 
 ## Extract developer identity:
 set +e  # Temporarily disable stop-on-error
-DEVELOPER_IDENTITY=$(security find-identity -v -p codesigning | grep "Developer ID Application" | grep -m 1 -oE '"[^"]+"' | tr -d '"')
+DEVELOPER_APPLICATION=$(security find-identity -v -p codesigning | grep "Developer ID Application" | grep -m 1 -oE '"[^"]+"' | tr -d '"')
+DEVELOPER_INSTALLER=$(security find-identity -v | grep "Developer ID Installer" | grep -m 1 -oE '"[^"]+"' | tr -d '"')
 set -e
-if [ -z "$DEVELOPER_IDENTITY" ]; then
+if [ -z "$DEVELOPER_APPLICATION" ]; then
   echo "Unable to find a Developer ID Application signing certificate in your Keychain" 1>&2
+  exit $EX_CONFIG
+fi
+if [ -z "$DEVELOPER_INSTALLER" ]; then
+  echo "Unable to find a Developer ID Installer signing certificate in your Keychain" 1>&2
   exit $EX_CONFIG
 fi
 
 ## Ensure the text string is "official" if needed:
-if [[ $(echo "$DEVELOPER_IDENTITY" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
+if [[ $(echo "$DEVELOPER_APPLICATION" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
   PKG_IDENTIFIER="com.matthewdenwood.jags"
+  PKG_KEYCHAIN="Developer ID: Matthew Denwood"
   if grep "official" "sign/JAGS-$BUILD/opt/jags/versions/jags/$BUILD/lib/pkgconfig/jags.pc"; then
     echo "Signing official JAGS binary"
   else
@@ -68,7 +74,7 @@ for dd in $(find "opt" -type d -print); do
         otool -L "$dd/$ff" >> "$BINDEPFILE"
         lipo -archs "$dd/$ff" >> "$BINDEPFILE"
         otool -l "$dd/$ff" | grep -E -A4 '(LC_VERSION_MIN_MACOSX|LC_BUILD_VERSION)' | grep -B1 sdk >> "$BINDEPFILE"
-        echo "     -> Signed by $DEVELOPER_IDENTITY \n\n" >> "$BINDEPFILE"      
+        echo "     -> Signed by $DEVELOPER_APPLICATION \n\n" >> "$BINDEPFILE"      
         sign=1
       fi
     fi
@@ -83,18 +89,43 @@ for dd in $(find "opt" -type d -print); do
     # Then sign:
     if [[ $sign -eq 1 ]]; then
       echo "Signing: $dd/$ff"
-      xcrun codesign --force --timestamp --options runtime --sign "$DEVELOPER_IDENTITY" "$dd/$ff"
+      xcrun codesign --force --timestamp --options runtime --sign "$DEVELOPER_APPLICATION" "$dd/$ff"
     fi    
   done
 done
 
 cd "$WDIR"
 
+# Copy in the post-installation script:
+mkdir -p "sign/JAGS-$BUILD/scripts"
+cp "build/postinstall-jags.sh" "sign/JAGS-$BUILD/scripts/postinstall"
+sed -i '' "s/__BUILD__/${BUILD}/g" "sign/JAGS-$BUILD/scripts/postinstall"
+chmod +x "sign/JAGS-$BUILD/scripts/postinstall"
+cp "utils/jags-version.sh" "sign/JAGS-$BUILD/scripts/jags-version"
+chmod +x "sign/JAGS-$BUILD/scripts/jags-version"
+
 ## Then create pkg file:
 pkgbuild --root "sign/JAGS-$BUILD/opt/" \
          --identifier "$PKG_IDENTIFIER" \
          --version "$BUILD" \
          --install-location "/opt/" \
-         "pkg/JAGS-$BUILD.pkg"
+         --scripts "sign/JAGS-$BUILD/scripts" \
+         "sign/JAGS-$BUILD.pkg"
+
+# Sign and notarise standalone version:
+rm -rf "sign/pkg"
+mkdir -p "sign/pkg"
+productsign --sign "$DEVELOPER_INSTALLER" "sign/JAGS-$BUILD.pkg" "sign/pkg/JAGS-$BUILD.pkg"
+cd "sign/pkg"
+pkgutil --check-signature "JAGS-$BUILD.pkg"
+xcrun notarytool submit "JAGS-$BUILD.pkg" --keychain-profile "$PKG_KEYCHAIN" --wait
+xcrun stapler staple "JAGS-$BUILD.pkg"
+
+# Verify:
+xcrun stapler validate "JAGS-$BUILD.pkg"
+spctl -a -vv -t install "JAGS-$BUILD.pkg"
+
+# Move to pkg directory once verification is complete:
+mv "JAGS-$BUILD.pkg" "$WDIR/pkg/JAGS-$BUILD.pkg"
 
 exit $EX_OK

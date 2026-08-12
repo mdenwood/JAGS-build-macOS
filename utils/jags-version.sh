@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-# Utility shell script to switch the active JAGS installation
+# Utility shell script to switch the active JAGS version
 # For help/options run jags-version --help
 
 # Arguments
@@ -72,7 +72,7 @@ if [[ $help -eq 1 ]]; then
 	}
 
 	printf "
-`embold "jags-version -- part of JAGS for macOS utilities version 1.0"`
+`embold "jags-version -- part of JAGS for macOS utilities version __VERSION__"`
 by Matt Denwood
 
 `embold SYNOPSIS`
@@ -113,6 +113,13 @@ of JAGS (https://mcmc-jags.sourceforge.io).
 
 	exit $EX_OK
 fi
+
+
+# Temporary:
+echo $target
+mkdir "/opt/jags/versions/current-$target"
+
+exit 0
 
 
 # Check for legacy/custom JAGS installations and warn:

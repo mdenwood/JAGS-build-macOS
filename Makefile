@@ -16,7 +16,7 @@ VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
 # all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
 # all: build/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg
 # all: tmp/JAGS-$(JAGSVERSION)-vecLib-single-universal/.stamp
-all: sign/transition-$(UTILSVERSION).pkg pkg/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg
+all: sign/transition-$(UTILSVERSION).pkg sign/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg
 
 
 ## Create folders
@@ -127,8 +127,8 @@ tgz/JAGS-%.tgz: tmp/JAGS-%/.stamp | tgz
 
 ## Sign, make dependency manifest and create pkg
 
-pkg/JAGS-%.pkg: scripts/jags-package.sh tgz/JAGS-%.tgz | sign pkg
-	./scripts/jags-package.sh $*
+sign/JAGS-%.pkg: scripts/package-jags.sh tgz/JAGS-%.tgz | sign pkg
+	./scripts/package-jags.sh $*
 
 
 ## Create transition pkg
@@ -139,8 +139,3 @@ sign/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postins
 
 ## Create JAGS installers
 
-build/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg: tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp
-	./scripts/jags-package.sh $(JAGSVERSION) vecLib gcd aarch64
-
-build/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg: tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp
-	./scripts/jags-package.sh $(JAGSVERSION) vecLib gcd universal

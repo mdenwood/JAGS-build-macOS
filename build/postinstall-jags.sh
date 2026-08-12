@@ -14,5 +14,8 @@ if [ $(id -u) -ne 0 ]; then
     exit $EX_USAGE
 fi
 
+# Run jags-version:
+./jags-version __BUILD__
+
 exit $EX_OK
 

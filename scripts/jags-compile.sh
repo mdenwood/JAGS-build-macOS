@@ -100,10 +100,10 @@ fi
 # Detect if this is an official build by finding my specific Developer ID Application string:
 VBSTRING="$VERSION ($BLAS-$THREAD-$ARCH build)"
 set +e  # Temporarily disable stop-on-error
-DEVELOPER_IDENTITY=$(security find-identity -v -p codesigning | grep "Developer ID Application" | grep -m 1 -oE '"[^"]+"' | tr -d '"')
+DEVELOPER_APPLICATION=$(security find-identity -v -p codesigning | grep "Developer ID Application" | grep -m 1 -oE '"[^"]+"' | tr -d '"')
 set -e
-if [ ! -z "$DEVELOPER_IDENTITY" ]; then
-  if [[ $(echo "$DEVELOPER_IDENTITY" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
+if [ ! -z "$DEVELOPER_APPLICATION" ]; then
+  if [[ $(echo "$DEVELOPER_APPLICATION" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
     VBSTRING="$VERSION (official $BLAS-$THREAD-$ARCH binary)"
     echo "\n\n *** Note: building official macOS binaries *** \n\n"
   fi
@@ -194,7 +194,11 @@ make --jobs=$CORES > make.out 2>&1
 
 echo "\tRunning make check..."
 make --jobs=$CORES check > make_check.out
-cat make_check.out | tail -n 17
+cat "make_check.out" | tail -n 17
+if ! grep -q "PASS:  4" "make_check.out"; then
+    echo "It seems that make check failed ('PASS:  4' not found)"  1>&2 
+    exit $EX_SOFTWARE
+fi
 
 # Create correct directory structure:
 make install DESTDIR="$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH" > make_install.out
