@@ -52,8 +52,7 @@ rm -rf /usr/local/share/man/man1/jags-switch.1
 rm -rf /usr/local/share/man/man1/jags-version.1 
 
 # Remove JAGS 5 beta files/symlinks
-setopt extended_glob glob_dots        # Enable extended globbing (provides the '^' negation operator) and glob_dots (includes hidden/dot files in the match)
-rm -rf -- ^"/opt/jags/versions"(D)    # Delete all files (including hidden files) except /opt/jags/versions
+find "/opt/jags" -mindepth 1 -maxdepth 1 ! -name "versions" -exec rm -rf {} +
 
 # Create symlinks under /opt/jags
 mkdir -p "/opt/jags/bin"

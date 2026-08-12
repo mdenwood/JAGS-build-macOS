@@ -1,8 +1,9 @@
 ## Versions of JAGS, CPPUNIT and LAPACK to use
 JAGSVERSION := 5.0.0
-CPPUNITVERS = 1.15.1
-LAPACKVERS = 3.12.1
-PKGCONVERS = 0.29.2
+UTILSVERSION := 1.0.0
+CPPUNITVERS := 1.15.1
+LAPACKVERS := 3.12.1
+PKGCONVERS := 0.29.2
 
 ## Extract JAGS major version from full version
 VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
@@ -15,7 +16,7 @@ VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
 # all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
 # all: build/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg
 # all: tmp/JAGS-$(JAGSVERSION)-vecLib-single-universal/.stamp
-all: pkg/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg
+all: sign/transition-$(UTILSVERSION).pkg pkg/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg
 
 
 ## Create folders
@@ -128,6 +129,12 @@ tgz/JAGS-%.tgz: tmp/JAGS-%/.stamp | tgz
 
 pkg/JAGS-%.pkg: scripts/jags-package.sh tgz/JAGS-%.tgz | sign pkg
 	./scripts/jags-package.sh $*
+
+
+## Create transition pkg
+
+sign/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postinstall-transition-$(UTILSVERSION).sh | sign pkg
+	./scripts/package-transition.sh $(UTILSVERSION)
 
 
 ## Create JAGS installers

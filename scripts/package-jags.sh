@@ -1,9 +1,7 @@
 #!/bin/zsh
 
 # Set only if not already set:
-: ${XCRUN_SIGN="Developer ID Application: Matthew Denwood"}
-: ${PDBUILD_SIGN="Developer ID Installer: Matthew Denwood"}
-: ${KEYCHAIN_PROFILE="Developer ID: Matthew Denwood"}
+: ${PKG_IDENTIFIER="unknown"}
 
 # Abort on error, use of unset variable, or error within pipe:
 set -euo pipefail
@@ -42,6 +40,7 @@ fi
 
 ## Ensure the text string is "official" if needed:
 if [[ $(echo "$DEVELOPER_IDENTITY" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
+  PKG_IDENTIFIER="com.matthewdenwood.jags"
   if grep "official" "sign/JAGS-$BUILD/opt/jags/versions/jags/$BUILD/lib/pkgconfig/jags.pc"; then
     echo "Signing official JAGS binary"
   else
@@ -93,7 +92,7 @@ cd "$WDIR"
 
 ## Then create pkg file:
 pkgbuild --root "sign/JAGS-$BUILD/opt/" \
-         --identifier "com.matthewdenwood.jags" \
+         --identifier "$PKG_IDENTIFIER" \
          --version "$BUILD" \
          --install-location "/opt/" \
          "pkg/JAGS-$BUILD.pkg"
