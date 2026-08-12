@@ -190,10 +190,12 @@ if [[ $jags_sym -eq 1 ]]; then
   sudo rm -rf "/usr/local/bin/jags"
   sudo rm -rf "/usr/local/bin/jags-uninstall"
   sudo rm -rf "/usr/local/bin/jags-switch"
+  sudo rm -rf "/usr/local/bin/jags-version"
   sudo rm -rf "/usr/local/lib/pkgconfig/jags.pc"
   sudo rm -rf "/usr/local/share/man/man1/jags.1"  
   sudo rm -rf "/usr/local/share/man/man1/jags-uninstall.1"  
   sudo rm -rf "/usr/local/share/man/man1/jags-switch.1"  
+  sudo rm -rf "/usr/local/share/man/man1/jags-version.1"  
 fi
 
 if [[ $jags_opt -eq 1 ]]; then

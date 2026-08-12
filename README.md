@@ -47,30 +47,45 @@ These installation scripts are designed for JAGS to use a versioned installation
 /opt/
 └── jags/
     ├── bin/
-    │   ├── jags
-    │   ├── jags-5
-    │   ├── jags-uninstall
-    │   └── jags-version
+    │   ├── jags                                # symlink to inside /opt/jags/versions/jags/currernt
+    │   ├── jags-4                              # symlink to inside /opt/jags/versions/utils/currernt
+    │   ├── jags-5                              # symlink to inside /opt/jags/versions/utils/currernt
+    │   ├── jags-uninstall                      # symlink to inside /opt/jags/versions/utils/currernt
+    │   └── jags-version                        # symlink to inside /opt/jags/versions/utils/currernt
     ├── lib
     │   └── pkgconfig
-    │       └── jags.pc
+    │       └── jags.pc                         # symlink to inside /opt/jags/versions/jags/currernt
     ├── share
     │   └── man
     │       └── man1
-    │           ├── jags-uninstall.1
-    │           ├── jags-version.1
-    │           └── jags.1
+    │           ├── jags-uninstall.1            # symlink to inside /opt/jags/versions/utils/currernt
+    │           ├── jags-version.1              # symlink to inside /opt/jags/versions/utils/currernt
+    │           └── jags.1                      # symlink to inside /opt/jags/versions/jags/currernt
     │
     └── versions/
         ├── jags/
         │   ├── 5.0.0-vecLib-gcd-aarch64
         │   ├── ...
-        │   ├── 5.x-current
-        │   └── current
+        │   ├── 5.x-current                     # symlink (directory)
+        │   └── current                         # symlink (directory)
         └── utils/
             ├── 1.0.0
             ├── ...
-            └── current
+            └── current                         # symlink (directory)
 
 To fit within this structure, JAGS is configured with a prefix of /opt/jags/versions/jags/5.x-current (or 4.x-current, for JAGS 4.x), but the installed files are moved to an installation path under /opt/jags/versions/jags/VERSION-BLAS-THREAD-ARCH so that multiple installations can co-exist and be switched on/off using the jags-version utility.  Note that the tools required to build jags (pkg-config, cppunit and Netlib's LAPACK) are only installed within the self-contained repo directory (under lib).
 
+
+## Installers produced
+
+JAGS (and utils) builds are produced as:
+
+- Individual-build JAGS/utils .tgz files under the tgz directory - these are not signed, and do not require an Apple Developer account to build
+
+- Individual-build JAGS/utils .pkg files under the pkg directory - these are signed, and do require an Apple Developer account
+
+- A transition.pkg file under the pkg directory - this can be run to remove previous versions of JAGS 4.x from /usr/local and /opt/R/arm64/ and JAGS 5 beta from /opt/jags, and install symlinks to /opt/jags under /usr/local for backwards compatibility without needing to update the PATH environmental variable
+
+- A combined build JAGS-$VERSION.pkg file under the pkg directory - this is also signed, and contains the default individual pkg files (currently refBLAS-single-universal, vecLib-single-universal, vecLib-gcd-universal, utils and transition)
+
+The individual pkg installers each run a post-install script to ensure that the newly installed JAGS build is selected as the default.  These are also run when installing these via the combined pkg installer.  The post-install script for utils always activates the latest available version; to activate an earlier version you will first have to remove newer versions of utils from /opt/jags/versions/utils manually.
