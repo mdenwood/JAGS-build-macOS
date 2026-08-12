@@ -1,7 +1,12 @@
 #!/bin/zsh
 
+# SPDX-FileCopyrightText: 2026 Matthew Denwood (https://github.com/mdenwood/JAGS-build-macOS)
+# SPDX-License-Identifier: Apache-2.0
+
 # Utility shell script to switch the active JAGS version
 # For help/options run jags-version --help
+# This utility is (also) distributed as part of the macOS installers for JAGS (https://mcmc-jags.sourceforge.io)
+
 
 # Arguments
 help=0
@@ -76,18 +81,19 @@ if [[ $help -eq 1 ]]; then
 by Matt Denwood
 
 `embold SYNOPSIS`
-A zsh script that facilitates switching the active JAGS installation on
-macOS. The -l option lists the official JAGS builds that can be switched
-(i.e. version 5.x and above, as well as the version 4.3.2 binary included
-with the JAGS 5.0.0-beta installer). Otherwise, the build option causes
-the active JAGS to be switched to that build/version by modifying symlinks
-provided at /opt/jags/current and /opt/jags/current-XX (where XX is the
-major version of JAGS). This should allow hot-switching of JAGS releases
+A zsh script that facilitates changing the active JAGS build/version on
+macOS. The -l option lists the JAGS builds/versions that can be switched.
+Otherwise, providing a single argument causes the active JAGS installation
+to be changed to the build/version provided by modifying the symlinks
+provided at /opt/jags/versions/jags/current and current-XX (where XX is the
+major version of JAGS). This should allow hot-switching of most JAGS builds
 with the same major version (i.e. minor updates and/or versions with 
 different BLAS linkage) without re-installing rjags. Note that switching
 the active JAGS installation between major versions should leave rjags
 functional with linkage to the previous major version: changing the major
 JAGS version for rjags requires re-installation of the rjags package.
+In some cases (such as switching to/from a OpenMP build of JAGS),
+re-compilation of rjags will be needed after changing the active JAGS build.
 
 `embold USAGE`
 `embold jags-version` `embold -l`
@@ -106,20 +112,13 @@ The following arguments are available:
 
 `embold NOTES`
 This script is distributed 'as is', both FREELY and WITHOUT CHARGE, under the 
-GNU general public license version 2.0, as part of the macOS official binaries
-of JAGS (https://mcmc-jags.sourceforge.io).
+Apache License version 2.0, via https://github.com/mdenwood/JAGS-build-macOS
+and the macOS official binaries of JAGS (https://mcmc-jags.sourceforge.io).
 
 "
 
 	exit $EX_OK
 fi
-
-
-# Temporary:
-echo $target
-mkdir "/opt/jags/versions/current-$target"
-
-exit 0
 
 
 # Check for legacy/custom JAGS installations and warn:
@@ -142,13 +141,13 @@ fi
 #fi
 
 # Check for an official JAGS version folder:
-if [[ ! -d "/opt/jags/" ]]; then
-  echo "Error: no installation under /opt/jags detected!\nPlease re-install JAGS using the official macOS installer." 1>&2
+if [[ ! -d "/opt/jags/versions/jags" ]]; then
+  echo "Error: no installation under /opt/jags/versions/jags detected!\nPlease re-install JAGS using an official macOS installer." 1>&2
   exit $EX_USAGE
 fi
 
 # Display avaialble JAGS builds:
-current=$(readlink /opt/jags/bin/jags)
+current=$(readlink /opt/jags/versions/jags/current)
 if [[ $list -eq 1 ]]; then
   if [[ $interactive -eq 1 ]]; then
     echo "Select one of the following JAGS builds:"
@@ -157,22 +156,22 @@ if [[ $list -eq 1 ]]; then
   else
     echo "The following JAGS builds are available:"
   fi
-  for ff in $(ls /opt/jags); do
-    if test ! -L "/opt/jags/$ff"; then
-      if [[ -f "/opt/jags/$ff/include/JAGS/version.h" ]]; then
+  for ff in $(ls /opt/jags/versions/jags); do
+    if test ! -L "/opt/jags/versions/jags/$ff"; then
+      if [[ -f "/opt/jags/versions/jags/$ff/include/JAGS/version.h" ]]; then
         
-        majvers=$(cat "/opt/jags/$ff/include/JAGS/version.h" | grep "JAGS_MAJOR" | cut -d " " -f 3)
+        majvers=$(cat "/opt/jags/versions/jags/$ff/include/JAGS/version.h" | grep "JAGS_MAJOR" | cut -d " " -f 3)
         invalid=0
         case $majvers in
             <0->) ;;
             *) invalid=1 ;;
         esac
         if [[ $invalid -eq 1 ]]; then
-          echo "Error: Invalid JAGS version in /opt/jags/$ff/include/JAGS/version.h" 1>&2
+          echo "Error: Invalid JAGS version in /opt/jags/versions/jags/$ff/include/JAGS/version.h" 1>&2
           exit $EX_USAGE
         fi
         
-        currentv=$(readlink /opt/jags/$majvers.x-current)
+        currentv=$(readlink /opt/jags/versions/jags/$majvers.x-current)
         printf "\t"
         if [[ $interactive -eq 1 ]]; then
           versions+=($ff)
@@ -180,9 +179,9 @@ if [[ $list -eq 1 ]]; then
           index=$((index+1))
         fi
         printf "$ff"
-        if [[ "$(readlink -- /opt/jags/bin/jags)" == "/opt/jags/$ff/bin/jags" ]] && [[ "/opt/jags/$ff" == "$currentv" ]]; then
+        if [[ "$(readlink -- /opt/jags/versions/jags/current)" == "/opt/jags/versions/jags/$ff" ]] && [[ "$currentv" == "/opt/jags/versions/jags/$ff" ]]; then
           printf " ($majvers.x-current & default)"
-        elif [[ "/opt/jags/$ff" == "$currentv" ]]; then
+        elif [[ "$currentv" == "/opt/jags/versions/jags/$ff" ]]; then
           printf " ($majvers.x-current)"
         fi
         printf "\n"
@@ -212,36 +211,38 @@ if [[ $list -eq 1 ]]; then
 fi
 
 # Check to see if the required JAGS is there (target can be blank):
-if [[ ! -d "/opt/jags/$target" ]]; then
-  echo "Error: no JAGS build at /opt/jags/$target detected!\nUse jags-version -l to display available builds." 1>&2
+if [[ ! -d "/opt/jags/versions/jags/$target" ]]; then
+  echo "Error: no JAGS build at /opt/jags/versions/jags/$target detected!\nUse jags-version -l to display available builds." 1>&2
   exit $EX_USAGE  
 fi
 
-# TODO:
-# If option -c is given then use sudo chown -vh to change ownership on the symlinks below to the current user so they can be modified without sudo in future
-# Test permissions BUT this is for the file the symlink points to, i.e. useless:
-if test -L -a -w "/opt/jags/bin/jags"; then;
-  echo "writeable"
-else
-  echo "not writeable"
+# Test we are either running as root or sudo:
+if [ $(id -u) -ne 0 ]; then
+    echo "Error: jags-version must be run using sudo (or as root) to switch the active JAGS build" >&2
+    echo "Usage: sudo $0 $@" >&2
+    exit $EX_USAGE
 fi
 
-# Need to harvest the owner from this?
-ls -lF "/opt/jags/bin/jags"
-ls -lF "/opt/jags/5.x-current"
-
-
-# Escalate permissions:
-sudo -v -p "Enter password to proceed with sudo: "
-
-# Switch:
+# Update active version:
+ln -Fs "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/current"
 majvers=$(echo $target | cut -d "." -f 1)
-sudo ln -Fs "/opt/jags/$target" "/opt/jags/$majvers.x-current"
-sudo ln -fs "/opt/jags/$target/bin/jags" "/opt/jags/bin/jags"
-sudo ln -Fs "/opt/jags/$target/include" "/opt/jags/include"
-sudo ln -Fs "/opt/jags/$target/lib" "/opt/jags/lib"
-sudo ln -Fs "/opt/jags/$target/libexec" "/opt/jags/libexec"
-sudo ln -fs "/opt/jags/$target/share/man/man1/jags.1" "/opt/jags/share/man/man1/jags.1"
+ln -Fs "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/$majvers.x-current"
+
+# Verify that the required symlinks are present:
+mkdir -p "/opt/jags/bin"
+mkdir -p "/opt/jags/lib/pkgconfig"
+mkdir -p "/opt/jags/share/man/man1"
+for ff ("bin/jags" "lib/pkgconfig/jags.pc" "share/man/man1/jags.1"); do
+    if [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/jags/current/$ff" ]]; then
+      ln -fs "/opt/jags/versions/jags/current/$ff" "/opt/jags/$ff"
+    fi
+done
+for ff ("bin/jags-4" "bin/jags-5" "bin/jags-uninstall" "bin/jags-version" "share/man/man1/jags-uninstall" "share/man/man1/jags-version"); do
+    if [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/utils/current/$ff" ]]; then
+      echo $ff
+      ln -fs "/opt/jags/versions/utils/current/$ff" "/opt/jags/$ff"
+    fi
+done
 
 echo "$target is now $majvers.x-current & default"
 exit $EX_OK

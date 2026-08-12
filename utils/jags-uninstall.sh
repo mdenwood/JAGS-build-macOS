@@ -1,8 +1,11 @@
 #!/bin/zsh
 
+# SPDX-FileCopyrightText: 2026 Matthew Denwood (https://github.com/mdenwood/JAGS-build-macOS)
+# SPDX-License-Identifier: Apache-2.0
+
 # Utility shell script to remove all detected JAGS installations
 # For help/options run jags-uninstall --help
-# Matt Denwood, 2026-04-23
+# This utility is (also) distributed as part of the macOS installers for JAGS (https://mcmc-jags.sourceforge.io)
 
 # Arguments
 custom=0
@@ -82,7 +85,7 @@ if [[ $help -eq 1 ]]; then
 	}
 
 	printf "
-`embold "jags-uninstall -- part of JAGS for macOS utilities version 1.0"`
+`embold "jags-uninstall -- part of JAGS for macOS utilities version __VERSION__"`
 by Matt Denwood
 
 `embold SYNOPSIS`
@@ -93,11 +96,11 @@ as official (version >= 5.x) builds under /opt/jags. To fine-tune this
 behaviour see the available options below.
 
 `embold USAGE`
-`embold jags-uninstall` [`embold -c`] [`embold -o`] [`embold -s`] [`embold -d`]
-`embold jags-uninstall` `embold -h`
+`embold jags-uninstall` [`embold -h`] [`embold -c`] [`embold -o`] [`embold -s`] [`embold -d`]
 
 `embold OPTIONS`
 The following options are available:
+`embold -h`  Print this help message and exit.
 `embold -c`  Over-ride the default and remove only custom/legacy JAGS
     installations under /usr/local and/or /opt/R/arm64 (unless the -o flag 
     is also set).
@@ -108,12 +111,11 @@ The following options are available:
     that point to /opt/jags/current (unless the -o or -c flag is also set).
 `embold -d`  Perform a dry-run i.e. list the files/directories that would be
     removed but don't actually do anything.
-`embold -h`  Print this help message and exit.
 
 `embold NOTES`
 This script is distributed 'as is', both FREELY and WITHOUT CHARGE, under the 
-GNU general public license version 2.0, as part of the macOS official binaries
-of JAGS (https://mcmc-jags.sourceforge.io).
+Apache License version 2.0, via https://github.com/mdenwood/JAGS-build-macOS
+and the macOS official binaries of JAGS (https://mcmc-jags.sourceforge.io).
 
 "
 
@@ -164,14 +166,22 @@ if [[ $jags_optR -eq 1 ]]; then
   echo "\t- Legacy or custom JAGS installation under /opt/R/arm64/"
 fi
 if [[ $jags_opt -eq 1 ]]; then
-  for ff in `ls /opt/jags`; do
-    if test ! -L "/opt/jags/$ff"; then
-      if [[ ! "$ff" == "bin" ]] && [[ ! "$ff" == "share" ]]; then
+  if [ -d "/opt/jags/versions/jags" ]; then
+    for ff in `ls /opt/jags/versions/jags`; do
+      if test ! -L "/opt/jags/versions/jags/$ff"; then
         vers=$(echo $ff | cut -d "-" -f 1)
-        echo "\t- JAGS version $vers installation at /opt/jags/$ff/"
+        echo "\t- JAGS version $vers installation at /opt/jags/versions/jags/$ff/"
       fi
-    fi
-  done
+    done
+  fi
+  if [ -d "/opt/jags/versions/utils" ]; then
+    for ff in `ls /opt/jags/versions/utils`; do
+      if test ! -L "/opt/jags/versions/utils/$ff"; then
+        vers=$(echo $ff | cut -d "-" -f 1)
+        echo "\t- JAGS utilities version $vers installation at /opt/jags/versions/utils/$ff/"
+      fi
+    done
+  fi
   echo "\t- Symlinks and subdirectories at /opt/jags/"
 fi
 if [[ $jags_sym -eq 1 ]]; then
@@ -183,51 +193,55 @@ if [[ $dryrun -eq 1 ]]; then
   exit $EX_OK
 fi
 
-# Escalate permissions:
-sudo -v -p "Enter password to proceed with sudo: "
+# Test we are either running as root or sudo:
+if [ $(id -u) -ne 0 ]; then
+    echo "Error: jags-uninstall must be run using sudo (or as root)" >&2
+    echo "Usage: sudo $0 $@" >&2
+    exit $EX_USAGE
+fi
 
 if [[ $jags_sym -eq 1 ]]; then
-  sudo rm -rf "/usr/local/bin/jags"
-  sudo rm -rf "/usr/local/bin/jags-uninstall"
-  sudo rm -rf "/usr/local/bin/jags-switch"
-  sudo rm -rf "/usr/local/bin/jags-version"
-  sudo rm -rf "/usr/local/lib/pkgconfig/jags.pc"
-  sudo rm -rf "/usr/local/share/man/man1/jags.1"  
-  sudo rm -rf "/usr/local/share/man/man1/jags-uninstall.1"  
-  sudo rm -rf "/usr/local/share/man/man1/jags-switch.1"  
-  sudo rm -rf "/usr/local/share/man/man1/jags-version.1"  
+  rm -rf "/usr/local/bin/jags"
+  rm -rf "/usr/local/bin/jags-uninstall"
+  rm -rf "/usr/local/bin/jags-switch"
+  rm -rf "/usr/local/bin/jags-version"
+  rm -rf "/usr/local/lib/pkgconfig/jags.pc"
+  rm -rf "/usr/local/share/man/man1/jags.1"  
+  rm -rf "/usr/local/share/man/man1/jags-uninstall.1"  
+  rm -rf "/usr/local/share/man/man1/jags-switch.1"  
+  rm -rf "/usr/local/share/man/man1/jags-version.1"  
 fi
 
 if [[ $jags_opt -eq 1 ]]; then
-  sudo rm -rf "/opt/jags/"
+  rm -rf "/opt/jags/"
 fi
 
 if [[ $jags_optR -eq 1 ]]; then
-  sudo rm -rf /opt/R/arm64/bin/jags
-  sudo rm -rf /opt/R/arm64/bin/jags-uninstall
-  sudo rm -rf /opt/R/arm64/libexec/jags-terminal
-  sudo rm -rf /opt/R/arm64/include/JAGS/
-  sudo rm -rf /opt/R/arm64/lib/libjags.4.dylib
-  sudo rm -rf /opt/R/arm64/lib/pkgconfig/jags.pc
-  sudo rm -rf /opt/R/arm64/lib/JAGS/
-  sudo rm -rf /opt/R/arm64/lib/libjrmath.0.dylib
-  sudo rm -rf /opt/R/arm64/lib/libjrmath.la
-  sudo rm -rf /opt/R/arm64/lib/libjags.la
-  sudo rm -rf /opt/R/arm64/share/man/man1/jags.1
+  rm -rf /opt/R/arm64/bin/jags
+  rm -rf /opt/R/arm64/bin/jags-uninstall
+  rm -rf /opt/R/arm64/libexec/jags-terminal
+  rm -rf /opt/R/arm64/include/JAGS/
+  rm -rf /opt/R/arm64/lib/libjags.4.dylib
+  rm -rf /opt/R/arm64/lib/pkgconfig/jags.pc
+  rm -rf /opt/R/arm64/lib/JAGS/
+  rm -rf /opt/R/arm64/lib/libjrmath.0.dylib
+  rm -rf /opt/R/arm64/lib/libjrmath.la
+  rm -rf /opt/R/arm64/lib/libjags.la
+  rm -rf /opt/R/arm64/share/man/man1/jags.1
 fi
 
 if [[ $jags_usr -eq 1 ]]; then
-  sudo rm -rf /usr/local/bin/jags
-  sudo rm -rf /usr/local/bin/jags-uninstall
-  sudo rm -rf /usr/local/libexec/jags-terminal
-  sudo rm -rf /usr/local/include/JAGS/
-  sudo rm -rf /usr/local/lib/libjags.4.dylib
-  sudo rm -rf /usr/local/lib/pkgconfig/jags.pc
-  sudo rm -rf /usr/local/lib/JAGS/
-  sudo rm -rf /usr/local/lib/libjrmath.0.dylib
-  sudo rm -rf /usr/local/lib/libjrmath.la
-  sudo rm -rf /usr/local/lib/libjags.la
-  sudo rm -rf /usr/local/share/man/man1/jags.1
+  rm -rf /usr/local/bin/jags
+  rm -rf /usr/local/bin/jags-uninstall
+  rm -rf /usr/local/libexec/jags-terminal
+  rm -rf /usr/local/include/JAGS/
+  rm -rf /usr/local/lib/libjags.4.dylib
+  rm -rf /usr/local/lib/pkgconfig/jags.pc
+  rm -rf /usr/local/lib/JAGS/
+  rm -rf /usr/local/lib/libjrmath.0.dylib
+  rm -rf /usr/local/lib/libjrmath.la
+  rm -rf /usr/local/lib/libjags.la
+  rm -rf /usr/local/share/man/man1/jags.1
 fi
 
 echo "JAGS uninstallation complete"

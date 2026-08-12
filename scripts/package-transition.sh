@@ -33,7 +33,7 @@ fi
 
 ## Set PKG_IDENTIFIER if the developer identity matches:
 if [[ $(echo "$DEVELOPER_INSTALLER" | shasum -a 256 | awk '{print $1}') == "bcf85e972ad33f433c3e117043f0c18f9718392e1becb7a08621285e64e0d3da" ]]; then
-  PKG_IDENTIFIER="com.matthewdenwood.jags"
+  PKG_IDENTIFIER="com.matthewdenwood.jags-transition"
   PKG_KEYCHAIN="Developer ID: Matthew Denwood"
 fi
 

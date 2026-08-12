@@ -24,44 +24,22 @@ WDIR=`pwd`
 
 ## Extract developer identity:
 set +e  # Temporarily disable stop-on-error
+DEVELOPER_APPLICATION=$(security find-identity -v -p codesigning | grep "Developer ID Application" | grep -m 1 -oE '"[^"]+"' | tr -d '"')
 DEVELOPER_INSTALLER=$(security find-identity -v | grep "Developer ID Installer" | grep -m 1 -oE '"[^"]+"' | tr -d '"')
 set -e
+if [ -z "$DEVELOPER_APPLICATION" ]; then
+  echo "Unable to find a Developer ID Application signing certificate in your Keychain" 1>&2
+  exit $EX_CONFIG
+fi
 if [ -z "$DEVELOPER_INSTALLER" ]; then
   echo "Unable to find a Developer ID Installer signing certificate in your Keychain" 1>&2
   exit $EX_CONFIG
 fi
 
 ## Set PKG_IDENTIFIER if the developer identity matches:
-if [[ $(echo "$DEVELOPER_INSTALLER" | shasum -a 256 | awk '{print $1}') == "bcf85e972ad33f433c3e117043f0c18f9718392e1becb7a08621285e64e0d3da" ]]; then
-  PKG_IDENTIFIER="com.matthewdenwood.jags"
+if [[ $(echo "$DEVELOPER_APPLICATION" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
+  PKG_IDENTIFIER="com.matthewdenwood.jags-utils"
   PKG_KEYCHAIN="Developer ID: Matthew Denwood"
 fi
 
-# Create temporary folder and move postinstall script in
-mkdir -p "sign/transition"
-cp "build/postinstall-utils-$VERSION.sh" "sign/transition/postinstall"
-chmod +x "sign/transition/postinstall"
-
 exit 1
-
-# Package:
-pkgbuild --identifier "$PKG_IDENTIFIER" \
-         --version "$VERSION" \
-         --scripts "sign/transition" \
-         --nopayload \
-           "sign/transition-$VERSION.pkg"
-
-# Sign and notarise standalone version:
-productsign --sign "$DEVELOPER_INSTALLER" "sign/transition-$VERSION.pkg" "pkg/transition-$VERSION.pkg"
-cd "pkg"
-pkgutil --check-signature "transition-$VERSION.pkg"
-xcrun notarytool submit "transition-$VERSION.pkg" --keychain-profile "$PKG_KEYCHAIN" --wait
-xcrun stapler staple "transition-$VERSION.pkg"
-
-# Verify:
-xcrun stapler validate "transition-$VERSION.pkg"
-# No code objects so not relevant:
-#codesign --verify -vvvv "transition-$VERSION.pkg"
-#spctl -vvv --assess --type exec "transition-$VERSION.pkg"
-
-exit $EX_OK

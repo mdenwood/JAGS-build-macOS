@@ -51,8 +51,10 @@ rm -rf /usr/local/share/man/man1/jags-uninstall.1
 rm -rf /usr/local/share/man/man1/jags-switch.1
 rm -rf /usr/local/share/man/man1/jags-version.1 
 
-# Remove JAGS 5 beta files/symlinks
-find "/opt/jags" -mindepth 1 -maxdepth 1 ! -name "versions" -exec rm -rf {} +
+# Remove any JAGS 5 beta files/symlinks
+if [ -d "/opt/jags" ]; then
+  find "/opt/jags" -mindepth 1 -maxdepth 1 ! -name "versions" -exec rm -rf {} +
+fi
 
 # Create symlinks under /opt/jags
 mkdir -p "/opt/jags/bin"

@@ -16,7 +16,7 @@ VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
 # all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
 # all: build/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg
 # all: tmp/JAGS-$(JAGSVERSION)-vecLib-single-universal/.stamp
-all: sign/transition-$(UTILSVERSION).pkg sign/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg
+all: utils/man/jags-uninstall.1 utils/man/jags-version.1 sign/transition-$(UTILSVERSION).pkg sign/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg
 
 
 ## Create folders
@@ -135,6 +135,11 @@ sign/JAGS-%.pkg: scripts/package-jags.sh tgz/JAGS-%.tgz | sign pkg
 
 sign/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postinstall-transition-$(UTILSVERSION).sh | sign pkg
 	./scripts/package-transition.sh $(UTILSVERSION)
+
+
+## Create utils pkg
+utils/man/jags-%.1: utils/jags-%.md utils/utils-vers.sh
+	pandoc utils/jags-$*.md -s -t man -M footer="Version $(UTILSVERSION)" -o utils/man/jags-$*.1
 
 
 ## Create JAGS installers
