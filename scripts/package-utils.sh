@@ -66,7 +66,7 @@ sed -i '' "s/__MAJ__/5/g" "$BASEPTH/bin/jags-5"
 chmod +x "$BASEPTH/bin/jags-5"
 cp "utils/jags-version.sh" "$BASEPTH/bin/jags-version"
 chmod +x "$BASEPTH/bin/jags-version"
-cp "utils/jags-version.sh" "$BASEPTH/bin/jags-uninstall"
+cp "utils/jags-uninstall.sh" "$BASEPTH/bin/jags-uninstall"
 chmod +x "$BASEPTH/bin/jags-uninstall"
 
 mkdir -p "$BASEPTH/share/man/man1"
@@ -74,81 +74,40 @@ for ff ("jags-4.1" "jags-5.1" "jags-uninstall.1" "jags-version.1"); do
   cp "utils/man/$ff" "$BASEPTH/share/man/man1/$ff"
 done
 
-
-exit 1
-
-## Make a list of archs and dependencies for checking:
-cd "sign/JAGS-$BUILD"
-BINDEPFILE="$WDIR/sign/JAGS-$BUILD/binary_dependencies.txt"
-echo "Binary dependencies:\n" >> "$BINDEPFILE"
-for dd in $(find "opt" -type d -print); do
+## Sign installed shell scripts:
+cd "$BASEPTH"
+for dd in $(find "bin" -type d -print); do
   for ff in $(ls "$dd"); do
-    ftype=$(file -I "$dd/$ff")
-    sign=0
-    # If a binary:
-    if echo "$ftype" | grep -q "application/x-mach-binary"; then
-      # That isn't a symlink:
-      if test ! -L "$dd/$ff"; then
-        ## Output dependencies, architectures and macos min versions for checking:
-        echo "$ff" >> "$BINDEPFILE"
-        otool -L "$dd/$ff" >> "$BINDEPFILE"
-        lipo -archs "$dd/$ff" >> "$BINDEPFILE"
-        otool -l "$dd/$ff" | grep -E -A4 '(LC_VERSION_MIN_MACOSX|LC_BUILD_VERSION)' | grep -B1 sdk >> "$BINDEPFILE"
-        echo "     -> Signed by $DEVELOPER_APPLICATION \n\n" >> "$BINDEPFILE"      
-        sign=1
-      fi
-    fi
-    # Or a shell script:
-    if [[ "$ff" == "jags" ]] || [[ "$ff" == "jags-version" ]] || [[ "$ff" == "jags-uninstall" ]]; then
-      sign=1
-    fi
-    # And not a folder:
-    if [[ -d "$dd/$ff" ]]; then
-      sign=0
-    fi
-    # Then sign:
-    if [[ $sign -eq 1 ]]; then
-      echo "Signing: $dd/$ff"
-      xcrun codesign --force --timestamp --options runtime --sign "$DEVELOPER_APPLICATION" "$dd/$ff"
-    fi    
+    echo "Signing $dd/$ff"
+    xcrun codesign --force --timestamp --options runtime --sign "$DEVELOPER_APPLICATION" "$dd/$ff"
   done
 done
 
 cd "$WDIR"
 
-# Copy in the post-installation script:
-mkdir -p "sign/JAGS-$BUILD/scripts"
-cp "build/postinstall-jags.sh" "sign/JAGS-$BUILD/scripts/postinstall"
-sed -i '' "s/__BUILD__/${BUILD}/g" "sign/JAGS-$BUILD/scripts/postinstall"
-chmod +x "sign/JAGS-$BUILD/scripts/postinstall"
-cp "utils/jags-version.sh" "sign/JAGS-$BUILD/scripts/jags-version"
-chmod +x "sign/JAGS-$BUILD/scripts/jags-version"
-
 ## Then create pkg file:
-pkgbuild --root "sign/JAGS-$BUILD/opt/" \
+pkgbuild --root "sign/utils/opt/" \
          --identifier "$PKG_IDENTIFIER" \
-         --version "$BUILD" \
+         --version "$VERSION" \
          --install-location "/opt/" \
-         --scripts "sign/JAGS-$BUILD/scripts" \
-         "sign/JAGS-$BUILD.pkg"
+         --scripts "sign/utils/scripts" \
+         "sign/utils-$VERSION.pkg"
 
 # Sign and notarise standalone version:
 rm -rf "sign/pkg"
 mkdir -p "sign/pkg"
-productsign --sign "$DEVELOPER_INSTALLER" "sign/JAGS-$BUILD.pkg" "sign/pkg/JAGS-$BUILD.pkg"
+productsign --sign "$DEVELOPER_INSTALLER" "sign/utils-$VERSION.pkg" "sign/pkg/utils-$VERSION.pkg"
 cd "sign/pkg"
-pkgutil --check-signature "JAGS-$BUILD.pkg"
-xcrun notarytool submit "JAGS-$BUILD.pkg" --keychain-profile "$PKG_KEYCHAIN" --wait
-xcrun stapler staple "JAGS-$BUILD.pkg"
+pkgutil --check-signature "utils-$VERSION.pkg"
+xcrun notarytool submit "utils-$VERSION.pkg" --keychain-profile "$PKG_KEYCHAIN" --wait
+xcrun stapler staple "utils-$VERSION.pkg"
 
 # Verify:
-xcrun stapler validate "JAGS-$BUILD.pkg"
-spctl -a -vv -t install "JAGS-$BUILD.pkg"
+xcrun stapler validate "utils-$VERSION.pkg"
+spctl -a -vv -t install "utils-$VERSION.pkg"
 
 # Move to pkg directory once verification is complete:
-mv "JAGS-$BUILD.pkg" "$WDIR/pkg/JAGS-$BUILD.pkg"
+mv "utils-$VERSION.pkg" "$WDIR/pkg/utils-$VERSION.pkg"
+rm -rf "sign/pkg"
 
 exit $EX_OK
-
-
-exit 1

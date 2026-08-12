@@ -8,11 +8,40 @@ EX_OK=0
 EX_USAGE=64
 EX_CONFIG=78
 
+# Utility to convert a string to a float:
+NUM_REGEX='^-?[0-9]*\.?[0-9]+$'
+
+# Find the latest version of utils and make sure it is active:
+latest="0.0"
+for vv in $(ls /opt/jags/versions/utils); do
+  if [[ $vv =~ $NUM_REGEX && $latest =~ $NUM_REGEX ]]; then      
+    if (( vv > latest )); then
+      echo "[NUMERIC] $vv is GREATER than $latest"
+    fi
+    latest="$vv"
+  else
+      echo "Warning: ignored non-numeric version: '$vv'" >&2
+  fi
+done
+
+# Make sure at least one utils version is installed:
+if [[ "$latest" == "0.0" ]]; then
+  echo "Error: no valid JAGS utils versions installed" >&2
+  exit $EX_USAGE
+fi
+if [[ ! -d "/opt/jags/versions/utils/$latest" ]]; then
+  echo "Error: no JAGS utilities build at /opt/jags/versions/utils/$latest detected\nPlease report this internal error to the maintainer (Matt Denwood)\nvia https://github.com/mdenwood/JAGS-build-macOS" 1>&2
+  exit $EX_SOFTWARE
+fi
+
 # Check we are running as root:
 if [ $(id -u) -ne 0 ]; then
     echo "Error: the postinstall script must be run as root" >&2
     exit $EX_USAGE
 fi
+
+# Create symlink to current:
+ln -Fs "/opt/jags/versions/utils/$latest" "/opt/jags/versions/utils/current"
 
 # Create symlinks under /opt/jags
 mkdir -p "/opt/jags/bin"
@@ -28,4 +57,3 @@ ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-uninstall.1" "/opt/
 ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-version.1" "/opt/jags/share/man/man1/jags-version.1"
 
 exit $EX_OK
-
