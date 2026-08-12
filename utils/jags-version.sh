@@ -237,7 +237,7 @@ for ff ("bin/jags" "lib/pkgconfig/jags.pc" "share/man/man1/jags.1"); do
       ln -fs "/opt/jags/versions/jags/current/$ff" "/opt/jags/$ff"
     fi
 done
-for ff ("bin/jags-4" "bin/jags-5" "bin/jags-uninstall" "bin/jags-version" "share/man/man1/jags-uninstall" "share/man/man1/jags-version"); do
+for ff ("bin/jags-4" "bin/jags-5" "bin/jags-uninstall" "bin/jags-version" "share/man/man1/jags-4.1" "share/man/man1/jags-5.1" "share/man/man1/jags-uninstall.1" "share/man/man1/jags-version.1"); do
     if [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/utils/current/$ff" ]]; then
       echo $ff
       ln -fs "/opt/jags/versions/utils/current/$ff" "/opt/jags/$ff"
