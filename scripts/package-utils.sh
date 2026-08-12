@@ -50,6 +50,9 @@ if [[ ! "$PVERS" == "$VERSION" ]]; then
   exit $EX_CONFIG
 fi
 
+## Remove final signed output:
+rm -rf "$WDIR/pkg/utils-$VERSION.pkg"
+
 ## Create temporary folder and move all scripts (including postinstall script) in:
 mkdir -p "sign/utils/scripts"
 cp "build/postinstall-utils.sh" "sign/utils/scripts/postinstall"

@@ -37,6 +37,9 @@ if [[ $(echo "$DEVELOPER_INSTALLER" | shasum -a 256 | awk '{print $1}') == "bcf8
   PKG_KEYCHAIN="Developer ID: Matthew Denwood"
 fi
 
+## Remove final signed output:
+rm -rf "$WDIR/pkg/transition-$VERSION.pkg"
+
 # Create temporary folder and move postinstall script in
 mkdir -p "sign/transition/scripts"
 cp "build/postinstall-transition-$VERSION.sh" "sign/transition/scripts/postinstall"

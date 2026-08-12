@@ -24,6 +24,9 @@ fi
 BUILD="$1"
 WDIR=`pwd`
 
+## Remove final signed output:
+rm -rf "$WDIR/pkg/JAGS-$BUILD.pkg"
+
 ## Untar into the sign directory:
 rm -rf "sign/JAGS-$BUILD"
 mkdir -p "sign/JAGS-$BUILD"
