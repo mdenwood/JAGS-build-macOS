@@ -27,17 +27,17 @@ if ! [ -f sources/pkg-config-$VERSION.tar.gz ]; then
   exit $EX_CONFIG
 fi
 
-rm -rf "lib/pkg-config/"
+rm -rf "tools/pkg-config/"
 rm -rf "tmp/pkg-config-$VERSION"
 tar -xmf "sources/pkg-config-$VERSION.tar.gz" -C "tmp"
 cd tmp/pkg-config-$VERSION
 
 echo "\n** Building pkg-config **\n"
-LDFLAGS="-framework CoreFoundation -framework Carbon" CFLAGS="-Wno-int-conversion" CXXFLAGS="-Wno-int-conversion" ./configure --with-internal-glib --prefix=$WDIR/lib/pkg-config --exec-prefix=$WDIR/lib/pkg-config
+LDFLAGS="-framework CoreFoundation -framework Carbon" CFLAGS="-Wno-int-conversion" CXXFLAGS="-Wno-int-conversion" ./configure --with-internal-glib --prefix=$WDIR/tools/pkg-config --exec-prefix=$WDIR/tools/pkg-config
 make clean
 make -j 12
 make install
 
-touch "$WDIR/lib/pkg-config/.stamp"
+touch "$WDIR/tools/pkg-config/.stamp"
 
 exit 0

@@ -213,8 +213,9 @@ if [[ "$PREFIX" == "/opt/jags/versions/jags/$VERSMAJ.x-current" ]]; then
   mv "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSMAJ.x-current" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH"
 fi
 
-echo "REMOVE BUILD FROM PC"
-exit 1
+# Remove the build text from the version string:
+sed -i "" -e "s|Version: $VBSTRING|Version: $VERSION|g" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags.pc"
 
+# Finished:
 touch "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/.stamp"
 exit $EX_OK

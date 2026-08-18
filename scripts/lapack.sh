@@ -29,7 +29,7 @@ if ! [ -f sources/v$VERSION.tar.gz ]; then
   exit $EX_CONFIG
 fi
 
-rm -rf "lib/lapack/"
+rm -rf "tools/lapack/"
 rm -rf "tmp/lapack-$VERSION"
 tar -xmf "sources/v$VERSION.tar.gz" -C "tmp"
 cd "tmp/lapack-$VERSION"
@@ -52,11 +52,11 @@ for arch in aarch64 x86_64; do
 done
 
 cd "$WDIR/tmp"
-mkdir -p "$WDIR/lib/lapack/"
-lipo "librefblas-aarch64.a" "librefblas-x86_64.a" -create -output "$WDIR/lib/lapack/librefblas.a"
-lipo "liblapack-aarch64.a" "liblapack-x86_64.a" -create -output "$WDIR/lib/lapack/liblapack.a"
+mkdir -p "$WDIR/tools/lapack/"
+lipo "librefblas-aarch64.a" "librefblas-x86_64.a" -create -output "$WDIR/tools/lapack/librefblas.a"
+lipo "liblapack-aarch64.a" "liblapack-x86_64.a" -create -output "$WDIR/tools/lapack/liblapack.a"
 
-touch "$WDIR/lib/lapack/.stamp"
+touch "$WDIR/tools/lapack/.stamp"
 
 exit $EX_OK
 

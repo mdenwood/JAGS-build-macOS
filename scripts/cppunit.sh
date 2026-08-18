@@ -32,12 +32,12 @@ fi
 rm -rf tmp/cppunit-aarch64
 rm -rf tmp/cppunit-x86_64
 rm -rf tmp/cppunit-universal
-rm -rf lib/cppunit
+rm -rf tools/cppunit
 tar -xmf "sources/cppunit-$VERSION.tar.gz" -C "tmp"
 cd tmp/cppunit-$VERSION
 
 echo "\n** Compiling cppunit-aarch64 **\n"
-./configure --prefix=$WDIR/lib/cppunit
+./configure --prefix=$WDIR/tools/cppunit
 make clean
 make -j $CORES
 make install DESTDIR="$WDIR/tmp/cppunit-aarch64"
@@ -46,18 +46,18 @@ echo "\n** Compiling cppunit-x86_64 **\n"
 ./configure \
   --host=x86_64-apple-darwin \
   --build=aarch64-apple-darwin \
-  --prefix=$WDIR/lib/cppunit \
+  --prefix=$WDIR/tools/cppunit \
   CC="clang -arch x86_64" \
   CXX="clang++ -arch x86_64"
 make clean
 make -j $CORES
 make install DESTDIR="$WDIR/tmp/cppunit-x86_64"
 
-echo "\n** Installing bi-arch cppunit to $WDIR/lib/cppunit **\n"
+echo "\n** Installing bi-arch cppunit to $WDIR/tools/cppunit **\n"
 
 cd $WDIR/tmp
 cp -r cppunit-aarch64 cppunit-universal
-IDIR="$WDIR/lib/cppunit"
+IDIR="$WDIR/tools/cppunit"
 for ff in "/lib/libcppunit-$VERSION.dylib" "/lib/libcppunit.dylib" "/lib/libcppunit.a"; do
   echo $ff
   lipo "$WDIR/tmp/cppunit-universal/$IDIR/$ff" "$WDIR/tmp/cppunit-x86_64/$IDIR/$ff" -create -output "$WDIR/tmp/cppunit-universal/$IDIR/$ff"
@@ -68,7 +68,7 @@ tar -zcf "../cppunit-universal-$VERSION.tar.gz" .
 cd ../
 tar -xmf cppunit-universal-$VERSION.tar.gz -C /
 
-touch "$WDIR/lib/cppunit/.stamp"
+touch "$WDIR/tools/cppunit/.stamp"
 
 exit $EX_OK
 
