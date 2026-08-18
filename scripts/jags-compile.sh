@@ -182,7 +182,7 @@ else
   exit $EX_SOFTWARE
 fi
    
-# Only needed when cross-compiling - note that we must have x86_64 here
+# Only needed when cross-compiling:
 if [[ "$ARCH" == "x86_64" ]]; then
   sed -i '' -e 's/compiler_flags=$/compiler_flags="--target=x86_64-apple-darwin20"/' libtool
   sed -i '' -e 's/linker_flags=$/linker_flags="--target=x86_64-apple-darwin20"/' libtool
@@ -207,20 +207,14 @@ fi
 # Make install
 make install DESTDIR="$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH" > make_install.out
 
-if [[ "$PREFIX"=="/opt/jags/versions/jags/$VERSMAJ.x-current" ]]; then
-  # Create correct directory structure (only if PREFIX is 5-current):
+if [[ "$PREFIX" == "/opt/jags/versions/jags/$VERSMAJ.x-current" ]]; then
+  echo $PREFIX
+  # Create correct directory structure (only if PREFIX is MAJVERS-current):
   mv "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSMAJ.x-current" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH"
-else
-  # Duplicate pkg-config file (only if PREFIX is specific build) and modify the original:
-  echo "THIS WONT WORK - IT NEEDS TO BE jags.pc BUT IN A DIFFERENT PATH - probably just a subdirectory i.e. lib/pkgconfig/$VERSION-$BLAS-$THREAD-$ARCH/jags.pc"
-  echo "ALSO: modify jags-version to check for the prefix in the (newly symlinked) /opt/jags/lib/pkgconfig/jags.pc file and warn if it is not /opt/jags/${VERSMAJ}.x-current that rjags compilation will now be build specific.  Or do I just have a separate jags.pc file under /opt/jags/lib/pkgconfig that is not a symlink but a modified file???"
-  cp "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH/lib/pkgconfig/jags.pc" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH/lib/pkgconfig/jags-$VERSION-$BLAS-$THREAD-$ARCH.pc"
-  sed -i "" -e "s|prefix=/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH|prefix=/opt/jags/${VERSMAJ}.x-current|g" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH/lib/pkgconfig/jags.pc"
-  # Also change the version string if needed:
-  echo "MODIFY VERSION IN JAGS.PC AS NEEDED"
-  exit 1
-  sed -i "" -e "s|Version: 5.0.0-betaprefix=/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH|prefix=/opt/jags/${VERSMAJ}.x-current|g" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH/lib/pkgconfig/jags.pc"  
 fi
+
+echo "REMOVE BUILD FROM PC"
+exit 1
 
 touch "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/.stamp"
 exit $EX_OK

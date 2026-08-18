@@ -13,10 +13,11 @@ VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
 	
 ## Complete build
 .PHONY: all
+all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp
 # all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
 # all: build/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg
 # all: tmp/JAGS-$(JAGSVERSION)-vecLib-single-universal/.stamp
-all: sign/utils-$(UTILSVERSION).pkg utils/man/jags-4.1 utils/man/jags-5.1 sign/transition-$(UTILSVERSION).pkg sign/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg
+# all: sign/utils-$(UTILSVERSION).pkg utils/man/jags-4.1 utils/man/jags-5.1 sign/transition-$(UTILSVERSION).pkg sign/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg
 
 
 ## Create folders

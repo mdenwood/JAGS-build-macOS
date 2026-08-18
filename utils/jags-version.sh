@@ -7,6 +7,16 @@
 # For help/options run jags-version --help
 # This utility is (also) distributed as part of the macOS installers for JAGS (https://mcmc-jags.sourceforge.io)
 
+echo "Modify jags-version to look for jags-MAJVERS.pc in the same place as jags.pc, and if it is not there then create it.  Then compare to the current pkgconfig-MAJVERS/jags.pc and pkconfig/jags.pc and warn about the need for rjags recompilation if not the same (but then over-write), otherwise do nothing.  Also be smart about JAGS 4 vs 5 difference vs e.g. -lomp addition"
+echo "Also modify rjags configure script to look under the new path for jags.pc"
+echo "Also fix jags-4 and jags-5 so they simply redirect to the correct build, allowing all arguments to be forwarded"
+exit 1
+
+# Duplicate and modify the pkg-config file (only if PREFIX is specific build):
+cp "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags.pc" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags-$MAJVERS.pc"
+sed -i "" -e "s|prefix=/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH|prefix=/opt/jags/${VERSMAJ}.x-current|g" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags-$MAJVERS.pc"
+sed -i "" -e "s|Version: $VERSION ($BLAS-$THREAD-$ARCH build)|Version: $MAJVERS|g" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags-$MAJVERS.pc"
+
 
 # Arguments
 help=0

@@ -47,31 +47,35 @@ These installation scripts are designed for JAGS to use a versioned installation
 /opt/
 └── jags/
     ├── bin/
-    │   ├── jags                                # symlink to inside /opt/jags/versions/jags/currernt
-    │   ├── jags-4                              # symlink to inside /opt/jags/versions/utils/currernt
-    │   ├── jags-5                              # symlink to inside /opt/jags/versions/utils/currernt
-    │   ├── jags-uninstall                      # symlink to inside /opt/jags/versions/utils/currernt
-    │   └── jags-version                        # symlink to inside /opt/jags/versions/utils/currernt
+    │   ├── jags                                : symlink to inside /opt/jags/versions/jags/current
+    │   ├── jags-4                              : symlink to inside /opt/jags/versions/jags/4.x-current
+    │   ├── jags-5                              : symlink to inside /opt/jags/versions/jags/5.x-current
+    │   ├── jags-uninstall                      : symlink to inside /opt/jags/versions/utils/current
+    │   └── jags-version                        : symlink to inside /opt/jags/versions/utils/current
     ├── lib
-    │   └── pkgconfig
-    │       └── jags.pc                         # symlink to inside /opt/jags/versions/jags/currernt
+    │   ├── pkgconfig
+    │   │   └── jags.pc                         : Modified pkg-config file for generic linkage to JAGS
+    │   ├── pkgconfig-4
+    │   │   └── jags.pc                         : Modified pkg-config file for generic linkage to JAGS 4.x
+    │   └── pkgconfig-5
+    │       └── jags.pc                         : Modified pkg-config file for generic linkage to JAGS 5.x
     ├── share
     │   └── man
     │       └── man1
-    │           ├── jags-uninstall.1            # symlink to inside /opt/jags/versions/utils/currernt
-    │           ├── jags-version.1              # symlink to inside /opt/jags/versions/utils/currernt
-    │           └── jags.1                      # symlink to inside /opt/jags/versions/jags/currernt
+    │           ├── jags-uninstall.1            : symlink to inside /opt/jags/versions/utils/current
+    │           ├── jags-version.1              : symlink to inside /opt/jags/versions/utils/current
+    │           └── jags.1                      : symlink to inside /opt/jags/versions/jags/current
     │
     └── versions/
         ├── jags/
         │   ├── 5.0.0-vecLib-gcd-aarch64
         │   ├── ...
-        │   ├── 5.x-current                     # symlink (directory)
-        │   └── current                         # symlink (directory)
+        │   ├── 5.x-current                     : symlink (directory)
+        │   └── current                         : symlink (directory)
         └── utils/
             ├── 1.0.0
             ├── ...
-            └── current                         # symlink (directory)
+            └── current                         : symlink (directory)
 
 To fit within this structure, JAGS is configured with a prefix of /opt/jags/versions/jags/5.x-current (or 4.x-current, for JAGS 4.x), but the installed files are moved to an installation path under /opt/jags/versions/jags/VERSION-BLAS-THREAD-ARCH so that multiple installations can co-exist and be switched on/off using the jags-version utility.  Note that the tools required to build jags (pkg-config, cppunit and Netlib's LAPACK) are only installed within the self-contained repo directory (under lib).
 
