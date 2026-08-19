@@ -21,47 +21,53 @@ VERSION="$1"
 export WDIR=`pwd`
 export CORES=$(sysctl -n hw.ncpu)
 export PATH=" /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export SDKROOT=`readlink -f "/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk"`
+export MACOSX_DEPLOYMENT_TARGET="11.0"
 
-if ! [ -f sources/pkg-config-$VERSION.tar.gz ]; then
+if ! [ -f sources/pkgconf-$VERSION.tar.gz ]; then
   echo "Source file not found" >&2
   exit $EX_CONFIG
 fi
 
-https://github.com/pkgconf/pkgconf/releases/download/pkgconf-3.0.5/pkgconf-3.0.5.tar.gz
 
-export SYSTEM_LIBDIR="/usr/lib"
-export SYSTEM_INCLUDEDIR="/usr/include"
-export PKG_DEFAULT_PATH="/usr/lib/pkgconfig:/usr/share/pkgconfig:/opt/jags/lib/pkgconfig"
+rm -rf "tools/pkgconf-lite/"
+rm -rf "tmp/pkgconf-lipo/"
+mkdir -p "tmp/pkgconf-lipo/"
 
-make -f Makefile.lite
+rm -rf tmp/pkgconf-pkgconf-$VERSION tmp/pkgconf-$VERSION
+tar -xmf "sources/pkgconf-$VERSION.tar.gz" -C "tmp"
+mv -f tmp/pkgconf-pkgconf-$VERSION tmp/pkgconf-$VERSION
 
-make -f Makefile.list clean
+echo "\n** Building pkgconf **\n"
+cd tmp/pkgconf-$VERSION
 
-make -f Makefile.lite \
-  CC="clang" \
-  CFLAGS="-arch x86_64 -O2" \
-  LDFLAGS="-arch x86_64"
+for arch in arm64 x86_64; do
+  echo "Compiling pkgconf-$arch..."
 
-# But also with minos version etc
+  make -f Makefile.lite clean
 
-# Also copy COPYING and AUTHORS into the installer, and a README file or similar saying this is pkgconf-lite downloaded from https://github.com/pkgconf/pkgconf/ with a permissive license, and note the version
-# Then add the pkg-config stuff to the uninstall scripts
-# Then modify the autoconf.ac file in rjags to look for /opt/jags/versions/pkgconf-lite/current/bin/pkg-config - DO NOT symlonk to /opt/jags/bin
+  make -f Makefile.lite \
+    CC="clang" \
+    CFLAGS="-O2 --target=${arch}-apple-darwin20" \
+    LDFLAGS="-target=${arch}-apple-darwin20" \
+    SYSTEM_LIBDIR="/usr/lib" \
+    SYSTEM_INCLUDEDIR="/usr/include" \
+    PKG_DEFAULT_PATH="/usr/lib/pkgconfig:/usr/share/pkgconfig:/opt/jags/lib/pkgconfig"
 
-exit 1
+  cp pkgconf-lite "$WDIR/tmp/pkgconf-lipo/pkgconf-$arch"
+done
 
+## Make UB:
+mkdir -p "$WDIR/tools/pkgconf-lite/versions/$VERSION/bin"
+mkdir -p "$WDIR/tools/pkgconf-lite/versions/$VERSION/doc/"
 
-rm -rf "tools/pkg-config/"
-rm -rf "tmp/pkg-config-$VERSION"
-tar -xmf "sources/pkg-config-$VERSION.tar.gz" -C "tmp"
-cd tmp/pkg-config-$VERSION
+lipo "$WDIR/tmp/pkgconf-lipo/pkgconf-arm64" "$WDIR/tmp/pkgconf-lipo/pkgconf-x86_64" -create -output "$WDIR/tools/pkgconf-lite/versions/$VERSION/bin/pkgconf"
+cp AUTHORS "$WDIR/tools/pkgconf-lite/versions/$VERSION/doc/"
+cp COPYING "$WDIR/tools/pkgconf-lite/versions/$VERSION/doc/"
+echo "This is pkgconf-lite version $VERSION - see https://github.com/pkgconf/pkgconf for source code\n" > "$WDIR/tools/pkgconf-lite/versions/$VERSION/doc/notes.txt"
 
-echo "\n** Building pkg-config **\n"
-LDFLAGS="-framework CoreFoundation -framework Carbon" CFLAGS="-Wno-int-conversion" CXXFLAGS="-Wno-int-conversion" ./configure --with-internal-glib --prefix=$WDIR/tools/pkg-config --exec-prefix=$WDIR/tools/pkg-config
-make clean
-make -j 12
-make install
+## Just for ease of use with building JAGS:
+ln -Fs "$WDIR/tools/pkgconf-lite/versions/$VERSION/bin/pkgconf" "$WDIR/tools/pkgconf-lite/pkgconf"
 
-touch "$WDIR/tools/pkg-config/.stamp"
-
+touch "$WDIR/tools/pkgconf-lite/.stamp"
 exit 0

@@ -1,8 +1,8 @@
 # Source files
 sources/*
 tmp/*
-lib/*
 tools/*
 tgz/*
 sign/*
 pkg/*
+build/*

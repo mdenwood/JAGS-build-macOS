@@ -24,14 +24,14 @@ export MACOSX_DEPLOYMENT_TARGET="11.0"
 export CORES=$(sysctl -n hw.ncpu)
 export PATH=" /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
-if ! [ -f sources/v$VERSION.tar.gz ]; then
+if ! [ -f sources/LAPACK-$VERSION.tar.gz ]; then
   echo "Source file not found" >&2
   exit $EX_CONFIG
 fi
 
 rm -rf "tools/lapack/"
 rm -rf "tmp/lapack-$VERSION"
-tar -xmf "sources/v$VERSION.tar.gz" -C "tmp"
+tar -xmf "sources/LAPACK-$VERSION.tar.gz" -C "tmp"
 cd "tmp/lapack-$VERSION"
 
 for arch in aarch64 x86_64; do

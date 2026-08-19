@@ -3,7 +3,8 @@ JAGSVERSION := 5.0.0
 UTILSVERSION := 1.0
 CPPUNITVERS := 1.15.1
 LAPACKVERS := 3.12.1
-PKGCONVERS := 0.29.2
+PKGCONFVERS := 3.0.5
+PKGCONFIGVERS := 0.29.2
 
 ## Extract JAGS major version from full version
 VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
@@ -44,34 +45,40 @@ build:						# For productbuild output
 ## Download source files
 
 .PHONY: download
-download: sources/JAGS-$(JAGSVERSION).tar.gz sources/v$(LAPACKVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz
+download: sources/JAGS-$(JAGSVERSION).tar.gz sources/LAPACK-$(LAPACKVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz sources/pkgconf-$(PKGCONFVERS).tar.gz #sources/pkg-config-$(PKGCONFIGVERS).tar.gz 
 
 sources/JAGS-$(JAGSVERSION).tar.gz: | sources
 	curl -OL --output-dir sources https://sourceforge.net/projects/mcmc-jags/files/JAGS/$(VERSMAJ).x/Source/JAGS-$(JAGSVERSION).tar.gz
 	
-sources/v$(LAPACKVERS).tar.gz: | sources
-	curl -OL --output-dir sources https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.12.1.tar.gz
+sources/LAPACK-$(LAPACKVERS).tar.gz: | sources
+	curl -L --output sources/LAPACK-$(LAPACKVERS).tar.gz https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v$(LAPACKVERS).tar.gz
 	
 sources/cppunit-$(CPPUNITVERS).tar.gz: | sources
 	curl -OL --output-dir sources http://dev-www.libreoffice.org/src/cppunit-$(CPPUNITVERS).tar.gz
 
-sources/pkg-config-$(PKGCONVERS).tar.gz: | sources
-	curl -OL --output-dir sources https://pkg-config.freedesktop.org/releases/pkg-config-$(PKGCONVERS).tar.gz
+sources/pkgconf-$(PKGCONFVERS).tar.gz: | sources
+	curl -L --output sources/pkgconf-$(PKGCONFVERS).tar.gz https://github.com/pkgconf/pkgconf/archive/refs/tags/pkgconf-$(PKGCONFVERS).tar.gz
+
+sources/pkg-config-$(PKGCONFIGVERS).tar.gz: | sources
+	curl -OL --output-dir sources https://pkg-config.freedesktop.org/releases/pkg-config-$(PKGCONFIGVERS).tar.gz
 	
 
 ## Build tools
 
 .PHONY: all-tools
-all-tools: tools/pkg-config/.stamp tools/cppunit/.stamp tools/lapack/.stamp #tools/omp/.stamp
-
-tools/pkg-config/.stamp: scripts/pkgconfig.sh sources/pkg-config-$(PKGCONVERS).tar.gz | tools tmp
-	./scripts/pkgconfig.sh $(PKGCONVERS)
+all-tools: tools/cppunit/.stamp tools/lapack/.stamp tools/pkgconf-lite/.stamp #tools/pkg-config/.stamp #tools/omp/.stamp
 
 tools/cppunit/.stamp: scripts/cppunit.sh sources/cppunit-$(CPPUNITVERS).tar.gz | tools tmp
 	./scripts/cppunit.sh $(CPPUNITVERS)
 
-tools/lapack/.stamp: scripts/lapack.sh sources/v$(LAPACKVERS).tar.gz | tools tmp
+tools/lapack/.stamp: scripts/lapack.sh sources/LAPACK-$(LAPACKVERS).tar.gz | tools tmp
 	./scripts/lapack.sh $(LAPACKVERS)
+
+tools/pkgconf-lite/.stamp: scripts/pkgconf.sh sources/pkgconf-$(PKGCONFVERS).tar.gz | tools lipo tmp
+	./scripts/pkgconf.sh $(PKGCONFVERS)
+
+tools/pkg-config/.stamp: scripts/pkgconfig.sh sources/pkg-config-$(PKGCONFIGVERS).tar.gz | tools tmp
+	./scripts/pkgconfig.sh $(PKGCONFIGVERS)
 
 # TODO: omp download
 tools/omp/.stamp: scripts/omp.sh sources/v$(LAPACKVERS).tar.gz | tools tmp
