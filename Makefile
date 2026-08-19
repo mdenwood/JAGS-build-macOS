@@ -47,16 +47,16 @@ build:						# For productbuild output
 download: sources/JAGS-$(JAGSVERSION).tar.gz sources/v$(LAPACKVERS).tar.gz sources/cppunit-$(CPPUNITVERS).tar.gz sources/pkg-config-$(PKGCONVERS).tar.gz
 
 sources/JAGS-$(JAGSVERSION).tar.gz: | sources
-	curl -OL --output sources https://sourceforge.net/projects/mcmc-jags/files/JAGS/$(VERSMAJ).x/Source/JAGS-$(JAGSVERSION).tar.gz
+	curl -OL --output-dir sources https://sourceforge.net/projects/mcmc-jags/files/JAGS/$(VERSMAJ).x/Source/JAGS-$(JAGSVERSION).tar.gz
 	
 sources/v$(LAPACKVERS).tar.gz: | sources
-	curl -OL --output sources https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.12.1.tar.gz
+	curl -OL --output-dir sources https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.12.1.tar.gz
 	
 sources/cppunit-$(CPPUNITVERS).tar.gz: | sources
-	curl -OL --output sources http://dev-www.libreoffice.org/src/cppunit-$(CPPUNITVERS).tar.gz
+	curl -OL --output-dir sources http://dev-www.libreoffice.org/src/cppunit-$(CPPUNITVERS).tar.gz
 
 sources/pkg-config-$(PKGCONVERS).tar.gz: | sources
-	curl -OL --output sources https://pkg-config.freedesktop.org/releases/pkg-config-$(PKGCONVERS).tar.gz
+	curl -OL --output-dir sources https://pkg-config.freedesktop.org/releases/pkg-config-$(PKGCONVERS).tar.gz
 	
 
 ## Build tools
@@ -64,17 +64,17 @@ sources/pkg-config-$(PKGCONVERS).tar.gz: | sources
 .PHONY: all-tools
 all-tools: tools/pkg-config/.stamp tools/cppunit/.stamp tools/lapack/.stamp #tools/omp/.stamp
 
-tools/pkg-config/.stamp: scripts/pkgconfig.sh sources/pkg-config-$(PKGCONVERS).tar.gz | tools
+tools/pkg-config/.stamp: scripts/pkgconfig.sh sources/pkg-config-$(PKGCONVERS).tar.gz | tools tmp
 	./scripts/pkgconfig.sh $(PKGCONVERS)
 
-tools/cppunit/.stamp: scripts/cppunit.sh sources/cppunit-$(CPPUNITVERS).tar.gz | tools
+tools/cppunit/.stamp: scripts/cppunit.sh sources/cppunit-$(CPPUNITVERS).tar.gz | tools tmp
 	./scripts/cppunit.sh $(CPPUNITVERS)
 
-tools/lapack/.stamp: scripts/lapack.sh sources/v$(LAPACKVERS).tar.gz | tools
+tools/lapack/.stamp: scripts/lapack.sh sources/v$(LAPACKVERS).tar.gz | tools tmp
 	./scripts/lapack.sh $(LAPACKVERS)
 
 # TODO: omp download
-tools/omp/.stamp: scripts/omp.sh sources/v$(LAPACKVERS).tar.gz | tools
+tools/omp/.stamp: scripts/omp.sh sources/v$(LAPACKVERS).tar.gz | tools tmp
 	./scripts/omp.sh $(LAPACKVERS)
 
 
