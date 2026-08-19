@@ -12,16 +12,18 @@ EX_CONFIG=78
 ./scripts/check_deps.sh
 
 ## Check arguments
-if [ "$#" -ne 4 ]; then
-    echo "Error: 4 arguments required (got $#)."
-    echo "Usage: $0 <VERSION> <BLAS> <THREAD> <ARCH>"
+if [ "$#" -ne 2 ]; then
+    echo "Error: 2 arguments required (got $#)."
+    echo "Usage: $0 <VERSION> <BLAS-THREAD-ARCH>"
     exit $EX_USAGE
 fi
 
 VERSION="$1"
-BLAS="$2"
-THREAD="$3"
-ARCH="$4"
+BUILD="$2"
+BUILDELEMS=( ${(s:-:)BUILD} )
+BLAS=$BUILDELEMS[1]
+THREAD=$BUILDELEMS[2]
+ARCH=$BUILDELEMS[3]
 
 # Extract major version
 VERSMAJ=$(echo $VERSION | cut -d "." -f 1)
@@ -114,7 +116,7 @@ export WDIR=`pwd`
 export SDKROOT=`readlink -f "/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk"`
 export MACOSX_DEPLOYMENT_TARGET="11.0"
 export CORES=$(sysctl -n hw.ncpu)
-export PATH=" /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 if ! [ -f sources/JAGS-$VERSION.tar.gz ]; then
   echo "Source file not found" >&2
@@ -143,8 +145,8 @@ if [[ "$BLAS" == "vecLib" ]]; then
   
 elif [[ "$BLAS" == "refBLAS" ]]; then
   
-  blasstr="$WDIR/lib/lapack/librefblas.a"
-  lapkstr="$WDIR/lib/lapack/liblapack.a"
+  blasstr="$WDIR/tools/lapack/librefblas.a"
+  lapkstr="$WDIR/tools/lapack/liblapack.a"
   fflags="-O2 -static-libgfortran -static-libquadmath"
   flibs="/opt/gfortran/lib/gcc/$ARCH-apple-darwin20.0/14.2.0/libgcc.a /opt/gfortran/lib/gcc/$ARCH-apple-darwin20.0/14.2.0/libquadmath.a /opt/gfortran/lib/gcc/$ARCH-apple-darwin20.0/14.2.0/libgfortran.a"
   
@@ -154,7 +156,7 @@ else
 fi
 
 # Get configuration for cppunit:
-CPPUCNF="$("$WDIR/lib/pkg-config/bin/pkg-config" --cflags "$WDIR/lib/cppunit/lib/pkgconfig/cppunit.pc") --target=$ARCH-apple-darwin20"
+CPPUCNF="$("$WDIR/tools/pkgconf-lite/bin/pkg-config" --cflags "$WDIR/tools/cppunit/lib/pkgconfig/cppunit.pc") --target=$ARCH-apple-darwin20"
 
 # Set PREFIX:
 # PREFIX="/opt/jags/versions/jags/$VERSMAJ.x-current"
@@ -163,7 +165,7 @@ PREFIX="/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH"
 # Configure according to THREAD:
 if [[ "$THREAD" == "single" ]]; then
   
-  PKG_CONFIG="$WDIR/lib/pkg-config/bin/pkg-config" PKG_CONFIG_PATH="$WDIR/lib/cppunit/lib/pkgconfig/" \
+  PKG_CONFIG="$WDIR/tools/pkgconf-lite/bin/pkg-config" PKG_CONFIG_PATH="$WDIR/tools/cppunit/lib/pkgconfig/" \
     FC="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FCLIBS="$flibs" CFLAGS="-O3 --target=$ARCH-apple-darwin20" CXXFLAGS="-O3 --target=$ARCH-apple-darwin20" \
     F77="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FFLAGS="$fflags" FLIBS="$flibs" \
     ./configure --build="$ARCH-apple-darwin20" --prefix="$PREFIX" --with-included-ltdl --with-blas="$blasstr" --with-lapack="$lapkstr" --disable-openmp \
@@ -171,7 +173,7 @@ if [[ "$THREAD" == "single" ]]; then
   
 elif [[ "$THREAD" == "gcd" ]]; then
   
-  PKG_CONFIG="$WDIR/lib/pkg-config/bin/pkg-config" PKG_CONFIG_PATH="$WDIR/lib/cppunit/lib/pkgconfig/" \
+  PKG_CONFIG="$WDIR/tools/pkgconf-lite/bin/pkg-config" PKG_CONFIG_PATH="$WDIR/tools/cppunit/lib/pkgconfig/" \
     FC="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FCLIBS="$flibs" CFLAGS="-O3 --target=$ARCH-apple-darwin20" CXXFLAGS="-O3 --target=$ARCH-apple-darwin20" \
     F77="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FFLAGS="$fflags" FLIBS="$flibs" \
     ./configure --build="$ARCH-apple-darwin20" --prefix="$PREFIX" --with-included-ltdl --with-blas="$blasstr" --with-lapack="$lapkstr" --enable-gcd \
@@ -215,6 +217,21 @@ fi
 
 # Remove the build text from the version string:
 sed -i "" -e "s|Version: $VBSTRING|Version: $VERSION|g" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags.pc"
+
+# If this is the official binary then update the man page:
+if [ ! -z "$DEVELOPER_APPLICATION" ]; then
+  if [[ $(echo "$DEVELOPER_APPLICATION" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
+    MANFILE="$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/share/man/man1/jags.1"
+    cp "$WDIR/utils/man/jags.1" "$MANFILE"
+    sed -i "" -e "s/VERSIONSTRING/$VERSION/g" "$MANFILE"
+    sed -i "" -e "s/BLASSTRING/$BLAS/g" "$MANFILE"
+    sed -i "" -e "s/THREADSTRING/$THREAD/g" "$MANFILE"
+    sed -i "" -e "s/ARCHSTRING/$ARCH/g" "$MANFILE"
+    echo "CHECK MANPAGE"
+    exit 1
+  fi
+fi
+
 
 # Finished:
 touch "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/.stamp"

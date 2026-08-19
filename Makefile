@@ -74,7 +74,7 @@ tools/cppunit/.stamp: scripts/cppunit.sh sources/cppunit-$(CPPUNITVERS).tar.gz |
 tools/lapack/.stamp: scripts/lapack.sh sources/LAPACK-$(LAPACKVERS).tar.gz | tools tmp
 	./scripts/lapack.sh $(LAPACKVERS)
 
-tools/pkgconf-lite/.stamp: scripts/pkgconf.sh sources/pkgconf-$(PKGCONFVERS).tar.gz | tools lipo tmp
+tools/pkgconf-lite/.stamp: scripts/pkgconf.sh sources/pkgconf-$(PKGCONFVERS).tar.gz | tools tmp
 	./scripts/pkgconf.sh $(PKGCONFVERS)
 
 tools/pkg-config/.stamp: scripts/pkgconfig.sh sources/pkg-config-$(PKGCONFIGVERS).tar.gz | tools tmp
@@ -85,21 +85,21 @@ tools/omp/.stamp: scripts/omp.sh sources/v$(LAPACKVERS).tar.gz | tools tmp
 	./scripts/omp.sh $(LAPACKVERS)
 
 
+## Ensure the customised JAGS manual is updated:
+utils/man/jags.1: utils/jags.md
+	pandoc utils/jags.md -s -t man -o utils/man/jags.1
+
 ## Compile JAGS
 
-# Build dependent on all tools, even when we don't need e.g. LAPACK/OMP:
-tmp/JAGS-$(JAGSVERSION)-%/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz all-tools
-
-# Note: we could do this, but then the lipo rule won't always have a shorter stem:
-# tmp/JAGS-$(JAGSVERSION)-%/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz tools/pkg-config/.stamp tools/cppunit/.stamp
-# 	./scripts/jags-compile.sh $(JAGSVERSION) "$*"
-# tmp/JAGS-$(JAGSVERSION)-refBLAS-%/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz tools/pkg-config/.stamp tools/cppunit/.stamp tools/lapack/.stamp
-# 	./scripts/jags-compile.sh $(JAGSVERSION) "refBLAS-$*"
+# Build dependent on all tools, even when we don't need e.g. LAPACK/OMP, for ease:
+tmp/JAGS-$(JAGSVERSION)-%-aarch64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz tools/cppunit/.stamp tools/lapack/.stamp tools/pkgconf-lite/.stamp utils/man/jags.1
+	./scripts/jags-compile.sh $(JAGSVERSION) "$*-aarch64"
+tmp/JAGS-$(JAGSVERSION)-%-x86_64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz tools/cppunit/.stamp tools/lapack/.stamp tools/pkgconf-lite/.stamp utils/man/jags.1
+	./scripts/jags-compile.sh $(JAGSVERSION) "$*-x86_64"
 
 
 ## Lipo JAGS
 
-# Note: including -universal makes the stem shorter, so it will match this and not the compile rule above
 tmp/JAGS-$(JAGSVERSION)-%-universal/.stamp: scripts/jags-lipo.sh tmp/JAGS-$(JAGSVERSION)-%-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-%-x86_64/.stamp
 	./scripts/jags-lipo.sh $(JAGSVERSION) "$*"
 

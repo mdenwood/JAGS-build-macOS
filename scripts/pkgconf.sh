@@ -58,16 +58,17 @@ for arch in arm64 x86_64; do
 done
 
 ## Make UB:
+mkdir -p "$WDIR/tools/pkgconf-lite/bin"
 mkdir -p "$WDIR/tools/pkgconf-lite/versions/$VERSION/bin"
 mkdir -p "$WDIR/tools/pkgconf-lite/versions/$VERSION/doc/"
 
-lipo "$WDIR/tmp/pkgconf-lipo/pkgconf-arm64" "$WDIR/tmp/pkgconf-lipo/pkgconf-x86_64" -create -output "$WDIR/tools/pkgconf-lite/versions/$VERSION/bin/pkgconf"
+lipo "$WDIR/tmp/pkgconf-lipo/pkgconf-arm64" "$WDIR/tmp/pkgconf-lipo/pkgconf-x86_64" -create -output "$WDIR/tools/pkgconf-lite/versions/$VERSION/bin/pkg-config"
 cp AUTHORS "$WDIR/tools/pkgconf-lite/versions/$VERSION/doc/"
 cp COPYING "$WDIR/tools/pkgconf-lite/versions/$VERSION/doc/"
 echo "This is pkgconf-lite version $VERSION - see https://github.com/pkgconf/pkgconf for source code\n" > "$WDIR/tools/pkgconf-lite/versions/$VERSION/doc/notes.txt"
 
 ## Just for ease of use with building JAGS:
-ln -Fs "$WDIR/tools/pkgconf-lite/versions/$VERSION/bin/pkgconf" "$WDIR/tools/pkgconf-lite/pkgconf"
+ln -Fs "$WDIR/tools/pkgconf-lite/versions/$VERSION/bin/pkg-config" "$WDIR/tools/pkgconf-lite/bin/pkg-config"
 
 touch "$WDIR/tools/pkgconf-lite/.stamp"
 exit 0

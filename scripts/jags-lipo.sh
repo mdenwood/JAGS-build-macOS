@@ -12,15 +12,17 @@ EX_CONFIG=78
 ./scripts/check_deps.sh
 
 ## Check arguments
-if [ "$#" -ne 3 ]; then
-    echo "Error: 3 arguments required (got $#)."
-    echo "Usage: $0 <VERSION> <BLAS> <THREAD>"
+if [ "$#" -ne 2 ]; then
+    echo "Error: 2 arguments required (got $#)."
+    echo "Usage: $0 <VERSION> <BLAS-THREAD>"
     exit $EX_USAGE
 fi
 
 VERSION="$1"
-BLAS="$2"
-THREAD="$3"
+BUILD="$2"
+BUILDELEMS=( ${(s:-:)BUILD} )
+BLAS=$BUILDELEMS[1]
+THREAD=$BUILDELEMS[2]
 
 # Extract major version
 VERSMAJ=$(echo $VERSION | cut -d "." -f 1)
