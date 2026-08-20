@@ -273,6 +273,21 @@ for vv ("$majvers"); do
     ln -fs "/opt/jags/versions/jags/current-$vv/lib/pkgconfig/jagsv.pc" "/opt/jags/lib/pkgconfig-$vv/jags.pc"
   fi
 done
+# Fix utils installation if needed and present:
+for ff ("bin/jags-4" "bin/jags-5" "bin/jags-uninstall" "bin/jags-version" "share/man/man1/jags-4.1" "share/man/man1/jags-5.1" "share/man/man1/jags-uninstall.1" "share/man/man1/jags-version.1"); do
+  if [[ -f "/opt/jags/versions/utils/latest/$ff" ]]; then
+    if [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/utils/latest/$ff" ]]; then
+      if [ $UID -ne 0 ]; then
+          echo "Error: jags-version must be run using sudo (or as root) to create the required symlinks" >&2
+          echo "Usage: sudo $0 $@" >&2
+          exit $EX_USAGE
+      fi            
+      # echo "Making symlink for /opt/jags/$ff"
+      ln -fs "/opt/jags/versions/utils/latest/$ff" "/opt/jags/$ff"
+    fi
+  fi
+done
+
 
 # Check for presence of the modified pkg-config file:
 if [[ ! -f "/opt/jags/versions/jags/$target/lib/pkgconfig/jagsv.pc" ]]; then

@@ -43,34 +43,19 @@ if [ $(id -u) -ne 0 ]; then
     exit $EX_USAGE
 fi
 
-# Create symlink to current:
-ln -Fs "/opt/jags/versions/utils/$latest" "/opt/jags/versions/utils/current"
+# Create symlink to latest:
+ln -Fs "/opt/jags/versions/utils/$latest" "/opt/jags/versions/utils/latest"
 
 # Create symlinks under /opt/jags
 mkdir -p "/opt/jags/bin"
 mkdir -p "/opt/jags/share/man/man1"
-ln -fs "/opt/jags/versions/utils/current/bin/jags-4" "/opt/jags/bin/jags-4"
-ln -fs "/opt/jags/versions/utils/current/bin/jags-5" "/opt/jags/bin/jags-5"
-ln -fs "/opt/jags/versions/utils/current/bin/jags-uninstall" "/opt/jags/bin/jags-uninstall"
-ln -fs "/opt/jags/versions/utils/current/bin/jags-version" "/opt/jags/bin/jags-version"
-ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-uninstall.1" "/opt/jags/share/man/man1/jags-4.1"
-ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-version.1" "/opt/jags/share/man/man1/jags-5.1"
-ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-uninstall.1" "/opt/jags/share/man/man1/jags-uninstall.1"
-ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-version.1" "/opt/jags/share/man/man1/jags-version.1"
-
-echo "FIXME"
-exit 1
-
-for ff ("bin/jags-4" "bin/jags-5" "bin/jags-uninstall" "bin/jags-version" "share/man/man1/jags-4.1" "share/man/man1/jags-5.1" "share/man/man1/jags-uninstall.1" "share/man/man1/jags-version.1"); do
-    if [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/utils/default/$ff" ]]; then
-      if [ $UID -ne 0 ]; then
-          echo "Error: jags-version must be run using sudo (or as root) to create the required symlinks" >&2
-          echo "Usage: sudo $0 $@" >&2
-          exit $EX_USAGE
-      fi            
-      # echo "Making symlink for /opt/jags/$ff"
-      ln -fs "/opt/jags/versions/utils/default/$ff" "/opt/jags/$ff"
-    fi
-done
+ln -fs "/opt/jags/versions/utils/latest/bin/jags-4" "/opt/jags/bin/jags-4"
+ln -fs "/opt/jags/versions/utils/latest/bin/jags-5" "/opt/jags/bin/jags-5"
+ln -fs "/opt/jags/versions/utils/latest/bin/jags-uninstall" "/opt/jags/bin/jags-uninstall"
+ln -fs "/opt/jags/versions/utils/latest/bin/jags-version" "/opt/jags/bin/jags-version"
+ln -fs "/opt/jags/versions/utils/latest/share/man/man1/jags-uninstall.1" "/opt/jags/share/man/man1/jags-4.1"
+ln -fs "/opt/jags/versions/utils/latest/share/man/man1/jags-version.1" "/opt/jags/share/man/man1/jags-5.1"
+ln -fs "/opt/jags/versions/utils/latest/share/man/man1/jags-uninstall.1" "/opt/jags/share/man/man1/jags-uninstall.1"
+ln -fs "/opt/jags/versions/utils/latest/share/man/man1/jags-version.1" "/opt/jags/share/man/man1/jags-version.1"
 
 exit $EX_OK
