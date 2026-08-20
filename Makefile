@@ -127,7 +127,7 @@ pkg/JAGS-%.pkg: scripts/package-jags.sh tgz/JAGS-%.tgz build/postinstall-jags.sh
 
 ## Create transition pkg
 
-sign/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postinstall-transition-$(UTILSVERSION).sh | sign pkg
+pkg/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postinstall-transition-$(UTILSVERSION).sh | sign pkg
 	./scripts/package-transition.sh $(UTILSVERSION)
 
 ## TODO: transition should allow new JAGS 4 to work with CRAN rjags

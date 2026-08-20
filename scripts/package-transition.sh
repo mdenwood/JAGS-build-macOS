@@ -53,7 +53,10 @@ pkgbuild --identifier "$PKG_IDENTIFIER" \
          --version "$VERSION" \
          --scripts "sign/transition/scripts" \
          --nopayload \
-           "sign/transition-$VERSION.pkg"
+           "pkg/transition-$VERSION.pkg"
+
+echo "Move signing to another script"
+exit 1
 
 # Sign and notarise standalone version:
 rm -rf "sign/pkg"

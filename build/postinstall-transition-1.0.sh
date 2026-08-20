@@ -63,9 +63,9 @@ fi
 mkdir -p "/opt/jags/bin"
 mkdir -p "/opt/jags/lib/pkgconfig"
 mkdir -p "/opt/jags/share/man/man1"
-ln -fs "/opt/jags/versions/jags/current/bin/jags" "/opt/jags/bin/jags"
-ln -fs "/opt/jags/versions/jags/current/lib/pkgconfig/jags.pc" "/opt/jags/lib/pkgconfig/jags.pc"
-ln -fs "/opt/jags/versions/jags/current/share/man/man1/jags.1" "/opt/jags/share/man/man1/jags.1"
+ln -fs "/opt/jags/versions/jags/default/bin/jags" "/opt/jags/bin/jags"
+ln -fs "/opt/jags/versions/jags/default/lib/pkgconfig/jags.pc" "/opt/jags/lib/pkgconfig/jags.pc"
+ln -fs "/opt/jags/versions/jags/default/share/man/man1/jags.1" "/opt/jags/share/man/man1/jags.1"
 
 # Create symlinks under /usr/local
 mkdir -p "/usr/local/bin"
