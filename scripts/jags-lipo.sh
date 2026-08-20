@@ -6,6 +6,9 @@
 # Abort on error, use of unset variable, or error within pipe:
 set -euo pipefail
 
+echo "CHANGE jags.pc to point to -universal not -arch, and update man to also say universal"
+exit 1
+
 # Return codes:
 EX_OK=0
 EX_USAGE=64

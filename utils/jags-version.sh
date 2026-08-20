@@ -7,16 +7,8 @@
 # For help/options run jags-version --help
 # This utility is (also) distributed as part of the macOS installers for JAGS (https://mcmc-jags.sourceforge.io)
 
-echo "Modify jags-version to look for jags-MAJVERS.pc in the same place as jags.pc, and if it is not there then create it.  Then compare to the current pkgconfig-MAJVERS/jags.pc and pkconfig/jags.pc and warn about the need for rjags recompilation if not the same (but then over-write), otherwise do nothing.  Also be smart about JAGS 4 vs 5 difference vs e.g. -lomp addition"
-echo "Also modify rjags configure script to look under the new path for jags.pc"
-echo "Also fix jags-4 and jags-5 so they simply redirect to the correct build, allowing all arguments to be forwarded"
-exit 1
-
-# Duplicate and modify the pkg-config file (only if PREFIX is specific build):
-cp "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags.pc" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags-$MAJVERS.pc"
-sed -i "" -e "s|prefix=/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH|prefix=/opt/jags/${VERSMAJ}.x-current|g" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags-$MAJVERS.pc"
-sed -i "" -e "s|Version: $VERSION ($BLAS-$THREAD-$ARCH build)|Version: $MAJVERS|g" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags-$MAJVERS.pc"
-
+# Abort on error, use of unset variable, or error within pipe:
+set -euo pipefail
 
 # Arguments
 help=0
@@ -133,10 +125,10 @@ fi
 
 # Check for legacy/custom JAGS installations and warn:
 legacy=0
-if [[ -d "/usr/local/lib/JAGS/" ]]; then
+if [[ -d "/usr/local/include/JAGS/" ]]; then
   legacy=1
 fi
-if [[ -d "/opt/R/arm64/lib/JAGS/" ]]; then
+if [[ -d "/opt/R/arm64/include/JAGS/" ]]; then
   legacy=1
 fi
 if [[ $legacy -eq 1 ]]; then
@@ -157,7 +149,11 @@ if [[ ! -d "/opt/jags/versions/jags" ]]; then
 fi
 
 # Display avaialble JAGS builds:
-current=$(readlink /opt/jags/versions/jags/current)
+if [[ -d "/opt/jags/versions/jags/default" ]]; then
+  default=$(readlink /opt/jags/versions/jags/default)
+else
+  default="UNSET"
+fi
 if [[ $list -eq 1 ]]; then
   if [[ $interactive -eq 1 ]]; then
     echo "Select one of the following JAGS builds:"
@@ -181,7 +177,12 @@ if [[ $list -eq 1 ]]; then
           exit $EX_USAGE
         fi
         
-        currentv=$(readlink /opt/jags/versions/jags/$majvers.x-current)
+        if [[ -d "/opt/jags/versions/jags/current-$majvers" ]]; then
+          currentv=$(readlink /opt/jags/versions/jags/current-$majvers)
+        else
+          currentv="UNSET"
+        fi
+        
         printf "\t"
         if [[ $interactive -eq 1 ]]; then
           versions+=($ff)
@@ -189,10 +190,12 @@ if [[ $list -eq 1 ]]; then
           index=$((index+1))
         fi
         printf "$ff"
-        if [[ "$(readlink -- /opt/jags/versions/jags/current)" == "/opt/jags/versions/jags/$ff" ]] && [[ "$currentv" == "/opt/jags/versions/jags/$ff" ]]; then
-          printf " ($majvers.x-current & default)"
+        if [[ "$default" == "/opt/jags/versions/jags/$ff" ]] && [[ "$currentv" == "/opt/jags/versions/jags/$ff" ]]; then
+          printf " (current-$majvers & default)"
         elif [[ "$currentv" == "/opt/jags/versions/jags/$ff" ]]; then
-          printf " ($majvers.x-current)"
+          printf " (current-$majvers)"
+        elif [[ "$default" == "/opt/jags/versions/jags/$ff" ]]; then
+          printf " (default)"
         fi
         printf "\n"
       fi
@@ -226,33 +229,88 @@ if [[ ! -d "/opt/jags/versions/jags/$target" ]]; then
   exit $EX_USAGE  
 fi
 
-# Test we are either running as root or sudo:
-if [ $(id -u) -ne 0 ]; then
+# Test we are either running as root or sudo (unless we are the owner of the /opt/jags/versions/jags directory):
+if [ ! -O "/opt/jags/versions/jags/" ] && [ $UID -ne 0 ]; then
     echo "Error: jags-version must be run using sudo (or as root) to switch the active JAGS build" >&2
     echo "Usage: sudo $0 $@" >&2
     exit $EX_USAGE
 fi
 
-# Update active version:
-ln -Fs "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/current"
-majvers=$(echo $target | cut -d "." -f 1)
-ln -Fs "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/$majvers.x-current"
+# Extract major version:
+majvers=$(echo $target | cut -d "." -f 1)    
 
-# Verify that the required symlinks are present:
-mkdir -p "/opt/jags/bin"
-mkdir -p "/opt/jags/lib/pkgconfig"
-mkdir -p "/opt/jags/share/man/man1"
+# Verify that the required directories and symlinks are present:
+for dd ("/opt/jags/bin" "/opt/jags/lib/pkgconfig" "/opt/jags/lib/pkgconfig-$majvers" "/opt/jags/share/man/man1"); do
+  if [[ ! -d "$dd" ]]; then
+    if [ $UID -ne 0 ]; then
+        echo "Error: jags-version must be run using sudo (or as root) to create the required directory structure" >&2
+        echo "Usage: sudo $0 $@" >&2
+        exit $EX_USAGE
+    fi  
+    # echo "Making directory $dd"
+    mkdir -p "$dd"    
+  fi    
+done
 for ff ("bin/jags" "lib/pkgconfig/jags.pc" "share/man/man1/jags.1"); do
-    if [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/jags/current/$ff" ]]; then
-      ln -fs "/opt/jags/versions/jags/current/$ff" "/opt/jags/$ff"
+    if [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/jags/default/$ff" ]]; then
+      if [ $UID -ne 0 ]; then
+          echo "Error: jags-version must be run using sudo (or as root) to create the required symlinks" >&2
+          echo "Usage: sudo $0 $@" >&2
+          exit $EX_USAGE
+      fi            
+      # echo "Making symlink for /opt/jags/$ff"
+      ln -fs "/opt/jags/versions/jags/default/$ff" "/opt/jags/$ff"
     fi
 done
-for ff ("bin/jags-4" "bin/jags-5" "bin/jags-uninstall" "bin/jags-version" "share/man/man1/jags-4.1" "share/man/man1/jags-5.1" "share/man/man1/jags-uninstall.1" "share/man/man1/jags-version.1"); do
-    if [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/utils/current/$ff" ]]; then
-      echo $ff
-      ln -fs "/opt/jags/versions/utils/current/$ff" "/opt/jags/$ff"
-    fi
+for vv ("$majvers"); do
+  if [[ ! "$(readlink -n "/opt/jags/lib/pkgconfig-$vv/jags.pc")" == "/opt/jags/versions/jags/current-$vv/lib/pkgconfig/jagsv.pc" ]]; then
+    if [ $UID -ne 0 ]; then
+        echo "Error: jags-version must be run using sudo (or as root) to create the required symlinks" >&2
+        echo "Usage: sudo $0 $@" >&2
+        exit $EX_USAGE
+    fi            
+    # echo "Making symlink for /opt/jags/lib/pkgconfig-$vv/jags.pc"
+    ln -fs "/opt/jags/versions/jags/current-$vv/lib/pkgconfig/jagsv.pc" "/opt/jags/lib/pkgconfig-$vv/jags.pc"
+  fi
 done
 
-echo "$target is now $majvers.x-current & default"
+# Check for presence of the modified pkg-config file:
+if [[ ! -f "/opt/jags/versions/jags/$target/lib/pkgconfig/jagsv.pc" ]]; then
+  if [ $UID -ne 0 ]; then
+      echo "Error: jags-version must be run using sudo (or as root) to modify pkg-config files" >&2
+      echo "Usage: sudo $0 $@" >&2
+      exit $EX_USAGE
+  fi
+  
+  if [[ ! -f "/opt/jags/versions/jags/$target/lib/pkgconfig/jags.pc" ]]; then
+    echo "Error: /opt/jags/versions/jags/$target/lib/pkgconfig/jags.pc was not found (invalid JAGS installation)" >&2
+    exit $EX_SOFTWARE
+  fi
+    
+  # Duplicate and modify the pkg-config file:
+  cp "/opt/jags/versions/jags/$target/lib/pkgconfig/jags.pc" "/opt/jags/versions/jags/$target/lib/pkgconfig/jagsv.pc"
+  sed -i "" -e "s|prefix=/opt/jags/versions/jags/$target|prefix=/opt/jags/versions/jags/current-$majvers|g" "/opt/jags/versions/jags/$target/lib/pkgconfig/jagsv.pc"  
+fi
+
+# Check if we are moving between major versions of JAGS:
+if [[ -f "/opt/jags/versions/jags/default/include/JAGS/version.h" ]]; then  
+  oldmajvers=$(cat "/opt/jags/versions/jags/default/include/JAGS/version.h" | grep "JAGS_MAJOR" | cut -d " " -f 3)
+  if [[ $oldmajvers -ne $majvers ]]; then
+    echo "Note: switching between major versions of JAGS ($oldmajvers -> $majvers) does not affect the rjags package without re-compilation"
+  fi  
+fi
+
+# Check the jagsv.pc file to see if it is the same as the currently linked version:
+if [[ -f "/opt/jags/lib/pkgconfig-$majvers/jags.pc" ]]; then
+  # echo "Checking to see if the jags.pc file is changed..."
+  if ! cmp -s "/opt/jags/lib/pkgconfig-$majvers/jags.pc" "/opt/jags/versions/jags/$target/lib/pkgconfig/jagsv.pc"; then
+    echo "Note: the JAGS-$majvers build indicated ($target) has a different \npkg-config file to the previous build ($default); \nyou may need to re-compile rjags"
+  fi
+fi
+
+# Update active version:
+ln -Fs "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/default"
+ln -Fs "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/current-$majvers"
+
+echo "JAGS build $target is now current-$majvers & default"
 exit $EX_OK

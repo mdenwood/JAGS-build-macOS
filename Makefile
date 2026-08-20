@@ -119,7 +119,7 @@ tgz/JAGS-%.tgz: tmp/JAGS-%/.stamp | tgz
 
 ## Sign code, make dependency manifest and create pkg
 
-pkg/JAGS-%.pkg: scripts/package-jags.sh tgz/JAGS-%.tgz | sign pkg
+pkg/JAGS-%.pkg: scripts/package-jags.sh tgz/JAGS-%.tgz build/postinstall-jags.sh utils/jags-version.sh | sign pkg
 	./scripts/package-jags.sh $*
 
 
@@ -137,7 +137,7 @@ sign/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postins
 utils/man/jags-%.1: utils/jags-%.md utils/utils-vers.sh
 	pandoc utils/jags-$*.md -s -t man -M footer="Version $(UTILSVERSION)" -o utils/man/jags-$*.1
 
-sign/utils-$(UTILSVERSION).pkg: utils/man/jags-4.1 utils/man/jags-5.1
+pkg/utils-$(UTILSVERSION).pkg: utils/man/jags-4.1 utils/man/jags-5.1 postinstall-utils.sh
 	./scripts/package-utils.sh $(UTILSVERSION)
 
 

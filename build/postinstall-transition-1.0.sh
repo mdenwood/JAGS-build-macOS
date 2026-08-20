@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+# SPDX-FileCopyrightText: 2026 Matthew Denwood (https://github.com/mdenwood/JAGS-build-macOS)
+# SPDX-License-Identifier: Apache-2.0
+
 # Abort on error, use of unset variable, or error within pipe:
 set -euo pipefail
 
@@ -71,5 +74,10 @@ mkdir -p "/usr/local/share/man/man1"
 ln -fs "/opt/jags/bin/jags" "/usr/local/bin/jags" 
 ln -fs "/opt/jags/lib/pkgconfig/jags.pc" "/usr/local/lib/pkgconfig/jags.pc" 
 ln -fs "/opt/jags/share/man/man1/jags.1" "/usr/local/share/man/man1/jags.1" 
+
+# For compatibility with the CRAN build of rjags-4:
+ln -Fs "/opt/jags/versions/jags/current-4/jags/lib/JAGS" "/usr/local/lib/JAGS"
+ln -fs "/opt/jags/versions/jags/current-4/jags/lib/libjags.dylib" "/usr/local/lib/libjags.dylib"
+ln -fs "/opt/jags/versions/jags/current-4/jags/lib/libjrmath.dylib" "/usr/local/lib/libjrmath.dylib"
 
 exit $EX_OK

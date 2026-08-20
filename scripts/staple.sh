@@ -24,6 +24,14 @@ fi
 BUILD="$1"
 WDIR=`pwd`
 
+echo "Also modify rjags configure script to look under the new path for jags.pc"
+echo "Also fix jags-4 and jags-5 so they simply redirect to the correct build, allowing all arguments to be forwarded"
+exit 1
+
+
+
+
+
 echo "FIXME"
 exit 1
 

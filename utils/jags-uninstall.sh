@@ -7,6 +7,9 @@
 # For help/options run jags-uninstall --help
 # This utility is (also) distributed as part of the macOS installers for JAGS (https://mcmc-jags.sourceforge.io)
 
+# Abort on error, use of unset variable, or error within pipe:
+set -euo pipefail
+
 # Arguments
 custom=0
 official=0

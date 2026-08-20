@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+# SPDX-FileCopyrightText: 2026 Matthew Denwood (https://github.com/mdenwood/JAGS-build-macOS)
+# SPDX-License-Identifier: Apache-2.0
+
 # Abort on error, use of unset variable, or error within pipe:
 set -euo pipefail
 
