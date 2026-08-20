@@ -4,6 +4,11 @@ section: 1
 header: JAGS Utilities User Manuals
 ---
 
+<!---
+SPDX-FileCopyrightText: 2026 Matthew Denwood (https://github.com/mdenwood/JAGS-build-macOS)
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # NAME
 jags-5 - launch JAGS 5.x
 

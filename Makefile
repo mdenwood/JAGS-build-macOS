@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Matthew Denwood (https://github.com/mdenwood/JAGS-build-macOS)
+# SPDX-License-Identifier: Apache-2.0
+
 ## Versions of JAGS, CPPUNIT and LAPACK to use
 JAGSVERSION := 5.0.0
 UTILSVERSION := 1.0
@@ -24,7 +27,7 @@ all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp
 ## Create folders
 
 .PHONY: mkdirs
-mkdirs: | sources tmp tools tgz sign pkg build
+mkdirs: | sources tmp tools tgz sign pkg release
 
 sources:					# For downloading source files
 	mkdir sources
@@ -36,10 +39,10 @@ tgz:							# For (potentially lipo'd) unsigned tarballs
 	mkdir tgz
 sign:						  # Temp directory for signing and verifying dependencies
 	mkdir sign
-pkg:							# For signed installers
+pkg:							# For installers (code is signed but not stapled)
 	mkdir pkg
-build:						# For productbuild output
-	mkdir build
+release:					# For all signed/stapled installers including productbuild output
+	mkdir release
 
 
 ## Download source files
@@ -66,7 +69,10 @@ sources/pkg-config-$(PKGCONFIGVERS).tar.gz: | sources
 ## Build tools
 
 .PHONY: all-tools
-all-tools: tools/cppunit/.stamp tools/lapack/.stamp tools/pkgconf-lite/.stamp #tools/pkg-config/.stamp #tools/omp/.stamp
+all-tools: tools/.stamp
+	
+tools/.stamp: tools/cppunit/.stamp tools/lapack/.stamp tools/pkgconf-lite/.stamp #tools/pkg-config/.stamp #tools/omp/.stamp
+	touch tools/.stamp
 
 tools/cppunit/.stamp: scripts/cppunit.sh sources/cppunit-$(CPPUNITVERS).tar.gz | tools tmp
 	./scripts/cppunit.sh $(CPPUNITVERS)
@@ -89,12 +95,13 @@ tools/omp/.stamp: scripts/omp.sh sources/v$(LAPACKVERS).tar.gz | tools tmp
 utils/man/jags.1: utils/jags.md
 	pandoc utils/jags.md -s -t man -o utils/man/jags.1
 
+
 ## Compile JAGS
 
 # Build dependent on all tools, even when we don't need e.g. LAPACK/OMP, for ease:
-tmp/JAGS-$(JAGSVERSION)-%-aarch64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz tools/cppunit/.stamp tools/lapack/.stamp tools/pkgconf-lite/.stamp utils/man/jags.1
+tmp/JAGS-$(JAGSVERSION)-%-aarch64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz tools/.stamp utils/man/jags.1 | tmp
 	./scripts/jags-compile.sh $(JAGSVERSION) "$*-aarch64"
-tmp/JAGS-$(JAGSVERSION)-%-x86_64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz tools/cppunit/.stamp tools/lapack/.stamp tools/pkgconf-lite/.stamp utils/man/jags.1
+tmp/JAGS-$(JAGSVERSION)-%-x86_64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz tools/.stamp utils/man/jags.1 | tmp
 	./scripts/jags-compile.sh $(JAGSVERSION) "$*-x86_64"
 
 
@@ -110,24 +117,45 @@ tgz/JAGS-%.tgz: tmp/JAGS-%/.stamp | tgz
 	tar -zcf tgz/JAGS-$*.tgz -C tmp/JAGS-$* opt
 
 
-## Sign, make dependency manifest and create pkg
+## Sign code, make dependency manifest and create pkg
 
-sign/JAGS-%.pkg: scripts/package-jags.sh tgz/JAGS-%.tgz | sign pkg
+pkg/JAGS-%.pkg: scripts/package-jags.sh tgz/JAGS-%.tgz | sign pkg
 	./scripts/package-jags.sh $*
 
+
+## FIXME BELOW
 
 ## Create transition pkg
 
 sign/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postinstall-transition-$(UTILSVERSION).sh | sign pkg
 	./scripts/package-transition.sh $(UTILSVERSION)
 
+## TODO: transition should allow new JAGS 4 to work with CRAN rjags
+
 
 ## Create utils pkg
 utils/man/jags-%.1: utils/jags-%.md utils/utils-vers.sh
 	pandoc utils/jags-$*.md -s -t man -M footer="Version $(UTILSVERSION)" -o utils/man/jags-$*.1
 
-sign/utils-$(UTILSVERSION).pkg:
+sign/utils-$(UTILSVERSION).pkg: utils/man/jags-4.1 utils/man/jags-5.1
 	./scripts/package-utils.sh $(UTILSVERSION)
 
-## Create JAGS installers
 
+## Create pkgconf pkg
+
+## Use productbuild to make (and staple) main release:
+release/JAGS-$(JAGSVERSION).pkg: scripts/productbuild.sh pkg/JAGS-$(JAGSVERSION)-refBLAS-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg | release
+	./scripts/productbuild.sh $(JAGSVERSION)
+
+
+## Staple additional releases:
+release/JAGS-%.pkg: scripts/staple.sh pkg/JAGS-%.pkg | release
+	./scripts/staple.sh "JAGS-$*"
+
+release/utils-$(UTILSVERSION).pkg: scripts/staple.sh pkg/utils-$(UTILSVERSION).pkg | release
+	./scripts/staple.sh "utils-$(UTILSVERSION)"
+
+# ETC
+
+.PHONY: releases
+releases: release/JAGS-$(JAGSVERSION).pkg # etc

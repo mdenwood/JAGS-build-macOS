@@ -3,10 +3,6 @@
 # SPDX-FileCopyrightText: 2026 Matthew Denwood (https://github.com/mdenwood/JAGS-build-macOS)
 # SPDX-License-Identifier: Apache-2.0
 
-# Set only if not already set:
-: ${PKG_IDENTIFIER="unknown"}
-: ${PKG_KEYCHAIN="INSERT KEYCHAIN PROFILE NAME HERE"}
-
 # Abort on error, use of unset variable, or error within pipe:
 set -euo pipefail
 
@@ -15,15 +11,24 @@ EX_OK=0
 EX_USAGE=64
 EX_CONFIG=78
 
+# Note: this script is intended to be run from the root directory (by the Makefile)
+./scripts/check_deps.sh
+
 ## Check arguments
 if [ "$#" -ne 1 ]; then
     echo "Error: 1 arguments required (got $#)."
-    echo "Usage: $0 <VERSION>"
+    echo "Usage: $0 <PKGFILE>"
     exit $EX_USAGE
 fi
 
-VERSION="$1"
+BUILD="$1"
 WDIR=`pwd`
+
+echo "FIXME"
+exit 1
+
+## Remove final signed output:
+rm -rf "$WDIR/release/$BUILD.pkg"
 
 ## Extract developer identity:
 set +e  # Temporarily disable stop-on-error
@@ -39,25 +44,20 @@ if [ -z "$DEVELOPER_INSTALLER" ]; then
   exit $EX_CONFIG
 fi
 
-## Set PKG_IDENTIFIER if the developer identity matches:
-if [[ $(echo "$DEVELOPER_APPLICATION" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
-  PKG_IDENTIFIER="com.matthewdenwood.jags-utils"
-  PKG_KEYCHAIN="Developer ID: Matthew Denwood"
-fi
+# Sign and notarise standalone version:
+rm -rf "sign/pkg"
+mkdir -p "sign/pkg"
+productsign --sign "$DEVELOPER_INSTALLER" "sign/JAGS-$BUILD.pkg" "sign/pkg/JAGS-$BUILD.pkg"
+cd "sign/pkg"
+pkgutil --check-signature "JAGS-$BUILD.pkg"
+xcrun notarytool submit "JAGS-$BUILD.pkg" --keychain-profile "$PKG_KEYCHAIN" --wait
+xcrun stapler staple "JAGS-$BUILD.pkg"
 
-## TODO: separate making a .pkg into components and signing standalone into pkg
+# Verify:
+xcrun stapler validate "JAGS-$BUILD.pkg"
+spctl -a -vv -t install "JAGS-$BUILD.pkg"
 
+# Move to pkg directory once verification is complete:
+mv "JAGS-$BUILD.pkg" "$WDIR/pkg/JAGS-$BUILD.pkg"
 
-## Use productbuild to make a multi-pkg installer
-
-exit 1
-
-# Generate distribution file automatically:
-productbuild --synthesize \
-             --package-path ./components \
-             ./Distribution.xml
-
-productbuild --distribution ./Distribution.xml \
-             --package-path ./components \
-             --sign "Developer ID Installer: Your Company Name (TEAMID)" \
-             ./FinalSuiteInstaller.pkg
+exit $EX_OK

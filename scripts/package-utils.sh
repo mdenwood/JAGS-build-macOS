@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+# SPDX-FileCopyrightText: 2026 Matthew Denwood (https://github.com/mdenwood/JAGS-build-macOS)
+# SPDX-License-Identifier: Apache-2.0
+
 # Set only if not already set:
 : ${PKG_IDENTIFIER="unknown"}
 : ${PKG_KEYCHAIN="INSERT KEYCHAIN PROFILE NAME HERE"}

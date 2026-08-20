@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+# SPDX-FileCopyrightText: 2026 Matthew Denwood (https://github.com/mdenwood/JAGS-build-macOS)
+# SPDX-License-Identifier: Apache-2.0
+
 # Abort on error, use of unset variable, or error within pipe:
 set -euo pipefail
 
@@ -227,8 +230,6 @@ if [ ! -z "$DEVELOPER_APPLICATION" ]; then
     sed -i "" -e "s/BLASSTRING/$BLAS/g" "$MANFILE"
     sed -i "" -e "s/THREADSTRING/$THREAD/g" "$MANFILE"
     sed -i "" -e "s/ARCHSTRING/$ARCH/g" "$MANFILE"
-    echo "CHECK MANPAGE"
-    exit 1
   fi
 fi
 

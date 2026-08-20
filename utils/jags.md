@@ -4,6 +4,11 @@ section: 1
 header: JAGS User Manual
 ---
 
+<!---
+SPDX-FileCopyrightText: 2026 Matthew Denwood (https://github.com/mdenwood/JAGS-build-macOS)
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # NAME
 jags - Just Another Gibbs Sampler (JAGS)
 

@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+# SPDX-FileCopyrightText: 2026 Matthew Denwood (https://github.com/mdenwood/JAGS-build-macOS)
+# SPDX-License-Identifier: Apache-2.0
+
 # Set only if not already set:
 : ${PKG_IDENTIFIER="unknown"}
 
@@ -50,7 +53,7 @@ fi
 if [[ $(echo "$DEVELOPER_APPLICATION" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
   PKG_IDENTIFIER="com.matthewdenwood.jags"
   PKG_KEYCHAIN="Developer ID: Matthew Denwood"
-  if grep "official" "sign/JAGS-$BUILD/opt/jags/versions/jags/$BUILD/lib/pkgconfig/jags.pc"; then
+  if grep "official macOS binary" "sign/JAGS-$BUILD/opt/jags/versions/jags/$BUILD/share/man/man1/jags.1"; then
     echo "Signing official JAGS binary"
   else
     echo "The indicated build of JAGS was not compiled with the 'official' string - do make clean and try again" 1>&2
@@ -113,22 +116,6 @@ pkgbuild --root "sign/JAGS-$BUILD/opt/" \
          --version "$BUILD" \
          --install-location "/opt/" \
          --scripts "sign/JAGS-$BUILD/scripts" \
-         "sign/JAGS-$BUILD.pkg"
-
-# Sign and notarise standalone version:
-rm -rf "sign/pkg"
-mkdir -p "sign/pkg"
-productsign --sign "$DEVELOPER_INSTALLER" "sign/JAGS-$BUILD.pkg" "sign/pkg/JAGS-$BUILD.pkg"
-cd "sign/pkg"
-pkgutil --check-signature "JAGS-$BUILD.pkg"
-xcrun notarytool submit "JAGS-$BUILD.pkg" --keychain-profile "$PKG_KEYCHAIN" --wait
-xcrun stapler staple "JAGS-$BUILD.pkg"
-
-# Verify:
-xcrun stapler validate "JAGS-$BUILD.pkg"
-spctl -a -vv -t install "JAGS-$BUILD.pkg"
-
-# Move to pkg directory once verification is complete:
-mv "JAGS-$BUILD.pkg" "$WDIR/pkg/JAGS-$BUILD.pkg"
+         "pkg/JAGS-$BUILD.pkg"
 
 exit $EX_OK
