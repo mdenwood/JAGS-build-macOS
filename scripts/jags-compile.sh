@@ -17,7 +17,7 @@ EX_CONFIG=78
 ## Check arguments
 if [ "$#" -ne 2 ]; then
     echo "Error: 2 arguments required (got $#)."
-    echo "Usage: $0 <VERSION> <BLAS-THREAD-ARCH>"
+    echo "Usage: $0 <VERSION> <BLAS-THREAD-[U]ARCH>"
     exit $EX_USAGE
 fi
 

@@ -13,17 +13,19 @@ SPDX-License-Identifier: Apache-2.0
 jags-4 - launch JAGS 4.x
 
 # SYNOPSIS
-**jags-4** [*BUILD*]
+**jags-4** [-b=*BUILD*] [*JAGS options/arguments*]
 
 # DESCRIPTION
 **jags-4** is a command-line utility that can be used to launch a specific version/build
 of JAGS version 4.x (https://mcmc-jags.sourceforge.io) created by the official JAGS 4.x
 installer for macOS released in August 2026 (or later), without having to run jags-version
-first.  Note that it is not possible to provide arguments to JAGS itself (e.g. debuggers).
+first.
 
 # OPTIONS
-**BUILD**
-: An optional target build/version (otherwise the 4.x-current version will be used)
+**-b=BUILD**
+: An optional target build/version (otherwise the current-4 version will be used)
+
+All other options and arguments will be passed directly to JAGS.
 
 # SEE ALSO
 http://mcmc-jags.sourceforge.net and https://github.com/mdenwood/JAGS-build-macOS

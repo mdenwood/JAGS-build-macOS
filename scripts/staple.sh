@@ -30,6 +30,9 @@ echo "DONE BUT CHECK:  transition should allow rjags-4 from CRAN to install and 
 echo "Provide fixed-link JAGS-5.x-aarch64 and JAGS-5.x-x86_64 for automatic downloads on build machines?"
 echo "Back-port configure changes from rjags 5.x to 4.x ??"
 echo "Also modify rjags configure script to look under the new path for jags.pc"
+/opt/jags/versions/pkgconf-lite/current/bin/pkg-config --with-path=/opt/jags/versions/jags/current-5/lib/pkgconfig --variable libdir jags 
+/opt/jags/versions/pkgconf-lite/current/bin/pkg-config --variable libdir jags 
+
 exit 1
 
 

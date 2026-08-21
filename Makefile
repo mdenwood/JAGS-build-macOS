@@ -137,7 +137,7 @@ pkg/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postinst
 utils/man/jags-%.1: utils/jags-%.md utils/utils-vers.sh
 	pandoc utils/jags-$*.md -s -t man -M footer="Version $(UTILSVERSION)" -o utils/man/jags-$*.1
 
-pkg/utils-$(UTILSVERSION).pkg: utils/jags-0.sh utils/man/jags-4.1 utils/man/jags-5.1 utils/man/jags-version.1 utils/man/jags-uninstall.1 build/postinstall-utils.sh
+pkg/utils-$(UTILSVERSION).pkg: utils/jags-0.sh utils/jags-version.sh utils/jags-uninstall.sh utils/man/jags-4.1 utils/man/jags-5.1 utils/man/jags-version.1 utils/man/jags-uninstall.1 build/postinstall-utils.sh
 	./scripts/package-utils.sh $(UTILSVERSION)
 
 

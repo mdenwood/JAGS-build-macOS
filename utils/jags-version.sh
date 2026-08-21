@@ -257,7 +257,7 @@ for dd ("/opt/jags/bin" "/opt/jags/lib/pkgconfig" "/opt/jags/lib/pkgconfig-$majv
     mkdir -p "$dd"    
   fi    
 done
-for ff ("bin/jags" "lib/pkgconfig/jags.pc" "share/man/man1/jags.1"); do
+for ff ("bin/jags" "share/man/man1/jags.1"); do
     if [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/jags/default/$ff" ]]; then
       if [ $UID -ne 0 ]; then
           echo "Error: jags-version must be run using sudo (or as root) to create the required symlinks" >&2
@@ -268,6 +268,15 @@ for ff ("bin/jags" "lib/pkgconfig/jags.pc" "share/man/man1/jags.1"); do
       ln -fs "/opt/jags/versions/jags/default/$ff" "/opt/jags/$ff"
     fi
 done
+if [[ ! "$(readlink -n "/opt/jags/lib/pkgconfig/jags.pc")" == "/opt/jags/versions/jags/default/lib/pkgconfig/jagsv.pc" ]]; then
+  if [ $UID -ne 0 ]; then
+      echo "Error: jags-version must be run using sudo (or as root) to create the required symlinks" >&2
+      echo "Usage: sudo $0 $@" >&2
+      exit $EX_USAGE
+  fi            
+  # echo "Making symlink for /opt/jags/lib/pkgconfig/jags.pc"
+  ln -fs "/opt/jags/versions/jags/default/lib/pkgconfig/jagsv.pc" "/opt/jags/lib/pkgconfig/jags.pc"
+fi
 for vv ("$majvers"); do
   if [[ ! "$(readlink -n "/opt/jags/lib/pkgconfig-$vv/jags.pc")" == "/opt/jags/versions/jags/current-$vv/lib/pkgconfig/jagsv.pc" ]]; then
     if [ $UID -ne 0 ]; then

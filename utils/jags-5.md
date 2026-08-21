@@ -13,17 +13,19 @@ SPDX-License-Identifier: Apache-2.0
 jags-5 - launch JAGS 5.x
 
 # SYNOPSIS
-**jags-5** [*BUILD*]
+**jags-5** [-b=*BUILD*] [*JAGS options/arguments*]
 
 # DESCRIPTION
 **jags-5** is a command-line utility that can be used to launch a specific version/build
 of JAGS version 5.x (https://mcmc-jags.sourceforge.io) created by the official JAGS 5.x
-installers for macOS released in August 2026 (or later), without having to run jags-version
-first.  Note that it is not possible to provide arguments to JAGS itself (e.g. debuggers).
+installer for macOS released in August 2026 (or later), without having to run jags-version
+first.
 
 # OPTIONS
-**BUILD**
-: An optional target build/version (otherwise the 5.x-current version will be used)
+**-b=BUILD**
+: An optional target build/version (otherwise the current-5 version will be used)
+
+All other options and arguments will be passed directly to JAGS.
 
 # SEE ALSO
 http://mcmc-jags.sourceforge.net and https://github.com/mdenwood/JAGS-build-macOS
