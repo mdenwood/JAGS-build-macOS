@@ -27,11 +27,22 @@ export PATH=" /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export SDKROOT=`readlink -f "/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk"`
 export MACOSX_DEPLOYMENT_TARGET="11.0"
 
-if ! [ -f sources/pkgconf-$VERSION.tar.gz ]; then
+if ! [ -f "sources/pkgconf-$VERSION.tar.gz" ]; then
   echo "Source file not found" >&2
   exit $EX_CONFIG
 fi
 
+# Verify checksum:
+if [[ "$VERSION" == "3.0.5" ]]; then
+  if [[ ! $(shasum -a 256 "sources/pkgconf-$VERSION.tar.gz" | awk '{print $1}') ==  
+        "245d441b9d8f7b74390e060cb9db1a326c26f1b96b1a6c3216b54a5d5439367a" ]]; then
+    echo "Invalid SHA256 checksum for pkgconf version $VERSION" >&2
+    exit $EX_USAGE
+  fi
+else
+  echo "Unable to validate download: no SHA256 checksum available for pkgconf version $VERSION" >&2
+  exit $EX_SOFTWARE
+fi
 
 rm -rf "tools/pkgconf-lite/"
 rm -rf "tmp/pkgconf-lipo/"
