@@ -16,6 +16,7 @@ EX_CONFIG=78
 
 ## Hard-code:
 MAJ="__MAJ__"
+MAJ=5
 
 # Default build:
 BUILD="current-$MAJ"

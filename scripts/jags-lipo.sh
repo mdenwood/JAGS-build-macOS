@@ -102,9 +102,6 @@ sed -i '' "s/aarch64/universal/g" "opt/jags/versions/jags/$VERSION-$BLAS-$THREAD
 sed -i '' "s/aarch64/universal/g" "opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-universal/lib/pkgconfig/jags.pc"
 sed -i '' "s/aarch64/universal/g" "opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-universal/share/man/man1/jags.1"
 
-echo "This doesn't work:  Library not loaded: /opt/jags/versions/jags/5.0.0-vecLib-single-aarch64/lib/libjags.5.dylib;  Referenced from: <C0356027-6388-32AA-A817-184A196DF9A8> /opt/jags/versions/jags/5.0.0-vecLib-single-universal/libexec/jags-terminal"
-exit 1
-
 touch ".stamp"
 
 exit $EX_OK

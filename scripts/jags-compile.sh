@@ -177,8 +177,9 @@ fi
 CPPUCNF="$("$WDIR/tools/pkgconf-lite/bin/pkg-config" --cflags "$WDIR/tools/cppunit/lib/pkgconfig/cppunit.pc") --target=$ARCH-apple-darwin20"
 
 # Set PREFIX:
-# PREFIX="/opt/jags/versions/jags/$VERSMAJ.x-current"
-PREFIX="/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH"
+PREFIX="/opt/jags/versions/jags/current-$VERSMAJ"
+# This is a nice idea but rjags stores hard paths, so it unfortunately won't switch between builds:
+# PREFIX="/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH"
 
 # Configure according to THREAD:
 if [[ "$THREAD" == "single" ]]; then
@@ -201,7 +202,14 @@ else
   echo "Error:  unhandled THREAD option $THREAD" 1>&2 
   exit $EX_SOFTWARE
 fi
-   
+
+# Modify version.cc to display the build string after the version, as rjags uses RF_makestring on it:
+sed -i '' -e "s/\"$VERSION\";/\"$VERSION ($BLAS-$THREAD-$ARCH)\";/" "src/lib/version.cc"
+
+# Modify parser.cc to add a newline in thw welcome string:
+sed -i '' -e "s/\"Welcome to \" << PACKAGE_STRING << \" on/\"Welcome to \" << PACKAGE_STRING << \"\\\\n\" << \"\ton/" "src/terminal/parser.cc"
+# sed -i '' -e "s/\"Welcome to \" << PACKAGE_STRING << \" on/\"Welcome to \" << PACKAGE_STRING << \"\\\\n\" << \"on/" "src/terminal/parser.cc"
+
 # Only needed when cross-compiling:
 if [[ "$ARCH" == "x86_64" ]]; then
   sed -i '' -e 's/compiler_flags=$/compiler_flags="--target=x86_64-apple-darwin20"/' libtool
@@ -227,12 +235,6 @@ fi
 # Make install
 make install DESTDIR="$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH" > make_install.out
 
-if [[ "$PREFIX" == "/opt/jags/versions/jags/$VERSMAJ.x-current" ]]; then
-  echo $PREFIX
-  # Create correct directory structure (only if PREFIX is MAJVERS-current):
-  mv "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSMAJ.x-current" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH"
-fi
-
 # Remove the build text from the version string:
 sed -i "" -e "s|Version: $VBSTRING|Version: $VERSION|g" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags.pc"
 
@@ -248,6 +250,8 @@ if [ ! -z "$DEVELOPER_APPLICATION" ]; then
   fi
 fi
 
+# Create correct directory structure:
+mv "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/current-$VERSMAJ" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/opt/jags/versions/jags/$VERSION-$BLAS-$THREAD-$ARCH"
 
 # Finished:
 touch "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/.stamp"

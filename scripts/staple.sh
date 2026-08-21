@@ -24,7 +24,8 @@ fi
 BUILD="$1"
 WDIR=`pwd`
 
-echo "Fix the universal build"
+echo "Fix jags-4 and jags-5 so they accept -b="" and then mimic usual jags script but with current-5 replaced with BUILD"
+echo "Comparing linker settings should use pkg-config (by adding mine to the PATH at the end, in case it isn't actually there)"
 echo "DONE BUT CHECK:  Use --identifier and --version with pkgbuild (https://manpagez.com/man/1/pkgbuild/) to make sure JAGS 5 does not overwrite JAGS 4, but that JAGS-5.0.1-vecLib-gcd-universal does overwrite the same 5.0.0 build"
 echo "DONE BUT CHECK:  transition should allow rjags-4 from CRAN to install and run"
 echo "Provide fixed-link JAGS-5.x-aarch64 and JAGS-5.x-x86_64 for automatic downloads on build machines?"
@@ -32,6 +33,7 @@ echo "Back-port configure changes from rjags 5.x to 4.x ??"
 echo "Also modify rjags configure script to look under the new path for jags.pc"
 /opt/jags/versions/pkgconf-lite/current/bin/pkg-config --with-path=/opt/jags/versions/jags/current-5/lib/pkgconfig --variable libdir jags 
 /opt/jags/versions/pkgconf-lite/current/bin/pkg-config --variable libdir jags 
+PKG_CONFIG_PATH="/opt/jags/lib/pkgconfig:$PKG_CONFIG_PATH"
 
 exit 1
 
