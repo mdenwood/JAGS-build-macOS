@@ -53,13 +53,23 @@ if [[ ! "$PVERS" == "$VERSION" ]]; then
   exit $EX_CONFIG
 fi
 
+## Find the relevant pkgconf-lite (PKGCONF_VERSION is set in utils-vers.sh):
+if ! [ -d "tools/pkgconf-lite/$PKGCONF_VERSION" ]; then
+  echo "tools/pkgconf-lite/$PKGCONF_VERSION not found" >&2
+  exit $EX_CONFIG
+fi
+
 ## Remove final signed output:
 rm -rf "$WDIR/pkg/utils-$VERSION.pkg"
+rm -rf "sign/utils"
 
 ## Create temporary folder and move all scripts (including postinstall script) in:
 mkdir -p "sign/utils/scripts"
 cp "build/postinstall-utils.sh" "sign/utils/scripts/postinstall"
 chmod +x "sign/utils/scripts/postinstall"
+
+mkdir -p "sign/utils/opt/jags/versions/pkgconf-lite"
+cp -r "tools/pkgconf-lite/$PKGCONF_VERSION" "sign/utils/opt/jags/versions/pkgconf-lite/$PKGCONF_VERSION"
 
 BASEPTH="sign/utils/opt/jags/versions/utils/$VERSION/"
 
@@ -80,8 +90,13 @@ for ff ("jags-4.1" "jags-5.1" "jags-uninstall.1" "jags-version.1"); do
   cp "utils/man/$ff" "$BASEPTH/share/man/man1/$ff"
 done
 
+## Sign installed pkgconf-lite:
+cd "$WDIR/sign/utils/opt/jags/versions/pkgconf-lite/$PKGCONF_VERSION/bin"
+echo "Signing pkg-config"
+xcrun codesign --force --timestamp --options runtime --sign "$DEVELOPER_APPLICATION" pkg-config
+
 ## Sign installed shell scripts:
-cd "$BASEPTH"
+cd "$WDIR/$BASEPTH"
 for dd in $(find "bin" -type d -print); do
   for ff in $(ls "$dd"); do
     echo "Signing $dd/$ff"

@@ -17,7 +17,11 @@ jags-uninstall - remove installations of JAGS
 
 # DESCRIPTION
 **jags-uninstall** is a command-line tool that can be used to remove installations
-of JAGS (https://mcmc-jags.sourceforge.io) created by the official JAGS installers for macOS
+of JAGS (https://mcmc-jags.sourceforge.io) created by the official JAGS installers for macOS.
+The default option removes **all** detected installations including custom and
+legacy (version <= 4.x) builds in /usr/local/ and/or /opt/R/arm64 as well
+as official (version >= 5.x) builds under /opt/jags. To fine-tune this 
+behaviour see the available options below.
 
 # OPTIONS
 **-h**

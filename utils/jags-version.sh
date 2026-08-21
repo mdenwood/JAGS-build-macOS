@@ -87,7 +87,7 @@ A zsh script that facilitates changing the active JAGS build/version on
 macOS. The -l option lists the JAGS builds/versions that can be switched.
 Otherwise, providing a single argument causes the active JAGS installation
 to be changed to the build/version provided by modifying the symlinks
-provided at /opt/jags/versions/jags/current and current-XX (where XX is the
+provided at /opt/jags/versions/jags/default and current-XX (where XX is the
 major version of JAGS). This should allow hot-switching of most JAGS builds
 with the same major version (i.e. minor updates and/or versions with 
 different BLAS linkage) without re-installing rjags. Note that switching
@@ -113,6 +113,12 @@ The following arguments are available:
     available options listed by running `embold jags-version` `embold -h`.
 
 `embold NOTES`
+Modification of the active JAGS build normally requires the utility to be
+run as root (e.g. using sudo) - alternatively you can make yourself owner
+of the relevant directory, after which sudo will not (usually) be needed:
+  
+  sudo chown -R \$USER /opt/jags/versions/jags
+
 This script is distributed 'as is', both FREELY and WITHOUT CHARGE, under the 
 Apache License version 2.0, via https://github.com/mdenwood/JAGS-build-macOS
 and the macOS official binaries of JAGS (https://mcmc-jags.sourceforge.io).
