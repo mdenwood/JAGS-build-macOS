@@ -50,6 +50,11 @@ fi
 
 ## Use productbuild to make a multi-pkg installer
 
+# Order of installation:
+# 1. transition (optional?)
+# 2. utils (so we have pkgconf-lite)
+# 3. JAGS in increasing order of importance, so the last one selected is left active
+
 exit 1
 
 # Generate distribution file automatically:

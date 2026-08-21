@@ -30,6 +30,24 @@ if ! [ -f sources/pkg-config-$VERSION.tar.gz ]; then
   exit $EX_CONFIG
 fi
 
+for f
+
+# Verify checksum:
+if [[ "$VERSION" == "0.29.2" ]]; then
+  if [[ ! $(shasum -a 256 "sources/pkg-config-$VERSION.tar.gz" | awk '{print $1}') ==  
+        "6fc69c01688c9458a57eb9a1664c9aba372ccda420a02bf4429fe610e7e7d591" ]]; then
+    echo "Invalid SHA256 checksum for pkg-config version $VERSION" >&2
+    exit $EX_USAGE
+  fi
+else
+  for ff in $(ls "sources"); do
+    echo "$ff: $(shasum -a 256 "sources/$ff" | awk '{print $1}')"
+  done  
+  echo "Unable to validate download: no SHA256 checksum available for pkg-config version $VERSION" >&2
+  exit $EX_SOFTWARE
+fi
+
+
 rm -rf "tools/pkg-config/"
 rm -rf "tmp/pkg-config-$VERSION"
 tar -xmf "sources/pkg-config-$VERSION.tar.gz" -C "tmp"

@@ -17,16 +17,21 @@ EX_CONFIG=78
 ## Hard-code:
 MAJ="__MAJ__"
 
-## Check arguments
-if [ "$#" -eq 0 ]; then
-  BUILD="$MAJ.x-current"
-elif [ "$#" -eq 1 ]; then
-  BUILD="$1"
-else
-  echo "Error: 0 or 1 arguments required (got $#)."
-  echo "Usage: $0 <BUILD>"
-  exit $EX_USAGE
-fi
+# Default build:
+BUILD="current-$MAJ"
+
+# Filtered arguments to pass directly to JAGS:
+local -a JAGSARGS
+
+# Loop through all passed arguments
+for arg in "$@"; do
+  # Extract possible build:
+  if [[ "$arg" == -b=* ]]; then
+    BUILD="${arg#*-b=}"
+    continue
+  fi
+  JAGSARGS+=("$arg")
+done
 
 ## Verify the specified build exists:
 if [[ ! -d "/opt/jags/versions/jags/$BUILD" ]]; then
@@ -39,9 +44,5 @@ if [[ ! "$majvers" == "$MAJ" ]]; then
   exit $EX_USAGE  
 fi  
 
-## Set variables:
-export LD_LIBRARY_PATH="/opt/jags/versions/jags/${BUILD}/lib"
-export LTDL_LIBRARY_PATH="/opt/jags/versions/jags/${BUILD}/lib/JAGS/modules-${MAJ}"
-
-## Launch JAGS
-exec "/opt/jags/versions/jags/$BUILD/libexec/jags-terminal"
+# Launch the specified build with arguments passed through:
+/opt/jags/versions/jags/$BUILD/bin/jags "${JAGSARGS[@]}"

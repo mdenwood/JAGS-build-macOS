@@ -40,6 +40,9 @@ if [[ "$VERSION" == "3.0.5" ]]; then
     exit $EX_USAGE
   fi
 else
+  for ff in $(ls "sources"); do
+    echo "$ff: $(shasum -a 256 "sources/$ff" | awk '{print $1}')"
+  done
   echo "Unable to validate download: no SHA256 checksum available for pkgconf version $VERSION" >&2
   exit $EX_SOFTWARE
 fi

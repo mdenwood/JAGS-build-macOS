@@ -32,6 +32,21 @@ if ! [ -f sources/LAPACK-$VERSION.tar.gz ]; then
   exit $EX_CONFIG
 fi
 
+# Verify checksum:
+if [[ "$VERSION" == "3.12.1" ]]; then
+  if [[ ! $(shasum -a 256 "sources/LAPACK-$VERSION.tar.gz" | awk '{print $1}') ==  
+        "2ca6407a001a474d4d4d35f3a61550156050c48016d949f0da0529c0aa052422" ]]; then
+    echo "Invalid SHA256 checksum for LAPACK version $VERSION" >&2
+    exit $EX_USAGE
+  fi
+else
+  for ff in $(ls "sources"); do
+    echo "$ff: $(shasum -a 256 "sources/$ff" | awk '{print $1}')"
+  done
+  echo "Unable to validate download: no SHA256 checksum available for LAPACK version $VERSION" >&2
+  exit $EX_SOFTWARE
+fi
+
 rm -rf "tools/lapack/"
 rm -rf "tmp/lapack-$VERSION"
 tar -xmf "sources/LAPACK-$VERSION.tar.gz" -C "tmp"

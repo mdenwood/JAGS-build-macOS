@@ -126,6 +126,21 @@ if ! [ -f sources/JAGS-$VERSION.tar.gz ]; then
   exit $EX_CONFIG
 fi
 
+# Verify checksum:
+if [[ "$VERSION" == "5.0.0" ]]; then
+  if [[ ! $(shasum -a 256 "sources/JAGS-$VERSION.tar.gz" | awk '{print $1}') ==  
+        "64fcd4883b8a8ee907722f49366cc9f277477a0647ada61356f17568f84ffff8" ]]; then
+    echo "Invalid SHA256 checksum for JAGS version $VERSION" >&2
+    exit $EX_USAGE
+  fi
+else
+  for ff in $(ls "sources"); do
+    echo "$ff: $(shasum -a 256 "sources/$ff" | awk '{print $1}')"
+  done
+  echo "Unable to validate download: no SHA256 checksum available for JAGS version $VERSION" >&2
+  exit $EX_SOFTWARE
+fi
+
 rm -rf "tmp/JAGS-$VERSION"
 rm -rf "tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH"
 tar -xmf "sources/JAGS-$VERSION.tar.gz" -C "tmp"

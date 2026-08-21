@@ -32,6 +32,21 @@ if ! [ -f sources/cppunit-$VERSION.tar.gz ]; then
   exit $EX_CONFIG
 fi
 
+# Verify checksum:
+if [[ "$VERSION" == "1.15.1" ]]; then
+  if [[ ! $(shasum -a 256 "sources/cppunit-$VERSION.tar.gz" | awk '{print $1}') ==  
+        "89c5c6665337f56fd2db36bc3805a5619709d51fb136e51937072f63fcc717a7" ]]; then
+    echo "Invalid SHA256 checksum for cppunit version $VERSION" >&2
+    exit $EX_USAGE
+  fi
+else
+  for ff in $(ls "sources"); do
+    echo "$ff: $(shasum -a 256 "sources/$ff" | awk '{print $1}')"
+  done
+  echo "Unable to validate download: no SHA256 checksum available for cppunit version $VERSION" >&2
+  exit $EX_SOFTWARE
+fi
+
 rm -rf tmp/cppunit-aarch64
 rm -rf tmp/cppunit-x86_64
 rm -rf tmp/cppunit-universal
