@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Set only if not already set:
-: ${PKG_IDENTIFIER="unknown"}
+: ${PKG_IDENTIFIER="com.unknown"}
 : ${PKG_KEYCHAIN="INSERT KEYCHAIN PROFILE NAME HERE"}
 
 # Abort on error, use of unset variable, or error within pipe:
@@ -41,7 +41,7 @@ fi
 
 ## Set PKG_IDENTIFIER if the developer identity matches:
 if [[ $(echo "$DEVELOPER_APPLICATION" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
-  PKG_IDENTIFIER="com.matthewdenwood.jags-utils"
+  PKG_IDENTIFIER="com.matthewdenwood"
   PKG_KEYCHAIN="Developer ID: Matthew Denwood"
 fi
 
@@ -93,27 +93,11 @@ cd "$WDIR"
 
 ## Then create pkg file:
 pkgbuild --root "sign/utils/opt/" \
-         --identifier "$PKG_IDENTIFIER" \
+         --identifier "$PKG_IDENTIFIER.jags-utils" \
          --version "$VERSION" \
          --install-location "/opt/" \
          --scripts "sign/utils/scripts" \
-         "sign/utils-$VERSION.pkg"
+         "pkg/utils-$VERSION.pkg"
 
-# Sign and notarise standalone version:
-rm -rf "sign/pkg"
-mkdir -p "sign/pkg"
-productsign --sign "$DEVELOPER_INSTALLER" "sign/utils-$VERSION.pkg" "sign/pkg/utils-$VERSION.pkg"
-cd "sign/pkg"
-pkgutil --check-signature "utils-$VERSION.pkg"
-xcrun notarytool submit "utils-$VERSION.pkg" --keychain-profile "$PKG_KEYCHAIN" --wait
-xcrun stapler staple "utils-$VERSION.pkg"
-
-# Verify:
-xcrun stapler validate "utils-$VERSION.pkg"
-spctl -a -vv -t install "utils-$VERSION.pkg"
-
-# Move to pkg directory once verification is complete:
-mv "utils-$VERSION.pkg" "$WDIR/pkg/utils-$VERSION.pkg"
-rm -rf "sign/pkg"
 
 exit $EX_OK

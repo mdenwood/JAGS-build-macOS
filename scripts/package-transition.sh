@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Set only if not already set:
-: ${PKG_IDENTIFIER="unknown"}
+: ${PKG_IDENTIFIER="com.unknown"}
 : ${PKG_KEYCHAIN="INSERT KEYCHAIN PROFILE NAME HERE"}
 
 # Abort on error, use of unset variable, or error within pipe:
@@ -36,7 +36,7 @@ fi
 
 ## Set PKG_IDENTIFIER if the developer identity matches:
 if [[ $(echo "$DEVELOPER_INSTALLER" | shasum -a 256 | awk '{print $1}') == "bcf85e972ad33f433c3e117043f0c18f9718392e1becb7a08621285e64e0d3da" ]]; then
-  PKG_IDENTIFIER="com.matthewdenwood.jags-transition"
+  PKG_IDENTIFIER="com.matthewdenwood"
   PKG_KEYCHAIN="Developer ID: Matthew Denwood"
 fi
 
@@ -49,29 +49,10 @@ cp "build/postinstall-transition-$VERSION.sh" "sign/transition/scripts/postinsta
 chmod +x "sign/transition/scripts/postinstall"
 
 # Package:
-pkgbuild --identifier "$PKG_IDENTIFIER" \
+pkgbuild --identifier "$PKG_IDENTIFIER.jags-transition" \
          --version "$VERSION" \
          --scripts "sign/transition/scripts" \
          --nopayload \
            "pkg/transition-$VERSION.pkg"
-
-echo "Move signing to another script"
-exit 1
-
-# Sign and notarise standalone version:
-rm -rf "sign/pkg"
-mkdir -p "sign/pkg"
-productsign --sign "$DEVELOPER_INSTALLER" "sign/transition-$VERSION.pkg" "sign/pkg/transition-$VERSION.pkg"
-cd "sign/pkg"
-pkgutil --check-signature "transition-$VERSION.pkg"
-xcrun notarytool submit "transition-$VERSION.pkg" --keychain-profile "$PKG_KEYCHAIN" --wait
-xcrun stapler staple "transition-$VERSION.pkg"
-
-# Verify:
-xcrun stapler validate "transition-$VERSION.pkg"
-spctl -a -vv -t install "transition-$VERSION.pkg"
-
-# Move to pkg directory once verification is complete:
-mv "transition-$VERSION.pkg" "$WDIR/pkg/transition-$VERSION.pkg"
 
 exit $EX_OK

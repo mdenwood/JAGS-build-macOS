@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Set only if not already set:
-: ${PKG_IDENTIFIER="unknown"}
+: ${PKG_IDENTIFIER="com.unknown"}
 
 # Abort on error, use of unset variable, or error within pipe:
 set -euo pipefail
@@ -26,6 +26,16 @@ fi
 
 BUILD="$1"
 WDIR=`pwd`
+
+## Extract the vbuild (build without minor version):
+VERSMAJ=$(echo $BUILD | cut -d "." -f 1)
+BPARTS=("${(s:-:)BUILD}")
+if [[ ! ${#BPARTS} -eq 4 ]]; then
+  echo "Unexpected size of BUILD string" >&2
+  exit $EX_SOFTWARE
+fi
+VERSION=${BPARTS[1]}
+VBUILD=$(echo "$VERSMAJ-${BPARTS[2]}-${BPARTS[3]}-${BPARTS[4]}")
 
 ## Remove final signed output:
 rm -rf "$WDIR/pkg/JAGS-$BUILD.pkg"
@@ -51,7 +61,7 @@ fi
 
 ## Ensure the text string is "official" if needed:
 if [[ $(echo "$DEVELOPER_APPLICATION" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
-  PKG_IDENTIFIER="com.matthewdenwood.jags"
+  PKG_IDENTIFIER="com.matthewdenwood"
   PKG_KEYCHAIN="Developer ID: Matthew Denwood"
   if grep "official macOS binary" "sign/JAGS-$BUILD/opt/jags/versions/jags/$BUILD/share/man/man1/jags.1"; then
     echo "Signing official JAGS binary"
@@ -112,8 +122,8 @@ chmod +x "sign/JAGS-$BUILD/scripts/jags-version"
 
 ## Then create pkg file:
 pkgbuild --root "sign/JAGS-$BUILD/opt/" \
-         --identifier "$PKG_IDENTIFIER" \
-         --version "$BUILD" \
+         --identifier "$PKG_IDENTIFIER.jags-$VBUILD" \
+         --version "$VERSION" \
          --install-location "/opt/" \
          --scripts "sign/JAGS-$BUILD/scripts" \
          "pkg/JAGS-$BUILD.pkg"

@@ -24,6 +24,7 @@ fi
 BUILD="$1"
 WDIR=`pwd`
 
+echo "Add chown $USER whatever to man page for jags-version"
 echo "Validate downloads by checksum"
 echo "pkconf-lite gets packaged with utils but in a jags/versions/pkgconf-lite directory"
 echo "Change latest back to current for versions/utils and pkgconf-lite"
@@ -74,5 +75,23 @@ spctl -a -vv -t install "JAGS-$BUILD.pkg"
 
 # Move to pkg directory once verification is complete:
 mv "JAGS-$BUILD.pkg" "$WDIR/pkg/JAGS-$BUILD.pkg"
+
+
+# Sign and notarise standalone version:
+rm -rf "sign/pkg"
+mkdir -p "sign/pkg"
+productsign --sign "$DEVELOPER_INSTALLER" "sign/utils-$VERSION.pkg" "sign/pkg/utils-$VERSION.pkg"
+cd "sign/pkg"
+pkgutil --check-signature "utils-$VERSION.pkg"
+xcrun notarytool submit "utils-$VERSION.pkg" --keychain-profile "$PKG_KEYCHAIN" --wait
+xcrun stapler staple "utils-$VERSION.pkg"
+
+# Verify:
+xcrun stapler validate "utils-$VERSION.pkg"
+spctl -a -vv -t install "utils-$VERSION.pkg"
+
+# Move to pkg directory once verification is complete:
+mv "utils-$VERSION.pkg" "$WDIR/pkg/utils-$VERSION.pkg"
+rm -rf "sign/pkg"
 
 exit $EX_OK
