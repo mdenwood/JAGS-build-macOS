@@ -1,5 +1,5 @@
 ---
-title: jags-5
+title: jags-[JAGSMAJVERS]
 section: 1
 header: JAGS Utilities User Manuals
 ---
@@ -10,22 +10,25 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # NAME
-jags-5 - launch JAGS 5.x
+jags-[JAGSMAJVERS] - launch JAGS [JAGSMAJVERS].x
 
 # SYNOPSIS
-**jags-5** [-b=*BUILD*] [*JAGS options/arguments*]
+**jags-[JAGSMAJVERS]** [-b=*BUILD*] [-build=*BUILD*] [SCRIPTFILE]
 
 # DESCRIPTION
-**jags-5** is a command-line utility that can be used to launch a specific version/build
-of JAGS version 5.x (https://mcmc-jags.sourceforge.io) created by the official JAGS 5.x
+**jags-[JAGSMAJVERS]** is a command-line utility that can be used to launch a specific version/build
+of JAGS version [JAGSMAJVERS].x (https://mcmc-jags.sourceforge.io) created by the official JAGS [JAGSMAJVERS].x
 installer for macOS released in August 2026 (or later), without having to run jags-version
-first.
+first. To see the available JAGS builds, use **jags-version -l**
 
 # OPTIONS
-**-b=BUILD**
-: An optional target build/version (otherwise the current-5 version will be used)
+**-b=BUILD, --build=BUILD**
+: An optional target build/version (otherwise the current-[JAGSMAJVERS] version will be used)
 
-All other options and arguments will be passed directly to JAGS.
+**SCRIPTFILE**
+: Run JAGS in batch mode using the provided script (otherwise JAGS is launched in interactive mode)
+
+No other options are supported - to use debuggers, call jags directly.
 
 # SEE ALSO
 http://mcmc-jags.sourceforge.net and https://github.com/mdenwood/JAGS-build-macOS

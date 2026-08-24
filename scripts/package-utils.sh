@@ -86,8 +86,12 @@ cp "utils/jags-uninstall.sh" "$BASEPTH/bin/jags-uninstall"
 chmod +x "$BASEPTH/bin/jags-uninstall"
 
 mkdir -p "$BASEPTH/share/man/man1"
-for ff ("jags-4.1" "jags-5.1" "jags-uninstall.1" "jags-version.1"); do
+for ff ("jags.1" "jags-uninstall.1" "jags-version.1"); do
   cp "utils/man/$ff" "$BASEPTH/share/man/man1/$ff"
+done
+for vv ("4" "5"); do
+  cp "utils/man/jags-0.1" "$BASEPTH/share/man/man1/jags-$vv.1"
+  sed -i '' "s/\[JAGSMAJVERS\]/${vv}/g" "$BASEPTH/share/man/man1/jags-$vv.1"
 done
 
 ## Sign installed pkgconf-lite:

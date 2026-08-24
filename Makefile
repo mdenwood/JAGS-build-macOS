@@ -3,7 +3,7 @@
 
 ## Versions of JAGS, CPPUNIT and LAPACK to use
 JAGSVERSION := 5.0.0
-UTILSVERSION := 1.0
+UTILSVERSION := 1.0.0
 CPPUNITVERS := 1.15.1
 LAPACKVERS := 3.12.1
 PKGCONFVERS := 3.0.5
@@ -137,7 +137,7 @@ pkg/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postinst
 utils/man/jags-%.1: utils/jags-%.md utils/utils-vers.sh
 	pandoc utils/jags-$*.md -s -t man -M footer="Version $(UTILSVERSION)" -o utils/man/jags-$*.1
 
-pkg/utils-$(UTILSVERSION).pkg: utils/jags-0.sh utils/jags-version.sh utils/jags-uninstall.sh utils/man/jags-4.1 utils/man/jags-5.1 utils/man/jags-version.1 utils/man/jags-uninstall.1 build/postinstall-utils.sh
+pkg/utils-$(UTILSVERSION).pkg: scripts/package-utils.sh utils/jags-0.sh utils/jags-version.sh utils/jags-uninstall.sh utils/man/jags-0.1 utils/man/jags-version.1 utils/man/jags-uninstall.1 build/postinstall-utils.sh | sign pkg
 	./scripts/package-utils.sh $(UTILSVERSION)
 
 

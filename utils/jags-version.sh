@@ -258,7 +258,9 @@ for dd ("/opt/jags/bin" "/opt/jags/lib/pkgconfig" "/opt/jags/lib/pkgconfig-$majv
   fi    
 done
 for ff ("bin/jags" "share/man/man1/jags.1"); do
-    if [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/jags/default/$ff" ]]; then
+    if [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/jags/default/$ff" ]] && 
+       [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/utils/current/share/man/man1/jags.1" ]]; then
+       # Note: jags.1 manual may be provided by utils
       if [ $UID -ne 0 ]; then
           echo "Error: jags-version must be run using sudo (or as root) to create the required symlinks" >&2
           echo "Usage: sudo $0 $@" >&2
