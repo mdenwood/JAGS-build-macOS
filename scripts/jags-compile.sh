@@ -157,6 +157,17 @@ echo "\n** Compiling JAGS-$BLAS-$THREAD-$ARCH **\n"
 mv configure configure.orig
 cat configure.orig | sed "s/PACKAGE_STRING=\'JAGS $VERSION\'/PACKAGE_STRING=\'JAGS $VBSTRING\'/g" | sed "s/PACKAGE_VERSION=\'$VERSION\'/PACKAGE_VERSION=\'$VBSTRING\'/g" > configure
 chmod 755 configure
+
+# Set up cross-compilation:
+CC="clang"
+CXX="clang++"
+LDFLAGS=""
+if [[ ! "$ARCH" == "`uname -m | sed 's/arm/aarch/'`" ]]; then
+  echo "Setting up for cross-compilation..."
+  CC="clang -arch $ARCH"
+  CXX="clang++ -arch $ARCH"
+  LDFLAGS="-arch $ARCH" 
+fi
   
 # Set up BLAS:
 if [[ "$BLAS" == "vecLib" ]]; then
@@ -192,7 +203,7 @@ if [[ "$THREAD" == "single" ]]; then
   PKG_CONFIG="$WDIR/tools/pkgconf-lite/bin/pkg-config" PKG_CONFIG_PATH="$WDIR/tools/cppunit/lib/pkgconfig/" \
     FC="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FCLIBS="$flibs" CFLAGS="-O3 --target=$ARCH-apple-darwin20" CXXFLAGS="-O3 --target=$ARCH-apple-darwin20" \
     F77="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FFLAGS="$fflags" FLIBS="$flibs" \
-    CC="clang -arch $ARCH" CXX="clang++ -arch $ARCH" LDFLAGS="-arch $ARCH" AM_LDFLAGS="-arch $ARCH" LIBTOOLFLAGS="--tag=CC" \
+    CC="$CC" CXX="$CXX" LDFLAGS="$LDFLAGS" AM_LDFLAGS="-arch $ARCH" LIBTOOLFLAGS="--tag=CC" \
     ./configure --build="$ARCH-apple-darwin20" --prefix="$PREFIX" --with-included-ltdl --with-blas="$blasstr" --with-lapack="$lapkstr" --disable-openmp \
     > configure.out >&2
   
@@ -201,7 +212,7 @@ elif [[ "$THREAD" == "gcd" ]]; then
   PKG_CONFIG="$WDIR/tools/pkgconf-lite/bin/pkg-config" PKG_CONFIG_PATH="$WDIR/tools/cppunit/lib/pkgconfig/" \
     FC="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FCLIBS="$flibs" CFLAGS="-O3 --target=$ARCH-apple-darwin20" CXXFLAGS="-O3 --target=$ARCH-apple-darwin20" \
     F77="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FFLAGS="$fflags" FLIBS="$flibs" \
-    CC="clang -arch $ARCH" CXX="clang++ -arch $ARCH" LDFLAGS="-arch $ARCH" AM_LDFLAGS="-arch $ARCH" LIBTOOLFLAGS="--tag=CC" \
+    CC="$CC" CXX="$CXX" LDFLAGS="$LDFLAGS" AM_LDFLAGS="-arch $ARCH" LIBTOOLFLAGS="--tag=CC" \
     ./configure --build="$ARCH-apple-darwin20" --prefix="$PREFIX" --with-included-ltdl --with-blas="$blasstr" --with-lapack="$lapkstr" --enable-gcd \
     > configure.out >&2
   
