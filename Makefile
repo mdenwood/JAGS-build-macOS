@@ -111,7 +111,7 @@ tmp/JAGS-$(JAGSVERSION)-%-x86_64/.stamp: scripts/jags-compile.sh sources/JAGS-$(
 tmp/JAGS-4.3.2-vecLib-single-aarch64/.stamp: scripts/jags-compile.sh sources/JAGS-4.3.2.tar.gz tools/.stamp utils/man/jags.1 | tmp
 	./scripts/jags-compile.sh 4.3.2 "vecLib-single-aarch64"
 tmp/JAGS-4.3.2-vecLib-single-x86_64/.stamp: scripts/jags-compile.sh sources/JAGS-4.3.2.tar.gz tools/.stamp utils/man/jags.1 | tmp
-	arch -x86_64 scripts/jags-compile.sh 4.3.2 "vecLib-single-x86_64"
+	scripts/jags-compile.sh 4.3.2 "vecLib-single-x86_64"
 
 
 ## Lipo JAGS

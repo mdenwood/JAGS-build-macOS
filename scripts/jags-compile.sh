@@ -100,10 +100,6 @@ if [[ $VERSMAJ -eq 4 ]]; then
     echo "Compilation for JAGS 4 requires vecLib-single" 1>&2
     exit $EX_USAGE
   fi
-  if [[ ! "$ARCH" == "`uname -m | sed 's/arm/aarch/'`" ]]; then
-    echo "Compilation for JAGS 4 must be run natively (e.g. using arch -x86_64 ./jags-compile.sh ...)" 1>&2
-    exit $EX_USAGE
-  fi
 fi
 
 # Detect if this is an official build by finding my specific Developer ID Application string:
@@ -196,7 +192,7 @@ if [[ "$THREAD" == "single" ]]; then
   PKG_CONFIG="$WDIR/tools/pkgconf-lite/bin/pkg-config" PKG_CONFIG_PATH="$WDIR/tools/cppunit/lib/pkgconfig/" \
     FC="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FCLIBS="$flibs" CFLAGS="-O3 --target=$ARCH-apple-darwin20" CXXFLAGS="-O3 --target=$ARCH-apple-darwin20" \
     F77="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FFLAGS="$fflags" FLIBS="$flibs" \
-    CC="clang -arch x86_64" CXX="clang++ -arch x86_64" LDFLAGS="-arch x86_64" AM_LDFLAGS="-arch x86_64" LIBTOOLFLAGS="--tag=CC" \
+    CC="clang -arch $ARCH" CXX="clang++ -arch $ARCH" LDFLAGS="-arch $ARCH" AM_LDFLAGS="-arch $ARCH" LIBTOOLFLAGS="--tag=CC" \
     ./configure --build="$ARCH-apple-darwin20" --prefix="$PREFIX" --with-included-ltdl --with-blas="$blasstr" --with-lapack="$lapkstr" --disable-openmp \
     > configure.out >&2
   
@@ -205,6 +201,7 @@ elif [[ "$THREAD" == "gcd" ]]; then
   PKG_CONFIG="$WDIR/tools/pkgconf-lite/bin/pkg-config" PKG_CONFIG_PATH="$WDIR/tools/cppunit/lib/pkgconfig/" \
     FC="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FCLIBS="$flibs" CFLAGS="-O3 --target=$ARCH-apple-darwin20" CXXFLAGS="-O3 --target=$ARCH-apple-darwin20" \
     F77="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FFLAGS="$fflags" FLIBS="$flibs" \
+    CC="clang -arch $ARCH" CXX="clang++ -arch $ARCH" LDFLAGS="-arch $ARCH" AM_LDFLAGS="-arch $ARCH" LIBTOOLFLAGS="--tag=CC" \
     ./configure --build="$ARCH-apple-darwin20" --prefix="$PREFIX" --with-included-ltdl --with-blas="$blasstr" --with-lapack="$lapkstr" --enable-gcd \
     > configure.out >&2
   
@@ -220,12 +217,6 @@ sed -i '' -e "s/\"$VERSION\";/\"$VERSION ($BLAS-$THREAD-$ARCH)\";/" "src/lib/ver
 sed -i '' -e "s/\"Welcome to \" << PACKAGE_STRING << \" on/\"Welcome to \" << PACKAGE_STRING << \"\\\\n\" << \"\ton/" "src/terminal/parser.cc"
 # sed -i '' -e "s/\"Welcome to \" << PACKAGE_STRING << \" on/\"Welcome to \" << PACKAGE_STRING << \"\\\\n\" << \"on/" "src/terminal/parser.cc"
 
-# Only needed when cross-compiling:
-if [[ "$ARCH" == "x86_64" ]]; then
-  sed -i '' -e 's/compiler_flags=$/compiler_flags="--target=x86_64-apple-darwin20"/' libtool
-  sed -i '' -e 's/linker_flags=$/linker_flags="--target=x86_64-apple-darwin20"/' libtool
-fi
-  
 # Remove spurious libquadmath dependency:
 find . -name 'Makefile' -type f -exec sed -i '' -e 's/libquadmath.a/libgfortran.a/' {} +
 find . -name 'Makefile' -type f -exec sed -i '' -e 's/-static-libquadmath//' {} +    
