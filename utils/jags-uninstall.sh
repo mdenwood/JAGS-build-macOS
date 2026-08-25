@@ -185,7 +185,15 @@ if [[ $jags_opt -eq 1 ]]; then
       fi
     done
   fi
-  echo "\t- Symlinks and subdirectories at /opt/jags/"
+  if [ -d "/opt/jags/versions/pkgconf-lite" ]; then
+    for ff in `ls /opt/jags/versions/pkgconf-lite`; do
+      if test ! -L "/opt/jags/versions/pkgconf-lite/$ff"; then
+        vers=$(echo $ff | cut -d "-" -f 1)
+        echo "\t- pkgconf-lite version $vers installation at /opt/jags/versions/pkgconf-lite/$ff/"
+      fi
+    done
+  fi
+  echo "\t- Symlinks and subdirectories under /opt/jags/"
 fi
 if [[ $jags_sym -eq 1 ]]; then
   echo "\t- Symlinks under /usr/local/"

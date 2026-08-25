@@ -96,8 +96,8 @@ fi
 
 # If JAGS 4 then only vecLib-single-aarch64 is supported:
 if [[ $VERSMAJ -eq 4 ]]; then
-  if [[ "$BLAS" != "vecLib" || "$THREAD" != "single" || "$ARCH" != "aarch64" ]]; then
-      echo "Compilation for JAGS 4 requires vecLib-single-aarch64" 1>&2
+  if [[ "$BLAS" != "vecLib" || "$THREAD" != "single" ]]; then
+      echo "Compilation for JAGS 4 requires vecLib-single" 1>&2
       exit $EX_USAGE
   fi
 fi
@@ -130,6 +130,12 @@ fi
 if [[ "$VERSION" == "5.0.0" ]]; then
   if [[ ! $(shasum -a 256 "sources/JAGS-$VERSION.tar.gz" | awk '{print $1}') ==  
         "64fcd4883b8a8ee907722f49366cc9f277477a0647ada61356f17568f84ffff8" ]]; then
+    echo "Invalid SHA256 checksum for JAGS version $VERSION" >&2
+    exit $EX_USAGE
+  fi
+elif [[ "$VERSION" == "4.3.2" ]]; then
+  if [[ ! $(shasum -a 256 "sources/JAGS-$VERSION.tar.gz" | awk '{print $1}') ==  
+        "871f556af403a7c2ce6a0f02f15cf85a572763e093d26658ebac55c4ab472fc8" ]]; then
     echo "Invalid SHA256 checksum for JAGS version $VERSION" >&2
     exit $EX_USAGE
   fi

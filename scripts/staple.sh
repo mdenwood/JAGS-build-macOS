@@ -24,7 +24,6 @@ fi
 BUILD="$1"
 WDIR=`pwd`
 
-echo "Add removal of pkgconf-lite to jags-uninstall"
 echo "Comparing linker settings should use pkg-config (by adding mine to the PATH at the end, in case it isn't actually there)"
 echo "There is no point in having jagsv.pc now - remove it (but still check jags.pc files are identical when jags-version switches)"
 echo "Implement main JAGS 5 installer"

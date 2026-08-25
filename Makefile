@@ -52,6 +52,9 @@ download: sources/JAGS-$(JAGSVERSION).tar.gz sources/LAPACK-$(LAPACKVERS).tar.gz
 
 sources/JAGS-$(JAGSVERSION).tar.gz: | sources
 	curl -OL --output-dir sources https://sourceforge.net/projects/mcmc-jags/files/JAGS/$(VERSMAJ).x/Source/JAGS-$(JAGSVERSION).tar.gz
+
+sources/JAGS-4.3.2.tar.gz: | sources
+	curl -OL --output-dir sources https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Source/JAGS-4.3.2.tar.gz
 	
 sources/LAPACK-$(LAPACKVERS).tar.gz: | sources
 	curl -L --output sources/LAPACK-$(LAPACKVERS).tar.gz https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v$(LAPACKVERS).tar.gz
@@ -104,11 +107,18 @@ tmp/JAGS-$(JAGSVERSION)-%-aarch64/.stamp: scripts/jags-compile.sh sources/JAGS-$
 tmp/JAGS-$(JAGSVERSION)-%-x86_64/.stamp: scripts/jags-compile.sh sources/JAGS-$(JAGSVERSION).tar.gz tools/.stamp utils/man/jags.1 | tmp
 	./scripts/jags-compile.sh $(JAGSVERSION) "$*-x86_64"
 
+tmp/JAGS-4.3.2-vecLib-single-aarch64/.stamp: scripts/jags-compile.sh sources/JAGS-4.3.2.tar.gz tools/.stamp utils/man/jags.1 | tmp
+	./scripts/jags-compile.sh 4.3.2 "vecLib-single-aarch64"
+tmp/JAGS-4.3.2-vecLib-single-x86_64/.stamp: scripts/jags-compile.sh sources/JAGS-4.3.2.tar.gz tools/.stamp utils/man/jags.1 | tmp
+	./scripts/jags-compile.sh 4.3.2 "vecLib-single-x86_64"
+
 
 ## Lipo JAGS
 
 tmp/JAGS-$(JAGSVERSION)-%-universal/.stamp: scripts/jags-lipo.sh tmp/JAGS-$(JAGSVERSION)-%-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-%-x86_64/.stamp
 	./scripts/jags-lipo.sh $(JAGSVERSION) "$*"
+tmp/JAGS-4.3.2-%-universal/.stamp: scripts/jags-lipo.sh tmp/JAGS-4.3.2-%-aarch64/.stamp tmp/JAGS-4.3.2-%-x86_64/.stamp
+	./scripts/jags-lipo.sh 4.3.2 "$*"
 
 
 ## Make tgz files
@@ -127,7 +137,7 @@ pkg/JAGS-%.pkg: scripts/package-jags.sh tgz/JAGS-%.tgz build/postinstall-jags.sh
 
 ## Create transition pkg
 
-pkg/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postinstall-transition-$(UTILSVERSION).sh | sign pkg
+pkg/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postinstall-transition-$(UTILSVERSION).sh pkg/JAGS-4.3.2-vecLib-single-universal.pkg | sign pkg
 	./scripts/package-transition.sh $(UTILSVERSION)
 
 ## TODO: transition should allow new JAGS 4 to work with CRAN rjags
