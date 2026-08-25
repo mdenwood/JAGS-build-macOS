@@ -13,6 +13,7 @@ EX_CONFIG=78
 
 # Note: this script is intended to be run from the root directory (by the Makefile)
 ./scripts/check_deps.sh
+# TODO: don't run if 4.3.2 x86_64 build needed
 
 ## Check arguments
 if [ "$#" -ne 2 ]; then
@@ -94,7 +95,7 @@ else
   exit $EX_USAGE
 fi
 
-# If JAGS 4 then only vecLib-single-aarch64 is supported:
+# If JAGS 4 then only vecLib-single is supported:
 if [[ $VERSMAJ -eq 4 ]]; then
   if [[ "$BLAS" != "vecLib" || "$THREAD" != "single" ]]; then
       echo "Compilation for JAGS 4 requires vecLib-single" 1>&2
