@@ -33,8 +33,7 @@ fi
 
 ## Check this is an Apple silicon mac
 if [[ ! "`uname -m`" == "arm64" ]]; then
-	echo "This script requires an Apple silicon (arm64/aarch64) mac" 1>&2 
-	exit $EX_CONFIG
+	echo "Warning: this script has only been tested on Apple silicon (arm64/aarch64)" 1>&2 
 fi
 
 ## Check Xcode command line tools are installed:

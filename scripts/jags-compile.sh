@@ -13,7 +13,6 @@ EX_CONFIG=78
 
 # Note: this script is intended to be run from the root directory (by the Makefile)
 ./scripts/check_deps.sh
-# TODO: don't run if 4.3.2 x86_64 build needed
 
 ## Check arguments
 if [ "$#" -ne 2 ]; then
@@ -98,8 +97,12 @@ fi
 # If JAGS 4 then only vecLib-single is supported:
 if [[ $VERSMAJ -eq 4 ]]; then
   if [[ "$BLAS" != "vecLib" || "$THREAD" != "single" ]]; then
-      echo "Compilation for JAGS 4 requires vecLib-single" 1>&2
-      exit $EX_USAGE
+    echo "Compilation for JAGS 4 requires vecLib-single" 1>&2
+    exit $EX_USAGE
+  fi
+  if [[ ! "$ARCH" == "`uname -m | sed 's/arm/aarch/'`" ]]; then
+    echo "Compilation for JAGS 4 must be run natively (e.g. using arch -x86_64 ./jags-compile.sh ...)" 1>&2
+    exit $EX_USAGE
   fi
 fi
 
@@ -114,7 +117,6 @@ if [ ! -z "$DEVELOPER_APPLICATION" ]; then
     echo "\n\n *** Note: building official macOS binaries *** \n\n"
   fi
 fi
-
 
 export WDIR=`pwd`
 export SDKROOT=`readlink -f "/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk"`
@@ -194,6 +196,7 @@ if [[ "$THREAD" == "single" ]]; then
   PKG_CONFIG="$WDIR/tools/pkgconf-lite/bin/pkg-config" PKG_CONFIG_PATH="$WDIR/tools/cppunit/lib/pkgconfig/" \
     FC="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FCLIBS="$flibs" CFLAGS="-O3 --target=$ARCH-apple-darwin20" CXXFLAGS="-O3 --target=$ARCH-apple-darwin20" \
     F77="/opt/gfortran/bin/$ARCH-apple-darwin20.0-gfortran" FFLAGS="$fflags" FLIBS="$flibs" \
+    CC="clang -arch x86_64" CXX="clang++ -arch x86_64" LDFLAGS="-arch x86_64" AM_LDFLAGS="-arch x86_64" LIBTOOLFLAGS="--tag=CC" \
     ./configure --build="$ARCH-apple-darwin20" --prefix="$PREFIX" --with-included-ltdl --with-blas="$blasstr" --with-lapack="$lapkstr" --disable-openmp \
     > configure.out >&2
   
