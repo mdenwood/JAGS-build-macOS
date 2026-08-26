@@ -6,9 +6,6 @@
 # Utility shell script to launch a specific version of JAGS
 # This utility is (also) distributed as part of the macOS installers for JAGS (https://mcmc-jags.sourceforge.io)
 
-# Abort on error, use of unset variable, or error within pipe:
-set -euo pipefail
-
 # Return codes:
 local EX_OK=0
 local EX_USAGE=64
@@ -64,9 +61,6 @@ fi
 ## Set prefix:
 local PREFIX="/opt/jags/versions/jags/$BUILD"
 
-# Launch the specified build with arguments passed through:
-/opt/jags/versions/jags/$BUILD/bin/jags "${JAGSARGS[@]}"
-
 ## Set environmental variables:
 if test -z "${LD_LIBRARY_PATH}"; then
    export LD_LIBRARY_PATH="${PREFIX}/lib"
@@ -77,9 +71,7 @@ export LTDL_LIBRARY_PATH="${JAGS_LIBS}:${PREFIX}/lib/JAGS/modules-${MAJ}"
 
 ## Startup with or without script:
 if [[ "$SCRIPT" == "" ]]; then
-  echo "Startup JAGS $BUILD with no script"
   exec "${PREFIX}/bin/jags"
 else
-  echo "Startup JAGS $BUILD with scriptfile $SCRIPT"
   exec "${PREFIX}/bin/jags" "${SCRIPT}"
 fi

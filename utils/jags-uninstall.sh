@@ -245,10 +245,12 @@ if [[ $jags_usr -eq 1 ]]; then
   rm -rf /usr/local/bin/jags
   rm -rf /usr/local/bin/jags-uninstall
   rm -rf /usr/local/libexec/jags-terminal
-  rm -rf /usr/local/include/JAGS/
+  rm -rf /usr/local/include/JAGS
   rm -rf /usr/local/lib/libjags.4.dylib
+  rm -rf /usr/local/lib/libjags.dylib
   rm -rf /usr/local/lib/pkgconfig/jags.pc
-  rm -rf /usr/local/lib/JAGS/
+  rm -rf /usr/local/lib/JAGS
+  rm -rf /usr/local/lib/libjrmath.dylib
   rm -rf /usr/local/lib/libjrmath.0.dylib
   rm -rf /usr/local/lib/libjrmath.la
   rm -rf /usr/local/lib/libjags.la

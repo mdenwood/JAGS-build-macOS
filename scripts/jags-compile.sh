@@ -103,13 +103,13 @@ if [[ $VERSMAJ -eq 4 ]]; then
 fi
 
 # Detect if this is an official build by finding my specific Developer ID Application string:
-VBSTRING="$VERSION ($BLAS-$THREAD-$ARCH build)"
+#VBSTRING="$VERSION ($BLAS-$THREAD-$ARCH build)"
 set +e  # Temporarily disable stop-on-error
 DEVELOPER_APPLICATION=$(security find-identity -v -p codesigning | grep "Developer ID Application" | grep -m 1 -oE '"[^"]+"' | tr -d '"')
 set -e
 if [ ! -z "$DEVELOPER_APPLICATION" ]; then
   if [[ $(echo "$DEVELOPER_APPLICATION" | shasum -a 256 | awk '{print $1}') == "c4f28510cd982a3766355e2dffb4053834786200b2c89045d752155ed517c77f" ]]; then
-    VBSTRING="$VERSION (official $BLAS-$THREAD-$ARCH binary)"
+    #VBSTRING="$VERSION (official $BLAS-$THREAD-$ARCH binary)"
     echo "\n\n *** Note: building official macOS binaries *** \n\n"
   fi
 fi
@@ -154,9 +154,9 @@ cd "tmp/JAGS-$VERSION"
 echo "\n** Compiling JAGS-$BLAS-$THREAD-$ARCH **\n"
 
 # Change configure script to show the build:    
-mv configure configure.orig
-cat configure.orig | sed "s/PACKAGE_STRING=\'JAGS $VERSION\'/PACKAGE_STRING=\'JAGS $VBSTRING\'/g" | sed "s/PACKAGE_VERSION=\'$VERSION\'/PACKAGE_VERSION=\'$VBSTRING\'/g" > configure
-chmod 755 configure
+# mv configure configure.orig
+# cat configure.orig | sed "s/PACKAGE_STRING=\'JAGS $VERSION\'/PACKAGE_STRING=\'JAGS $VBSTRING\'/g" | sed "s/PACKAGE_VERSION=\'$VERSION\'/PACKAGE_VERSION=\'$VBSTRING\'/g" > configure
+# chmod 755 configure
 
 # Set up cross-compilation:
 CC="clang"
@@ -221,12 +221,13 @@ else
   exit $EX_SOFTWARE
 fi
 
-# Modify version.cc to display the build string after the version, as rjags uses RF_makestring on it:
+# Modify version.cc to display the build string after the version:
 sed -i '' -e "s/\"$VERSION\";/\"$VERSION ($BLAS-$THREAD-$ARCH)\";/" "src/lib/version.cc"
 
 # Modify parser.cc to add a newline in thw welcome string:
-sed -i '' -e "s/\"Welcome to \" << PACKAGE_STRING << \" on/\"Welcome to \" << PACKAGE_STRING << \"\\\\n\" << \"\ton/" "src/terminal/parser.cc"
+# sed -i '' -e "s/\"Welcome to \" << PACKAGE_STRING << \" on/\"Welcome to \" << PACKAGE_STRING << \"\\\\n\" << \"\ton/" "src/terminal/parser.cc"
 # sed -i '' -e "s/\"Welcome to \" << PACKAGE_STRING << \" on/\"Welcome to \" << PACKAGE_STRING << \"\\\\n\" << \"on/" "src/terminal/parser.cc"
+sed -i '' -e "s/JAGS is free software/macOS build: BLAS=${BLAS} - Threading=${THREAD} - Arch=${ARCH}\\\\nJAGS is free software/" "src/terminal/parser.cc"
 
 # Remove spurious libquadmath dependency:
 find . -name 'Makefile' -type f -exec sed -i '' -e 's/libquadmath.a/libgfortran.a/' {} +
@@ -248,7 +249,7 @@ fi
 make install DESTDIR="$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH" > make_install.out
 
 # Remove the build text from the version string:
-sed -i "" -e "s|Version: $VBSTRING|Version: $VERSION|g" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags.pc"
+# sed -i "" -e "s|Version: $VBSTRING|Version: $VERSION|g" "$WDIR/tmp/JAGS-$VERSION-$BLAS-$THREAD-$ARCH/$PREFIX/lib/pkgconfig/jags.pc"
 
 # If this is the official binary then update the man page:
 if [ ! -z "$DEVELOPER_APPLICATION" ]; then
