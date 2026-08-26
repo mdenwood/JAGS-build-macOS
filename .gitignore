@@ -5,4 +5,4 @@ tools/*
 tgz/*
 sign/*
 pkg/*
-build/*
+release/*

@@ -9,6 +9,7 @@ set -e
 # Return codes:
 EX_OK=0
 EX_USAGE=64
+EX_SOFTWARE=70
 EX_CONFIG=78
 
 # Note: this script is intended to be run from the root directory (by the Makefile)

@@ -12,6 +12,7 @@ set -euo pipefail
 # Return codes:
 EX_OK=0
 EX_USAGE=64
+EX_SOFTWARE=70
 EX_CONFIG=78
 
 # Note: this script is intended to be run from the root directory (by the Makefile)
@@ -126,6 +127,11 @@ pkgbuild --root "sign/JAGS-$BUILD/opt/" \
          --version "$VERSION" \
          --install-location "/opt/" \
          --scripts "sign/JAGS-$BUILD/scripts" \
-         "pkg/JAGS-$BUILD.pkg"
+         "sign/JAGS-$BUILD.pkg"
+
+## Then remove the ._ files manually:
+echo "Removing dotbars..."
+scripts/package-remove-dotbar.sh "sign/JAGS-$BUILD.pkg" "pkg/JAGS-$BUILD.pkg"
+echo "Wrote package to pkg/JAGS-$BUILD.pkg"
 
 exit $EX_OK

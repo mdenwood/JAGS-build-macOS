@@ -60,6 +60,11 @@ pkgbuild --root "sign/JAGS-4.3.2-vecLib-single-universal/opt/" \
          --version "$VERSION" \
          --install-location "/opt/" \
          --scripts "sign/transition/scripts" \
-         "pkg/transition-$VERSION.pkg"
+         "sign/transition-$VERSION.pkg"
+
+## Then remove the ._ files manually:
+echo "Removing dotbars..."
+scripts/package-remove-dotbar.sh "sign/transition-$VERSION.pkg" "pkg/transition-$VERSION.pkg"
+echo "Wrote package to pkg/transition-$VERSION.pkg"
 
 exit $EX_OK

@@ -1,0 +1,95 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2869
+\cocoascreenfonts1\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 LucidaGrande-Bold;\f1\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;\red255\green0\blue0;}
+{\*\expandedcolortbl;;\csgenericrgb\c100000\c0\c0;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid201\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid3}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}}
+\margl1440\margr1440\vieww17100\viewh12260\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs36 \cf0 JAGS 5.0.0-beta for macOS
+\f1\b0\fs24 \
+\
+JAGS (Just Another Gibbs Sampler) is a program for analysis of Bayesian Graphical models by Gibbs Sampling written by Martyn Plummer with contributions from Matt Denwood. The functionality of JAGS is based on the BUGS program created by the MRC Biostatistics Unit (http://www.mrc-bsu.cam.ac.uk). There is a short manual that describes the differences between JAGS and BUGS.\
+\
+This is the 64-bit universal (arm64 + x86_64) official build of JAGS 5.0.0-beta, built for binary compatibility with \'93Big Sur\'94 and \'93Sonoma\'94 releases of R for macOS (version 4.3.0 and onwards).  The official binary is notarised/signed by Matt Denwood (the maintainer of macOS binaries of JAGS).  The JAGS code has no dependencies on R and will work on its own.\
+\
+Starting with JAGS 5.x the official macOS builds install to /opt/jags, which is set up with subdirectories for different builds of JAGS along with symbolic links that allow a user to set the currently active version using the included jags-switch command-line utility.  To facilitate installation (and for historical compatibility), symlinks are also created at /usr/local\
+\
+
+\f0\b\fs30 \
+Builds included:\
+\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa280\partightenfactor0
+
+\f1\b0\fs24 \cf0 	\'95	5.0.0-beta-vecLib:  this is the official universal binary of JAGS version 5.0.0-beta dynamically linked to the vecLib BLAS implementation provided by Apple within the Accelerate framework.  This is the default build with linkage matching that used for previous builds of JAGS (4.3.2 and earlier).\
+	\'95	5.0.0-beta-refBLAS:  this is the official universal binary of JAGS version 5.0.0-beta statically linked to the reference BLAS implementation provided by Netlib\'92s LAPACK (version 3.12.1).  This is an additional build that may be useful for comparing results based on different BLAS implementations.
+\f0\b\fs30 \
+
+\f1\b0\fs24 	\'95	4.3.2-vecLib:  this is the official universal binary of JAGS version 4.3.2 dynamically linked to the vecLib BLAS implementation provided by Apple within the Accelerate framework.  This is an additional build that is identical to the previous official binary of JAGS 4.3.2 except for the installation location; it is provided in order to facilitate testing/comparison of JAGS 5.0.0-beta with JAGS 4.3.2 on macOS.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs30 \cf0 Switching JAGS build:\
+
+\f1\b0\fs24 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa280\partightenfactor0
+\cf0 	\'95	After installation you can change the currently active version of JAGS at the command line using the included utility:  jags-switch\
+	\'95	It is NOT necessary to re-install rjags version 5 if switching between builds of JAGS version 5.x, but switching between JAGS versions 4.x and 5.x will require re-installation of the appropriate version of rjags.  Note that the CRAN builds of rjags_4-x are not compatible with any of the builds provided by this installer:  see the JAGS discussion forum at https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d/ for more details.\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa280\partightenfactor0
+\cf0 	\'95	JAGS can be fully uninstalled at the command line using the included utility:  jags-uninstall\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa280\partightenfactor0
+
+\f0\b\fs30 \cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 Binary Compatibility with R:
+\f1\b0\fs24 \
+\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa280\partightenfactor0
+\ls1\ilvl0\cf0 {\listtext	\uc0\u8226 	}If you interface JAGS and R using the rjags package (or other packages using the rjags interface), then it is extremely important to ensure that your builds of R and JAGS are fully binary compatible.  Official builds of JAGS are binary compatible with the \'93Big Sur\'94 and \'93Sonoma\'94 releases of R for macOS (version 4.3.0 and later), but NOT previous versions of R for macOS (version 4.2.x and earlier).\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa280\partightenfactor0
+\cf0 	\'95	If your builds of R and JAGS are NOT binary compatible, then you may see unexpected crashes and segmentation faults when using rjags.  This applies to mixing up official builds, as well as to using other builds of JAGS that may or may not be binary compatible with the official build of R.  We therefore strongly recommend using the official build of JAGS corresponding to the official build of R that you have installed.\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs30 \cf0 \
+Important Notes:
+\f1\b0\fs24 \
+\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa280\partightenfactor0
+\ls2\ilvl0\cf0 {\listtext	\uc0\u8226 	}JAGS will be installed into subdirectories of /opt/jags with symlinks installed under /usr/local\
+{\listtext	\uc0\u8226 	}Before installation, a script will be run to remove any existing installation of JAGS either in /usr/local and/or in /opt/R/arm64 - this is necessary to avoid potential linkage problems with R.  If you have also manually installed JAGS in another location (for example using homebrew) then it is strongly recommended to also remove these.\
+{\listtext	\uc0\u8226 	}As part of the installation process, you will be asked to authenticate as an administrative user. The first user you create when setting up macOS has administrator privileges by default.\
+{\listtext	\uc0\u8226 	}Once the installation is complete, you can safely delete the installer.  Note that there is no GUI associated with JAGS, so you will not find anything in Applications after the installation.  If you wish to test the JAGS installation you should open a terminal window (Applications/Utilities/Terminal) and type /opt/jags/bin/jags (type exit to leave JAGS again).\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa280\partightenfactor0
+\ls3\ilvl0\cf0 {\listtext	\uc0\u8226 	}The rjags and runjags packages for current versions of R are available from CRAN for the previous release of JAGS 4.3.2.  Version 5.x of JAGS requires version 5-x of the rjags package, which is not yet on CRAN.  However, we have provided pre-built binaries of the rjags-4 and rjags-5 package for macOS that are compatible with the JAGS binaries provided in this installer: see the JAGS discussion forum at https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d/ for more details.\
+{\listtext	\uc0\u8226 	}Source code for these packages and more information can be found at the JAGS website: http://mcmc-jags.sourceforge.net\
+\pard\tx720\pardeftab720\sa280\partightenfactor0
+
+\f0\b\fs28 \cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\fs30 \cf0 Legal Notices:\'a0
+\f1\b0\fs24 \
+\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa280\partightenfactor0
+\cf0 	\'95	This software is covered by the 
+\fs26 GNU GENERAL PUBLIC LICENSE Version 2, June 1991
+\fs24 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs30 \cf0 \
+Bug Reports and Feedback:\'a0
+\f1\b0 \cf2 \
+
+\fs24 \cf0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa280\partightenfactor0
+\cf0 	\'95	This build is being provided to you \'93as is\'94, with no warranties or guarantees of any kind. Should you encounter any problems with this installer, please contact us through the JAGS discussion forum at https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d/ \
+	\'95	WHEN SUPPLYING FEEDBACK: If the problem is a crash, bad code generation, incorrect error message etc., the most valuable information you can provide is full and complete instructions on how to reproduce the problem.\'a0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+Matt Denwood (with thanks to Bill Northcott)\
+27th April 2026\
+}

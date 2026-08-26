@@ -110,13 +110,25 @@ done
 
 cd "$WDIR"
 
+## Try to get rid of ._ files, although this doesn't work:
+export COPYFILE_DISABLE=1
+export NO_APPLE_DOUBLE=1
+xattr -cr "sign/utils/opt/"
+dot_clean -m "sign/utils/opt/"
+find "sign/utils/opt/" -name "._*" -delete
+find "sign/utils/opt/" -name ".DS_Store" -delete
+
 ## Then create pkg file:
 pkgbuild --root "sign/utils/opt/" \
          --identifier "$PKG_IDENTIFIER.jags-utils" \
          --version "$VERSION" \
          --install-location "/opt/" \
          --scripts "sign/utils/scripts" \
-         "pkg/utils-$VERSION.pkg"
+         "sign/utils-$VERSION.pkg"
 
+## Then remove the ._ files manually:
+echo "Removing dotbars..."
+scripts/package-remove-dotbar.sh "sign/utils-$VERSION.pkg" "pkg/utils-$VERSION.pkg"
+echo "Wrote package to pkg/utils-$VERSION.pkg"
 
 exit $EX_OK

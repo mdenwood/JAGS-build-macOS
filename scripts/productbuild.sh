@@ -76,10 +76,12 @@ if [[ $(echo "$DEVELOPER_INSTALLER" | shasum -a 256 | awk '{print $1}') == "bcf8
 fi
 
 ## Remove final signed output:
-rm -rf "$WDIR/pkg/JAGS-$VERSION-$ARCH.pkg"
+rm -rf "pkg/JAGS-$VERSION-$ARCH.pkg"
 
 
-# Make installer to pkg
+## Make installer to pkg
+productbuild --distribution "build/Distribution.xml" --package-path "./pkg" --resources "./build" "pkg/JAGS-$VERSION-$ARCH.pkg"
+
 
 # Then staple everything from pkg to release
 

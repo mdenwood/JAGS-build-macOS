@@ -1,107 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="2">
 
-    <title>My Enterprise Application</title>
-    <organization>com.example</organization>
+    <title>JAGS: Just Another Gibbs Sampler</title>
+    <organization>com.matthewdenwood</organization>
 
-    <background file="background.png"
-                mime-type="image/png"
-                alignment="center"
-                scaling="proportional"/>
-
-    <welcome file="welcome.html"/>
-    <license file="license.rtf"/>
-    <conclusion file="conclusion.html"/>
-
-    <domains
-        enable_anywhere="false"
-        enable_currentUserHome="false"
-        enable_localSystem="true"/>
+    <welcome file="Welcome.html"/>
+    <license file="License.rtf"/>
+    <conclusion file="Conclusion.html"/>
 
     <options
-        customize="always"
+        customize="allow"
         require-scripts="true"
-        hostArchitectures="arm64,x86_64"/>
-
-    <!-- Custom install validation -->
-    <installation-check script="checkSystem();"/>
-
-    <script>
-    <![CDATA[
-        function checkSystem() {
-
-            if (system.version.ProductVersion < '13.0') {
-                my.result.type = 'Fatal';
-                my.result.message =
-                    'macOS Ventura or later is required.';
-                return false;
-            }
-
-            var freeGB =
-                system.filesystem.availableSpace('/') /
-                (1024 * 1024 * 1024);
-
-            if (freeGB < 5) {
-                my.result.type = 'Fatal';
-                my.result.message =
-                    'At least 5GB of free disk space is required.';
-                return false;
-            }
-
-            return true;
-        }
-    ]]>
-    </script>
-
+        hostArchitectures="arm64,x86_64"
+        rootVolumeOnly="true" />
+    
+    <allowed-os-versions>
+        <os-version min="11.0.0"/>
+    </allowed-os-versions>
+ 
     <choices-outline>
-        <line choice="app"/>
-        <line choice="helper"/>
-        <line choice="agent"/>
+        <line choice="utils"/>
+        <line choice="transition"/>
+        <line choice="jags-rsu"/>
+        <line choice="jags-vsu"/>
+        <line choice="jags-vgu"/>
     </choices-outline>
 
     <choice
-        id="app"
-        title="Main Application"
-        description="Installs the primary application."
-        start_selected="true">
-        <pkg-ref id="com.example.myapp"/>
+        id="utils"
+        title="JAGS utils"
+        description="Utilities scripts and pkgconf-lite"
+        visible="true"
+        selected="true"
+        enabled="false" >
+        <pkg-ref id="com.matthewdenwood.jags-utils"/>
+    </choice>
+    
+    <choice
+        id="transition"
+        title="JAGS transition"
+        description="Transition framework from JAGS 4.x to 5.x (includes JAGS 4.3.2-vecLib-single-universal)"
+        visible="true"
+        selected="true" >
+        <pkg-ref id="com.matthewdenwood.jags-transition"/>
     </choice>
 
     <choice
-        id="helper"
-        title="Helper Tools"
-        description="Administrative helper binaries."
-        start_selected="true">
-        <pkg-ref id="com.example.helper"/>
+        id="jags-rsu"
+        title="JAGS 5.0.0-refBLAS-single-universal"
+        description="JAGS built with reference BLAS/LAPACK and single threading"
+        visible="true"
+        selected="true" >
+        <pkg-ref id="com.matthewdenwood.jags-rsu"/>
     </choice>
 
     <choice
-        id="agent"
-        title="Launch Agent"
-        description="Automatically starts application services."
-        start_selected="true">
-        <pkg-ref id="com.example.agent"/>
+        id="jags-vsu"
+        title="JAGS 5.0.0-vecLib-single-universal"
+        description="JAGS built with Apple's Accelerate framework and single threading"
+        visible="true"
+        selected="true" >
+        <pkg-ref id="com.matthewdenwood.jags-vsu"/>
     </choice>
-
+    
+    <choice
+        id="jags-vgu"
+        title="JAGS 5.0.0-vecLib-gcd-universal"
+        description="JAGS built with Apple's Accelerate framework and multi-threading using Grand Central Dispatch (GCD)"
+        visible="true"
+        selected="true" >
+        <pkg-ref id="com.matthewdenwood.jags-vgu"/>
+    </choice>
+    
     <pkg-ref
-        id="com.example.myapp"
-        version="2.0.0"
-        auth="Root">
-        packages/MyApp.pkg
+        id="com.matthewdenwood.jags-transition"
+        version="1.0.0" >
+        transition-1.0.0.pkg
     </pkg-ref>
 
     <pkg-ref
-        id="com.example.helper"
-        version="2.0.0"
-        auth="Root">
-        packages/HelperTools.pkg
+        id="com.matthewdenwood.jags-utils"
+        version="1.0.0" >
+        utils-1.0.0.pkg
     </pkg-ref>
 
     <pkg-ref
-        id="com.example.agent"
-        version="2.0.0"
-        auth="Root">
-        packages/LaunchAgent.pkg
+        id="com.matthewdenwood.jags-rsu"
+        version="5.0.0" >
+        JAGS-5.0.0-refBLAS-single-universal.pkg
+    </pkg-ref>
+
+    <pkg-ref
+        id="com.matthewdenwood.jags-vsu"
+        version="5.0.0" >
+        pkg/JAGS-5.0.0-vecLib-single-universal.pkg
+    </pkg-ref>
+
+    <pkg-ref
+        id="com.matthewdenwood.jags-vgu"
+        version="5.0.0" >
+        pkg/JAGS-5.0.0-vecLib-gcd-universal.pkg
     </pkg-ref>
 
 </installer-gui-script>
