@@ -3,6 +3,10 @@
 # SPDX-FileCopyrightText: 2026 Matthew Denwood (https://github.com/mdenwood/JAGS-build-macOS)
 # SPDX-License-Identifier: Apache-2.0
 
+# Set only if not already set:
+: ${PKG_IDENTIFIER="com.unknown"}
+: ${PKG_KEYCHAIN="INSERT KEYCHAIN PROFILE NAME HERE"}
+
 # Abort on error, use of unset variable, or error within pipe:
 set -euo pipefail
 
@@ -15,33 +19,41 @@ EX_CONFIG=78
 ./scripts/check_deps.sh
 
 ## Check arguments
-if [ "$#" -ne 1 ]; then
-    echo "Error: 1 arguments required (got $#)."
-    echo "Usage: $0 <PKGFILE>"
+if [ "$#" -ne 4 ]; then
+    echo "Error: 4 arguments required (got $#)."
+    echo "Usage: $0 <VERSION> <ARCH> <TRANSVERSION> <UTILSVERSION>"
     exit $EX_USAGE
 fi
 
-BUILD="$1"
+VERSION="$1"
+ARCH="$2"
+TRANSVERSION="$3"
+UTILSVERSION="$4"
 WDIR=`pwd`
 
-echo "Implement main JAGS 5 installer"
-echo "Include JAGS 4 with transition installer"
-echo "DONE BUT CHECK:  Use --identifier and --version with pkgbuild (https://manpagez.com/man/1/pkgbuild/) to make sure JAGS 5 does not overwrite JAGS 4, but that JAGS-5.0.1-vecLib-gcd-universal does overwrite the same 5.0.0 build"
-echo "Provide fixed-link JAGS-5.x-aarch64 and JAGS-5.x-x86_64 for automatic downloads on build machines?"
-echo "Back-port configure changes from rjags 5.x to 4.x ??"
-echo "Also modify rjags configure script to look under the new path for jags.pc"
 
-exit 1
+## Check pkg files are available:
+if ! [ -f "pkg/JAGS-$VERSION-refBLAS-single-$ARCH.pkg" ]; then
+  echo "One or more JAGS .pkg file not found" >&2
+  exit $EX_CONFIG
+fi
+if ! [ -f "pkg/JAGS-$VERSION-vecLib-single-$ARCH.pkg" ]; then
+  echo "One or more JAGS .pkg file not found" >&2
+  exit $EX_CONFIG
+fi
+if ! [ -f "pkg/JAGS-$VERSION-vecLib-gcd-$ARCH.pkg" ]; then
+  echo "One or more JAGS .pkg file not found" >&2
+  exit $EX_CONFIG
+fi
+if ! [ -f "pkg/transition-$TRANSVERSION.pkg" ]; then
+  echo "Transition .pkg file not found" >&2
+  exit $EX_CONFIG
+fi
+if ! [ -f "pkg/utils-$UTILSVERSION.pkg" ]; then
+  echo "Utils .pkg file not found" >&2
+  exit $EX_CONFIG
+fi
 
-
-
-
-
-echo "FIXME"
-exit 1
-
-## Remove final signed output:
-rm -rf "$WDIR/release/$BUILD.pkg"
 
 ## Extract developer identity:
 set +e  # Temporarily disable stop-on-error
@@ -56,6 +68,34 @@ if [ -z "$DEVELOPER_INSTALLER" ]; then
   echo "Unable to find a Developer ID Installer signing certificate in your Keychain" 1>&2
   exit $EX_CONFIG
 fi
+
+## Set PKG_IDENTIFIER if the developer identity matches:
+if [[ $(echo "$DEVELOPER_INSTALLER" | shasum -a 256 | awk '{print $1}') == "bcf85e972ad33f433c3e117043f0c18f9718392e1becb7a08621285e64e0d3da" ]]; then
+  PKG_IDENTIFIER="com.matthewdenwood"
+  PKG_KEYCHAIN="Developer ID: Matthew Denwood"
+fi
+
+## Remove final signed output:
+rm -rf "$WDIR/pkg/JAGS-$VERSION-$ARCH.pkg"
+
+
+# Make installer to pkg
+
+# Then staple everything from pkg to release
+
+
+echo "Implement main JAGS 5 installer"
+echo "Include JAGS 4 with transition installer"
+echo "DONE BUT CHECK:  Use --identifier and --version with pkgbuild (https://manpagez.com/man/1/pkgbuild/) to make sure JAGS 5 does not overwrite JAGS 4, but that JAGS-5.0.1-vecLib-gcd-universal does overwrite the same 5.0.0 build"
+echo "Provide fixed-link JAGS-5.x-aarch64 and JAGS-5.x-x86_64 for automatic downloads on build machines?"
+echo "Back-port configure changes from rjags 5.x to 4.x ??"
+echo "Also modify rjags configure script to look under the new path for jags.pc"
+
+exit 1
+
+
+
+
 
 # Sign and notarise standalone version:
 rm -rf "sign/pkg"
