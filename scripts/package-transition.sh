@@ -49,10 +49,17 @@ cp "build/postinstall-transition-$VERSION.sh" "sign/transition/scripts/postinsta
 chmod +x "sign/transition/scripts/postinstall"
 
 # Package:
-pkgbuild --identifier "$PKG_IDENTIFIER.jags-transition" \
+# pkgbuild --identifier "$PKG_IDENTIFIER.jags-transition" \
+#          --version "$VERSION" \
+#          --scripts "sign/transition/scripts" \
+#          --nopayload \
+#            "pkg/transition-$VERSION.pkg"
+
+pkgbuild --root "sign/JAGS-4.3.2-vecLib-single-universal/opt/" \
+         --identifier "$PKG_IDENTIFIER.jags-transition" \
          --version "$VERSION" \
+         --install-location "/opt/" \
          --scripts "sign/transition/scripts" \
-         --nopayload \
-           "pkg/transition-$VERSION.pkg"
+         "pkg/transition-$VERSION.pkg"
 
 exit $EX_OK

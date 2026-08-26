@@ -134,28 +134,22 @@ pkg/JAGS-%.pkg: scripts/package-jags.sh tgz/JAGS-%.tgz build/postinstall-jags.sh
 	./scripts/package-jags.sh $*
 
 
-## FIXME BELOW
-
 ## Create transition pkg
 
 pkg/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postinstall-transition-$(UTILSVERSION).sh pkg/JAGS-4.3.2-vecLib-single-universal.pkg | sign pkg
 	./scripts/package-transition.sh $(UTILSVERSION)
 
-## TODO: transition should allow new JAGS 4 to work with CRAN rjags
 
-
-## Create utils pkg
+## Create utils pkg (including pkgconf-lite)
 utils/man/jags-%.1: utils/jags-%.md utils/utils-vers.sh
 	pandoc utils/jags-$*.md -s -t man -M footer="Version $(UTILSVERSION)" -o utils/man/jags-$*.1
 
-pkg/utils-$(UTILSVERSION).pkg: scripts/package-utils.sh utils/jags-0.sh utils/jags-version.sh utils/jags-uninstall.sh utils/man/jags-0.1 utils/man/jags-version.1 utils/man/jags-uninstall.1 build/postinstall-utils.sh | sign pkg
+pkg/utils-$(UTILSVERSION).pkg: scripts/package-utils.sh tools/pkgconf-lite/.stamp utils/jags-0.sh utils/jags-version.sh utils/jags-uninstall.sh utils/man/jags-0.1 utils/man/jags-version.1 utils/man/jags-uninstall.1 build/postinstall-utils.sh | sign pkg
 	./scripts/package-utils.sh $(UTILSVERSION)
 
 
-## Create pkgconf pkg
-
-## Use productbuild to make (and staple) main release:
-release/JAGS-$(JAGSVERSION).pkg: scripts/productbuild.sh pkg/JAGS-$(JAGSVERSION)-refBLAS-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg | release
+## Use productbuild to make (and staple) main release(s):
+release/JAGS-$(JAGSVERSION)-%.pkg: scripts/productbuild.sh pkg/JAGS-$(JAGSVERSION)-refBLAS-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg | release
 	./scripts/productbuild.sh $(JAGSVERSION)
 
 

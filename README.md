@@ -7,7 +7,7 @@ Most users will simply want to download one of the pre-built installers from sou
 Note that the scripts are NOT intended to be portable between platforms:  a recent build of macOS on an arm64/aarch64 machine is assumed.
 
 
-## Makefile
+## Available make targets
 
 TODO
 
@@ -25,19 +25,17 @@ Additional folders will be created by make as needed.
 
 ## Pre-requisites
 
-Expand the MacOSX11.3 SDK into /Library/Developer/CommandLineTools/SDKs/ and then run:
+The following system-level dependencies must be installed before attempting to run make:
 
-cd /Library/Developer/CommandLineTools/SDKs
-sudo ln -s MacOSX11.3.sdk MacOSX11.sdk
-SDKROOT=`readlink -f "/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk"`
+- Apple's Xcode command-line tools:  xcode-select --install
 
-Install homebrew, pkg-config, gfortran and rosetta:
-brew install pkg-config
-/usr/sbin/softwareupdate --install-rosetta --agree-to-license
+- The universal GNU Fortran 14.2 compiler available from https://cran.r-project.org/bin/macosx/tools/
 
-BUT make sure homebrew gcc and fortran are not in the PATH!!!
+- Rosetta:  /usr/sbin/softwareupdate --install-rosetta --agree-to-license
 
-export PATH="/opt/homebrew/Cellar/pkgconf/2.5.1/bin:/opt/cppunit/current/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/Library/TeX/texbin:/Applications/iTerm.app/Contents/Resources/utilities:/opt/gfortran/bin:/usr/local/bin/"
+- The MacOSX11.3 SDK (software development kit) - run scripts/check_deps.sh for instructions
+
+Make will automatically download and compile the dependencies cppunit, LAPACK, and pkgconf-lite before attempting to compile JAGS.  Note that any PATH environmental variable you have set is ignored to ensure that the build process only picks up the standard Apple-provided build tools and specific version of gfortran given above.
 
 
 ## Installation directory
@@ -68,28 +66,36 @@ These installation scripts are designed for JAGS to use a versioned installation
     │
     └── versions/
         ├── jags/
-        │   ├── 5.0.0-vecLib-gcd-aarch64
+        │   ├── 4.3.2-vecLib-single-universal
+        │   ├── 5.0.0-vecLib-gcd-universal
         │   ├── ...
-        │   ├── 5.x-current                     : symlink (directory)
+        │   ├── current-4                       : symlink (directory)
+        │   ├── current-5                       : symlink (directory)
+        │   └── default                         : symlink (directory)
+        ├── pkgconf-lite/
+        │   ├── 3.0.5
+        │   ├── ...
         │   └── current                         : symlink (directory)
         └── utils/
             ├── 1.0.0
             ├── ...
             └── current                         : symlink (directory)
 
-To fit within this structure, JAGS is configured with a prefix of /opt/jags/versions/jags/5.x-current (or 4.x-current, for JAGS 4.x), but the installed files are moved to an installation path under /opt/jags/versions/jags/VERSION-BLAS-THREAD-ARCH so that multiple installations can co-exist and be switched on/off using the jags-version utility.  Note that the tools required to build jags (pkg-config, cppunit and Netlib's LAPACK) are only installed within the self-contained repo directory (under lib).
+To fit within this structure, JAGS is configured with a prefix of /opt/jags/versions/jags/current-5 (or current-4, for JAGS 4.x), but the installed files are moved to an installation path under /opt/jags/versions/jags/VERSION-BLAS-THREAD-ARCH so that multiple installations can co-exist and be switched on/off using the jags-version utility.  Note that the tools required only to build jags (cppunit and Netlib's LAPACK) are only installed within the self-contained repo directory (under lib).
 
 
 ## Installers produced
 
-JAGS (and utils) builds are produced as:
+JAGS builds are produced as:
 
-- Individual-build JAGS/utils .tgz files under the tgz directory - these are not signed, and do not require an Apple Developer account to build
+- Individual-build .tgz files under the tgz directory - these are not signed, and do not require an Apple Developer account to build
 
-- Individual-build JAGS/utils .pkg files under the pkg directory - these are signed, and do require an Apple Developer account
+- Individual-build .pkg files under the pkg directory - these are signed, and do require an Apple Developer account to build
 
-- A transition.pkg file under the pkg directory - this can be run to remove previous versions of JAGS 4.x from /usr/local and /opt/R/arm64/ and JAGS 5 beta from /opt/jags, and install symlinks to /opt/jags under /usr/local for backwards compatibility without needing to update the PATH environmental variable
+- A utils.pkg file under the pkg directory - this contains the jags-version etc utilities as well as pkgconf-lite (requires an Apple Developer account to build)
+
+- A transition.pkg file under the pkg directory - this can be run to remove previous versions of JAGS 4.x from /usr/local and /opt/R/arm64/ and JAGS 5 beta from /opt/jags, install JAGS 4.3.2 within the new directory structure shown above, and install symlinks to /opt/jags under /usr/local for backwards compatibility with the CRAN build of rjags 4-x (requires an Apple Developer account to build)
 
 - A combined build JAGS-$VERSION.pkg file under the pkg directory - this is also signed, and contains the default individual pkg files (currently refBLAS-single-universal, vecLib-single-universal, vecLib-gcd-universal, utils and transition)
 
-The individual pkg installers each run a post-install script to ensure that the newly installed JAGS build is selected as the default.  These are also run when installing these via the combined pkg installer.  The post-install script for utils always activates the latest available version; to activate an earlier version you will first have to remove newer versions of utils from /opt/jags/versions/utils manually.
+The individual pkg installers each run a post-install script to ensure that the newly installed JAGS build is selected as the default.  These are also run when installing these via the combined pkg installer.  The post-install script for utils always activates the latest available version; to activate an earlier version you will first have to remove newer versions of utils from /opt/jags/versions/utils and/or /opt/jags/versions/pkgconf-lite manually (although this is not recommended).

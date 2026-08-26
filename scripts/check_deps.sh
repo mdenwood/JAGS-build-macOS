@@ -50,7 +50,7 @@ fi
 
 ## Check SDK is available:
 if ! [ -d /Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk ]; then
-  echo "SDK not found - find and download e.g. McOSX11.3.sdk then run:\n cd /Library/Developer/CommandLineTools/SDKs/; sudo ln -s MacOSX11.3.sdk MacOSX11.sdk" 1>&2
+  echo "SDK not found - find and download e.g. McOSX11.3.sdk (google 'pesky SDKs') then\nexpand into /Library/Developer/CommandLineTools/SDKs/ and run:\ncd /Library/Developer/CommandLineTools/SDKs/\nsudo ln -s MacOSX11.3.sdk MacOSX11.sdk" 1>&2
   exit $EX_CONFIG
 fi
 SDKROOT=`readlink -f "/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk"`
