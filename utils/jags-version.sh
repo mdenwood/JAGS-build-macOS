@@ -328,8 +328,10 @@ if [[ -f "/opt/jags/lib/pkgconfig-$majvers/jags.pc" ]]; then
     NEW=`pkg-config --cflags --libs "/opt/jags/versions/jags/$target/lib/pkgconfig/jags.pc"`
     if [[ ! "$OLD" == "$NEW" ]]; then
       currentv="$(readlink -n "/opt/jags/versions/jags/current-$majvers")"      
-      echo "Note: the JAGS-$majvers build indicated ($target) \nhas a different pkg-config file to the previous build \n(${currentv##*/}) - you may need to re-compile rjags!"
+      echo "Note: the JAGS-$majvers build indicated ($target) \nhas a different pkg-config file to the previous build \n(${currentv##*/}) - you may need to re-compile rjags..."
     fi
+  else
+    echo "Warning: unable to locate pkg-config (or pkgconf-lite)\n- you may or may not need to re-compile rjags..."
   fi
 fi
 
