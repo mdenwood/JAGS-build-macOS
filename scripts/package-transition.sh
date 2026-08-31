@@ -55,6 +55,9 @@ chmod +x "sign/transition/scripts/postinstall"
 #          --nopayload \
 #            "pkg/transition-$VERSION.pkg"
 
+echo "We also need to run jags-version to active this jags-4 installation"
+exit 1
+
 pkgbuild --root "sign/JAGS-4.3.2-vecLib-single-universal/opt/" \
          --identifier "$PKG_IDENTIFIER.jags-transition" \
          --version "$VERSION" \

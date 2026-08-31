@@ -93,7 +93,7 @@ echo "Provide fixed-link JAGS-5.x-aarch64 and JAGS-5.x-x86_64 for automatic down
 echo "Back-port configure changes from rjags 5.x to 4.x ??"
 echo "Also modify rjags configure script to look under the new path for jags.pc"
 
-exit 1
+# exit 1
 
 
 
@@ -102,18 +102,23 @@ exit 1
 # Sign and notarise standalone version:
 rm -rf "sign/pkg"
 mkdir -p "sign/pkg"
-productsign --sign "$DEVELOPER_INSTALLER" "sign/JAGS-$BUILD.pkg" "sign/pkg/JAGS-$BUILD.pkg"
+productsign --sign "$DEVELOPER_INSTALLER" "pkg/JAGS-$VERSION-$ARCH.pkg" "sign/pkg/JAGS-$VERSION-$ARCH.pkg"
 cd "sign/pkg"
-pkgutil --check-signature "JAGS-$BUILD.pkg"
-xcrun notarytool submit "JAGS-$BUILD.pkg" --keychain-profile "$PKG_KEYCHAIN" --wait
-xcrun stapler staple "JAGS-$BUILD.pkg"
+pkgutil --check-signature "JAGS-$VERSION-$ARCH.pkg"
+xcrun notarytool submit "JAGS-$VERSION-$ARCH.pkg" --keychain-profile "$PKG_KEYCHAIN" --wait
+xcrun stapler staple "JAGS-$VERSION-$ARCH.pkg"
+
+
+
 
 # Verify:
-xcrun stapler validate "JAGS-$BUILD.pkg"
-spctl -a -vv -t install "JAGS-$BUILD.pkg"
+xcrun stapler validate "JAGS-$VERSION-$ARCH.pkg"
+spctl -a -vv -t install "JAGS-$VERSION-$ARCH.pkg"
 
 # Move to pkg directory once verification is complete:
-mv "JAGS-$BUILD.pkg" "$WDIR/pkg/JAGS-$BUILD.pkg"
+mv "JAGS-$VERSION-$ARCH.pkg" "$WDIR/release/JAGS-$VERSION-$ARCH.pkg"
+
+exit 1
 
 
 # Sign and notarise standalone version:

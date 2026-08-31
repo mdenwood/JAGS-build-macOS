@@ -131,7 +131,7 @@ tgz/JAGS-%.tgz: tmp/JAGS-%/.stamp | tgz
 ## Sign code, make dependency manifest and create pkg
 
 pkg/JAGS-%.pkg: scripts/package-jags.sh tgz/JAGS-%.tgz build/postinstall-jags.sh utils/jags-version.sh | sign pkg
-	./scripts/package-jags.sh $*
+	./scripts/package-jags.sh $* 
 
 
 ## Create transition pkg
@@ -149,16 +149,16 @@ pkg/utils-$(UTILSVERSION).pkg: scripts/package-utils.sh tools/pkgconf-lite/.stam
 
 
 ## Use productbuild to make (and staple) main release(s):
-release/JAGS-$(JAGSVERSION)-%.pkg: scripts/productbuild.sh pkg/JAGS-$(JAGSVERSION)-refBLAS-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg | release
-	./scripts/productbuild.sh $(JAGSVERSION)
+release/JAGS-$(JAGSVERSION).pkg: scripts/productbuild.sh pkg/JAGS-$(JAGSVERSION)-refBLAS-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg pkg/transition-1.0.0.pkg pkg/utils-$(UTILSVERSION).pkg | release
+	./scripts/productbuild.sh $(JAGSVERSION) universal 1.0.0 $(UTILSVERSION)
 
 
 ## Staple additional releases:
-release/JAGS-%.pkg: scripts/staple.sh pkg/JAGS-%.pkg | release
-	./scripts/staple.sh "JAGS-$*"
+#release/JAGS-%.pkg: scripts/staple.sh pkg/JAGS-%.pkg | release
+#	./scripts/staple.sh "JAGS-$*"
 
-release/utils-$(UTILSVERSION).pkg: scripts/staple.sh pkg/utils-$(UTILSVERSION).pkg | release
-	./scripts/staple.sh "utils-$(UTILSVERSION)"
+#release/utils-$(UTILSVERSION).pkg: scripts/staple.sh pkg/utils-$(UTILSVERSION).pkg | release
+#	./scripts/staple.sh "utils-$(UTILSVERSION)"
 
 # ETC
 
