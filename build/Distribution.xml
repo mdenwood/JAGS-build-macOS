@@ -46,6 +46,15 @@
     </choice>
 
     <choice
+        id="jags-4"
+        title="JAGS 4.3.2-vecLib-single-universal"
+        description="JAGS 4.3.2 re-compiled for use within the new /opt/jags/ installation directory"
+        visible="true"
+        selected="true" >
+        <pkg-ref id="com.matthewdenwood.jags-transition"/>
+    </choice>
+
+    <choice
         id="jags-rsu"
         title="JAGS 5.0.0-refBLAS-single-universal"
         description="JAGS built with reference BLAS/LAPACK and single threading"
@@ -85,19 +94,25 @@
     </pkg-ref>
 
     <pkg-ref
-        id="com.matthewdenwood.jags-rsu"
+        id="com.matthewdenwood.jags4-vsu"
+        version="4.3.2" >
+        JAGS-4.3.2-vecLib-single-universal.pkg
+    </pkg-ref>
+
+    <pkg-ref
+        id="com.matthewdenwood.jags5-rsu"
         version="5.0.0" >
         JAGS-5.0.0-refBLAS-single-universal.pkg
     </pkg-ref>
 
     <pkg-ref
-        id="com.matthewdenwood.jags-vsu"
+        id="com.matthewdenwood.jags5-vsu"
         version="5.0.0" >
         pkg/JAGS-5.0.0-vecLib-single-universal.pkg
     </pkg-ref>
 
     <pkg-ref
-        id="com.matthewdenwood.jags-vgu"
+        id="com.matthewdenwood.jags5-vgu"
         version="5.0.0" >
         pkg/JAGS-5.0.0-vecLib-gcd-universal.pkg
     </pkg-ref>

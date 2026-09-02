@@ -82,6 +82,7 @@ rm -rf "pkg/JAGS-$VERSION-$ARCH.pkg"
 ## Make installer to pkg
 productbuild --distribution "build/Distribution.xml" --package-path "./pkg" --resources "./build" "pkg/JAGS-$VERSION-$ARCH.pkg"
 
+exit 1
 
 # Then staple everything from pkg to release
 
