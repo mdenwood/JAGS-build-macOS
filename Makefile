@@ -161,7 +161,13 @@ release/JAGS-%.pkg: scripts/staple.sh pkg/JAGS-%.pkg | release
 	./scripts/staple.sh "JAGS-$*.pkg"
 
 
+## Make checksums:
+
+release/checksums.txt: scripts/checksums.sh release/JAGS-$(JAGSVERSION)-universal.pkg release/JAGS-$(JAGSVERSION)-vecLib-single-aarch64.pkg release/JAGS-$(JAGSVERSION)-vecLib-single-x86_64.pkg
+	./scripts/checksums.sh
+
+
 ## All releases:
 
 .PHONY: releases
-releases: release/JAGS-$(JAGSVERSION)-universal.pkg release/JAGS-$(JAGSVERSION)-vecLib-single-aarch64.pkg release/JAGS-$(JAGSVERSION)-vecLib-single-x86_64.pkg
+releases: release/checksums.txt
