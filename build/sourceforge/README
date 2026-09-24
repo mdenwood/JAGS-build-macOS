@@ -1,0 +1,48 @@
+These are the official binaries of JAGS 5.x for macOS, which
+install to a versioned /opt/jags directory structure. The
+majority of users will want to use the combined installer:
+
+- JAGS-5.0.0-universal.pkg
+
+This is a signed universal (x86_64 + arm64) package installer
+that has been built for binary compatibility with the “Big Sur”
+and “Sonoma” releases of R for macOS (versions 4.3.0 and onwards).
+It contains three different builds of JAGS with varying BLAS
+linkage and multi-threading capabilities, along with a build
+of JAGS 4.3.2 that is provided for backwards compatibility.
+The installer includes detailed descriptions of the included
+builds and utilities on the welcome page - please do read this.
+
+The following architecture and build specific installers are
+also provided:
+
+- JAGS-5.0.0-vecLib-single-aarch64.pkg
+- JAGS-5.0.0-vecLib-single-x86_64.pkg
+
+These each contain a single build of JAGS corresponding to the
+BLAS linkage (Apple's vecLib) and single threading used for
+previous macOS builds of JAGS, but otherwise using the same
+build environment as for the combined installer. These
+installers will not remove any existing version of JAGS 4.x
+that you may already have installed on your system.
+
+The build process for the installers is self-documented by the
+build scripts, which are maintained on the following GitHub
+repository:  https://github.com/mdenwood/JAGS-build-macOS
+
+If you encounter problems with installation of JAGS on macOS then
+please use the following JAGS discussion forum thread for help:
+https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d/ 
+
+SHA-256 checksums for each installer are provided below: 
+
+- JAGS-5.0.0-universal.pkg:
+  489609326115e174cb4ad4445c9c95d6758a4ac1bfe6d26339ad8059a0cda1fd
+
+- JAGS-5.0.0-vecLib-single-aarch64.pkg
+  f8b5b7c8f3949c53e6dd6475b7b0f4d2b3d672319fe3697c3ff961f5cdc4e421
+
+- JAGS-5.0.0-vecLib-single-x86_64.pkg
+  f7a98167cd8ac92ea85393a1a155234d1444578ce45645c775895e56a2f23fbe
+
+Last updated by Matt Denwood, 24th September 2026
