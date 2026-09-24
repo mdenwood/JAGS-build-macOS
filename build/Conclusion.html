@@ -28,6 +28,13 @@
         li {
             margin-bottom: 6px;
         }
+        li code {
+          font-family: monospace;
+          background-color: #f4f4f4;
+          padding: 2px 4px;
+          border-radius: 4px;
+          font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -37,17 +44,23 @@
     <p>Here are some suggested Terminal commands to get started with JAGS for macOS:</p>
     
     <ul>
-        <li>Add /opt/jags/bin to your PATH:  echo 'export PATH="/opt/jags/bin:$PATH"' >> ~/.zshrc </li>
-        <li>Launch the active build of JAGS:  jags</li>
-        <li>List available JAGS builds:  jags-version -l</li>
-        <li>View the help file for jags-version:  man jags-version</li>
-        <li>View the help file for jags-uninstall:  man jags-uninstall</li>
-        <li>View the help file for JAGS:  man jags</li>
+        <li>Add /opt/jags/bin to your PATH:<br>
+          <code>echo 'export PATH="/opt/jags/bin:$PATH"' >> ~/.zshrc</code></li>
+        <li>Launch the active build of JAGS:<br>
+          <code>jags</code></li>
+        <li>List available JAGS builds:<br>
+          <code>jags-version -l</code></li>
+        <li>View the help file for jags-version:<br>
+          <code>man jags-version</code></li>
+        <li>View the help file for jags-uninstall:<br>
+          <code>man jags-uninstall</code></li>
+        <li>View the help file for JAGS:<br>
+          <code>man jags</code></li>
     </ul>
 
     <p>Alternatively, you can install the rjags and/or runjags packages to interface JAGS directly to R.</p>
     
-    <p>If you encounter any issues with this installer, please post to https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d</p>
+    <p>If you encounter any issues with this installer, please post to <a href="https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d">the JAGS discussion forum</a></p>
 
 </body>
 </html>

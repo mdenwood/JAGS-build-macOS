@@ -27,6 +27,11 @@ fi
 FILE="$1"
 WDIR=`pwd`
 
+if ! [ -f "pkg/$FILE" ]; then
+  echo "$FILE not found under pkg" >&2
+  exit $EX_CONFIG
+fi
+
 ## Extract developer identity:
 set +e  # Temporarily disable stop-on-error
 DEVELOPER_APPLICATION=$(security find-identity -v -p codesigning | grep "Developer ID Application" | grep -m 1 -oE '"[^"]+"' | tr -d '"')
@@ -59,6 +64,21 @@ spctl -a -vv -t install "$FILE"
 # If this succeeds then move it to release:
 cd "$WDIR"
 mv "release/tmp/$FILE" "release/$FILE"
+
+echo "Build product stapled to release/$FILE"
 rm -rf release/tmp
 
 exit $EX_OK
+
+
+
+
+
+echo "Implement main JAGS 5 installer"
+echo "Include JAGS 4 with transition installer"
+echo "DONE BUT CHECK:  Use --identifier and --version with pkgbuild (https://manpagez.com/man/1/pkgbuild/) to make sure JAGS 5 does not overwrite JAGS 4, but that JAGS-5.0.1-vecLib-gcd-universal does overwrite the same 5.0.0 build"
+echo "Provide fixed-link JAGS-5.x-aarch64 and JAGS-5.x-x86_64 for automatic downloads on build machines?"
+echo "Back-port configure changes from rjags 5.x to 4.x ??"
+echo "Also modify rjags configure script to look under the new path for jags.pc"
+
+# exit 1

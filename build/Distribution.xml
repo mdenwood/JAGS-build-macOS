@@ -32,6 +32,7 @@
         title="JAGS utils"
         description="Utilities scripts and pkgconf-lite"
         visible="true"
+        exclusive="false"
         selected="true"
         enabled="false" >
         <pkg-ref id="com.matthewdenwood.jags-utils"/>
@@ -42,7 +43,8 @@
         title="JAGS transition"
         description="Transition framework from JAGS 4.x to 5.x"
         visible="true"
-        selected="true" >
+        exclusive="false"
+        selected="choices['transition'].selected === undefined ? true : choices['transition'].selected" >
         <pkg-ref id="com.matthewdenwood.jags-transition"/>
     </choice>
 
@@ -51,7 +53,8 @@
         title="JAGS 4.3.2-vecLib-single-universal"
         description="JAGS 4.3.2 re-compiled for use within the new /opt/jags/ installation directory"
         visible="true"
-        selected="true" >
+        exclusive="false"
+        selected="choices['jags-4-vsu'].selected === undefined ? true : choices['jags-4-vsu'].selected" >
         <pkg-ref id="com.matthewdenwood.jags-4-vsu"/>
     </choice>
 
@@ -60,7 +63,8 @@
         title="JAGS 5.0.0-refBLAS-single-universal"
         description="JAGS built with reference BLAS/LAPACK and single threading"
         visible="true"
-        selected="true" >
+        exclusive="false"
+        selected="choices['jags-5-rsu'].selected === undefined ? true : choices['jags-5-rsu'].selected" >
         <pkg-ref id="com.matthewdenwood.jags-5-rsu"/>
     </choice>
 
@@ -69,7 +73,8 @@
         title="JAGS 5.0.0-vecLib-single-universal"
         description="JAGS built with Apple's Accelerate framework and single threading"
         visible="true"
-        selected="true" >
+        exclusive="false"
+        selected="choices['jags-5-vsu'].selected === undefined ? true : choices['jags-5-vsu'].selected" >
         <pkg-ref id="com.matthewdenwood.jags-5-vsu"/>
     </choice>
     
@@ -78,7 +83,8 @@
         title="JAGS 5.0.0-vecLib-gcd-universal"
         description="JAGS built with Apple's Accelerate framework and multi-threading using Grand Central Dispatch (GCD)"
         visible="true"
-        selected="true" >
+        exclusive="false"
+        selected="choices['jags-5-vgu'].selected === undefined ? true : choices['jags-5-vgu'].selected" >
         <pkg-ref id="com.matthewdenwood.jags-5-vgu"/>
     </choice>
     

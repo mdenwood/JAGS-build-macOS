@@ -136,31 +136,32 @@ pkg/JAGS-%.pkg: scripts/package-jags.sh tgz/JAGS-%.tgz build/postinstall-jags.sh
 
 ## Create transition pkg
 
-pkg/transition-$(UTILSVERSION).pkg: scripts/package-transition.sh build/postinstall-transition-$(UTILSVERSION).sh pkg/JAGS-4.3.2-vecLib-single-universal.pkg | sign pkg
-	./scripts/package-transition.sh $(UTILSVERSION)
+pkg/transition-1.0.0.pkg: scripts/package-transition.sh build/postinstall-transition-1.0.0.sh | sign pkg
+	./scripts/package-transition.sh 1.0.0
 
 
 ## Create utils pkg (including pkgconf-lite)
+
 utils/man/jags-%.1: utils/jags-%.md utils/utils-vers.sh
 	pandoc utils/jags-$*.md -s -t man -M footer="Version $(UTILSVERSION)" -o utils/man/jags-$*.1
 
-pkg/utils-$(UTILSVERSION).pkg: scripts/package-utils.sh tools/pkgconf-lite/.stamp utils/jags-0.sh utils/jags-version.sh utils/jags-uninstall.sh utils/man/jags-0.1 utils/man/jags-version.1 utils/man/jags-uninstall.1 build/postinstall-utils.sh | sign pkg
+pkg/utils-$(UTILSVERSION).pkg: scripts/package-utils.sh tools/pkgconf-lite/.stamp utils/jags-0.sh utils/jags-version.sh utils/jags-uninstall.sh utils/man/jags-4.1  utils/man/jags-5.1 utils/man/jags-version.1 utils/man/jags-uninstall.1 build/postinstall-utils.sh | sign pkg
 	./scripts/package-utils.sh $(UTILSVERSION)
 
 
-## Use productbuild to make (and staple) main release(s):
-release/JAGS-$(JAGSVERSION).pkg: scripts/productbuild.sh pkg/JAGS-$(JAGSVERSION)-refBLAS-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg pkg/transition-1.0.0.pkg pkg/utils-$(UTILSVERSION).pkg | release
+## Use productbuild to make main release:
+
+pkg/JAGS-$(JAGSVERSION)-universal.pkg: scripts/productbuild.sh pkg/JAGS-4.3.2-vecLib-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-refBLAS-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-single-universal.pkg pkg/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg pkg/transition-1.0.0.pkg pkg/utils-$(UTILSVERSION).pkg | pkg
 	./scripts/productbuild.sh $(JAGSVERSION) universal 1.0.0 $(UTILSVERSION)
 
 
-## Staple additional releases:
-#release/JAGS-%.pkg: scripts/staple.sh pkg/JAGS-%.pkg | release
-#	./scripts/staple.sh "JAGS-$*"
+## Staple releases:
 
-#release/utils-$(UTILSVERSION).pkg: scripts/staple.sh pkg/utils-$(UTILSVERSION).pkg | release
-#	./scripts/staple.sh "utils-$(UTILSVERSION)"
+release/JAGS-%.pkg: scripts/staple.sh pkg/JAGS-%.pkg | release
+	./scripts/staple.sh "JAGS-$*.pkg"
 
-# ETC
+
+## All releases:
 
 .PHONY: releases
-releases: release/JAGS-$(JAGSVERSION).pkg # etc
+releases: release/JAGS-$(JAGSVERSION)-universal.pkg release/JAGS-$(JAGSVERSION)-vecLib-single-aarch64.pkg release/JAGS-$(JAGSVERSION)-vecLib-single-x86_64.pkg
