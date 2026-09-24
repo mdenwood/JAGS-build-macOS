@@ -29,26 +29,4 @@ for ff in $(ls release); do
   echo "\n- $ff:\n\t$cs" >> release/checksums.txt
 done
 
-exit 1
-
-if [[ "$VERSION" == "5.0.0" ]]; then
-  if [[ ! $(shasum -a 256 "sources/JAGS-$VERSION.tar.gz" | awk '{print $1}') ==  
-        "64fcd4883b8a8ee907722f49366cc9f277477a0647ada61356f17568f84ffff8" ]]; then
-    echo "Invalid SHA256 checksum for JAGS version $VERSION" >&2
-    exit $EX_USAGE
-  fi
-elif [[ "$VERSION" == "4.3.2" ]]; then
-  if [[ ! $(shasum -a 256 "sources/JAGS-$VERSION.tar.gz" | awk '{print $1}') ==  
-        "871f556af403a7c2ce6a0f02f15cf85a572763e093d26658ebac55c4ab472fc8" ]]; then
-    echo "Invalid SHA256 checksum for JAGS version $VERSION" >&2
-    exit $EX_USAGE
-  fi
-else
-  for ff in $(ls "sources"); do
-    echo "$ff: $(shasum -a 256 "sources/$ff" | awk '{print $1}')"
-  done
-  echo "Unable to validate download: no SHA256 checksum available for JAGS version $VERSION" >&2
-  exit $EX_SOFTWARE
-fi
-
 exit $EX_OK
