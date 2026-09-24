@@ -32,21 +32,22 @@
 </head>
 <body>
 
-    <h1>Installation Complete!</h1>
+    <h1>JAGS installation complete</h1>
     
-    <p class="success-icon">✓ YourApp has been successfully installed on your Mac.</p>
+    <p>Here are some suggested Terminal commands to get started with JAGS for macOS:</p>
     
-    <p>To get started with the software, please follow these quick steps:</p>
-    
-    <ol>
-        <li>Open your <strong>Applications</strong> folder.</li>
-        <li>Double-click the <strong>YourApp</strong> icon to launch it.</li>
-        <li>Follow the on-screen prompts to sign in or create an account.</li>
-    </ol>
+    <ul>
+        <li>Add /opt/jags/bin to your PATH:  echo 'export PATH="/opt/jags/bin:$PATH"' >> ~/.zshrc </li>
+        <li>Launch the active build of JAGS:  jags</li>
+        <li>List available JAGS builds:  jags-version -l</li>
+        <li>View the help file for jags-version:  man jags-version</li>
+        <li>View the help file for jags-uninstall:  man jags-uninstall</li>
+        <li>View the help file for JAGS:  man jags</li>
+    </ul>
 
-    <p>If you encounter any issues or require technical support, please visit our online documentation center or reach out to our help desk.</p>
-
-    <p>Thank you for choosing YourApp!</p>
+    <p>Alternatively, you can install the rjags and/or runjags packages to interface JAGS directly to R.</p>
+    
+    <p>If you encounter any issues with this installer, please post to https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d</p>
 
 </body>
 </html>

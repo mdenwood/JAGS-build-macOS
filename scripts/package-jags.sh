@@ -132,6 +132,6 @@ pkgbuild --root "sign/JAGS-$BUILD/opt/" \
 ## Then remove the ._ files manually:
 echo "Removing dotbars..."
 scripts/package-remove-dotbar.sh "sign/JAGS-$BUILD.pkg" "pkg/JAGS-$BUILD.pkg"
-echo "Wrote package to pkg/JAGS-$BUILD.pkg"
+echo "Signed package saved to pkg/JAGS-$BUILD.pkg"
 
 exit $EX_OK

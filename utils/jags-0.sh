@@ -20,6 +20,9 @@ local BUILD="current-$MAJ"
 # Possible script argument:
 local SCRIPT=""
 
+echo "Note: the build option doesn't work!" >&2
+exit 1
+
 for arg in "$@"; do
   # Extract possible build:
   if [[ "$arg" == -b=* ]] || [[ "$arg" == --build=* ]]; then

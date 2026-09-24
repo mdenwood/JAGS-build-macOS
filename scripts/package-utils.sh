@@ -74,12 +74,13 @@ cp -r "tools/pkgconf-lite/$PKGCONF_VERSION" "sign/utils/opt/jags/versions/pkgcon
 BASEPTH="sign/utils/opt/jags/versions/utils/$VERSION/"
 
 mkdir -p "$BASEPTH/bin"
-cp "utils/jags-0.sh" "$BASEPTH/bin/jags-4"
-sed -i '' "s/__MAJ__/4/g" "$BASEPTH/bin/jags-4"
-chmod +x "$BASEPTH/bin/jags-4"
-cp "utils/jags-0.sh" "$BASEPTH/bin/jags-5"
-sed -i '' "s/__MAJ__/5/g" "$BASEPTH/bin/jags-5"
-chmod +x "$BASEPTH/bin/jags-5"
+# Note: jags-4 and jags-5 are not included as the build option doesn't work
+#cp "utils/jags-0.sh" "$BASEPTH/bin/jags-4"
+#sed -i '' "s/__MAJ__/4/g" "$BASEPTH/bin/jags-4"
+#chmod +x "$BASEPTH/bin/jags-4"
+#cp "utils/jags-0.sh" "$BASEPTH/bin/jags-5"
+#sed -i '' "s/__MAJ__/5/g" "$BASEPTH/bin/jags-5"
+#chmod +x "$BASEPTH/bin/jags-5"
 cp "utils/jags-version.sh" "$BASEPTH/bin/jags-version"
 chmod +x "$BASEPTH/bin/jags-version"
 cp "utils/jags-uninstall.sh" "$BASEPTH/bin/jags-uninstall"
@@ -89,10 +90,11 @@ mkdir -p "$BASEPTH/share/man/man1"
 for ff ("jags.1" "jags-uninstall.1" "jags-version.1"); do
   cp "utils/man/$ff" "$BASEPTH/share/man/man1/$ff"
 done
-for vv ("4" "5"); do
-  cp "utils/man/jags-0.1" "$BASEPTH/share/man/man1/jags-$vv.1"
-  sed -i '' "s/\[JAGSMAJVERS\]/${vv}/g" "$BASEPTH/share/man/man1/jags-$vv.1"
-done
+# Note: jags-4 and jags-5 are not included as the build option doesn't work
+#for vv ("4" "5"); do
+#  cp "utils/man/jags-0.1" "$BASEPTH/share/man/man1/jags-$vv.1"
+#  sed -i '' "s/\[JAGSMAJVERS\]/${vv}/g" "$BASEPTH/share/man/man1/jags-$vv.1"
+#done
 
 ## Sign installed pkgconf-lite:
 cd "$WDIR/sign/utils/opt/jags/versions/pkgconf-lite/$PKGCONF_VERSION/bin"
@@ -129,6 +131,6 @@ pkgbuild --root "sign/utils/opt/" \
 ## Then remove the ._ files manually:
 echo "Removing dotbars..."
 scripts/package-remove-dotbar.sh "sign/utils-$VERSION.pkg" "pkg/utils-$VERSION.pkg"
-echo "Wrote package to pkg/utils-$VERSION.pkg"
+echo "Signed package saved to pkg/utils-$VERSION.pkg"
 
 exit $EX_OK

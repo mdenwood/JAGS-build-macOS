@@ -291,7 +291,8 @@ for vv ("$majvers"); do
   fi
 done
 # Fix utils installation if needed and present:
-for ff ("bin/jags-4" "bin/jags-5" "bin/jags-uninstall" "bin/jags-version" "share/man/man1/jags-4.1" "share/man/man1/jags-5.1" "share/man/man1/jags-uninstall.1" "share/man/man1/jags-version.1"); do
+# Note: jags-4 and jags-5 are not included as the build option doesn't work "bin/jags-4" "bin/jags-5" "share/man/man1/jags-4.1" "share/man/man1/jags-5.1" 
+for ff ("bin/jags-uninstall" "bin/jags-version" "share/man/man1/jags-uninstall.1" "share/man/man1/jags-version.1"); do
   if [[ -f "/opt/jags/versions/utils/latest/$ff" ]]; then
     if [[ ! "$(readlink -n "/opt/jags/$ff")" == "/opt/jags/versions/utils/latest/$ff" ]]; then
       if [ $UID -ne 0 ]; then

@@ -46,23 +46,21 @@ These installation scripts are designed for JAGS to use a versioned installation
     └── jags/
         ├── bin/
         │   ├── jags                                : symlink to inside /opt/jags/versions/jags/current
-        │   ├── jags-4                              : symlink to inside /opt/jags/versions/jags/4.x-current
-        │   ├── jags-5                              : symlink to inside /opt/jags/versions/jags/5.x-current
         │   ├── jags-uninstall                      : symlink to inside /opt/jags/versions/utils/current
         │   └── jags-version                        : symlink to inside /opt/jags/versions/utils/current
         ├── lib
         │   ├── pkgconfig
-        │   │   └── jags.pc                         : Modified pkg-config file for generic linkage to JAGS
+        │   │   └── jags.pc                         : symlink to inside /opt/jags/versions/jags/current
         │   ├── pkgconfig-4
-        │   │   └── jags.pc                         : Modified pkg-config file for generic linkage to JAGS 4.x
+        │   │   └── jags.pc                         : symlink to inside /opt/jags/versions/jags/current-4
         │   └── pkgconfig-5
-        │       └── jags.pc                         : Modified pkg-config file for generic linkage to JAGS 5.x
+        │       └── jags.pc                         : symlink to inside /opt/jags/versions/jags/current-5
         ├── share
         │   └── man
         │       └── man1
+        │           ├── jags.1                      : symlink to inside /opt/jags/versions/jags/current
         │           ├── jags-uninstall.1            : symlink to inside /opt/jags/versions/utils/current
-        │           ├── jags-version.1              : symlink to inside /opt/jags/versions/utils/current
-        │           └── jags.1                      : symlink to inside /opt/jags/versions/jags/current
+        │           └── jags-version.1              : symlink to inside /opt/jags/versions/utils/current
         │
         └── versions/
             ├── jags/

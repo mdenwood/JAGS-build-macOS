@@ -69,13 +69,15 @@ ln -fs "/opt/jags/versions/jags/default/share/man/man1/jags.1" "/opt/jags/share/
 
 # If we have utils installed then re-create those symlinks:
 if [ -d "/opt/jags/versions/utils/current" ]; then
-  ln -fs "/opt/jags/versions/utils/current/bin/jags-4" "/opt/jags/bin/jags-4"
-  ln -fs "/opt/jags/versions/utils/current/bin/jags-5" "/opt/jags/bin/jags-5"
+  # Note: jags-4 and jags-5 are not included as the build option doesn't work
+  # ln -fs "/opt/jags/versions/utils/current/bin/jags-4" "/opt/jags/bin/jags-4"
+  # ln -fs "/opt/jags/versions/utils/current/bin/jags-5" "/opt/jags/bin/jags-5"
   ln -fs "/opt/jags/versions/utils/current/bin/jags-uninstall" "/opt/jags/bin/jags-uninstall"
   ln -fs "/opt/jags/versions/utils/current/bin/jags-version" "/opt/jags/bin/jags-version"
   ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags.1" "/opt/jags/share/man/man1/jags.1"
-  ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-4.1" "/opt/jags/share/man/man1/jags-4.1"
-  ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-5.1" "/opt/jags/share/man/man1/jags-5.1"
+  # Note: jags-4 and jags-5 are not included as the build option doesn't work
+  # ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-4.1" "/opt/jags/share/man/man1/jags-4.1"
+  # ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-5.1" "/opt/jags/share/man/man1/jags-5.1"
   ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-uninstall.1" "/opt/jags/share/man/man1/jags-uninstall.1"
   ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-version.1" "/opt/jags/share/man/man1/jags-version.1"
 fi

@@ -49,25 +49,21 @@ cp "build/postinstall-transition-$VERSION.sh" "sign/transition/scripts/postinsta
 chmod +x "sign/transition/scripts/postinstall"
 
 # Package:
-# pkgbuild --identifier "$PKG_IDENTIFIER.jags-transition" \
-#          --version "$VERSION" \
-#          --scripts "sign/transition/scripts" \
-#          --nopayload \
-#            "pkg/transition-$VERSION.pkg"
-
-echo "We also need to run jags-version to active this jags-4 installation"
-exit 1
-
-pkgbuild --root "sign/JAGS-4.3.2-vecLib-single-universal/opt/" \
-         --identifier "$PKG_IDENTIFIER.jags-transition" \
+pkgbuild --identifier "$PKG_IDENTIFIER.jags-transition" \
          --version "$VERSION" \
-         --install-location "/opt/" \
          --scripts "sign/transition/scripts" \
+         --nopayload \
          "sign/transition-$VERSION.pkg"
 
-## Then remove the ._ files manually:
-echo "Removing dotbars..."
-scripts/package-remove-dotbar.sh "sign/transition-$VERSION.pkg" "pkg/transition-$VERSION.pkg"
-echo "Wrote package to pkg/transition-$VERSION.pkg"
+# pkgbuild --root "sign/JAGS-4.3.2-vecLib-single-universal/opt/" \
+#         --identifier "$PKG_IDENTIFIER.jags-transition" \
+#         --version "$VERSION" \
+#         --install-location "/opt/" \
+#         --scripts "sign/transition/scripts" \
+#         "sign/transition-$VERSION.pkg"
+
+## Then transfer to pkg directory:
+mv "sign/transition-$VERSION.pkg" "pkg/transition-$VERSION.pkg"
+echo "Signed package saved to pkg/transition-$VERSION.pkg"
 
 exit $EX_OK
