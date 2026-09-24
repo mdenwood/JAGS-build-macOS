@@ -50,7 +50,7 @@
     <ul>
         <li><strong>JAGS utils</strong> - the jags-version and jags-uninstall utilities, along with pkgconf-lite.</li>
         <li><strong>JAGS transition</strong> - symlinks under /usr/local that allow compiling against JAGS 5.x in the same way as for JAGS 4.x, as well as allowing the CRAN build of rjags 4.x to work with the JAGS-4.3.2-vecLib-single-universal build. Note that this also removes any existing versions of JAGS 4.x (and earlier).</li>
-        <li><strong>JAGS-4.3.2-vecLib-single-universal</strong> - the previous JAGS 4.3.2 release installed under the new /opt/jags directory.</li>
+        <li><strong>JAGS-4.3.2-vecLib-single-universal</strong> - the previous JAGS 4.3.2 release re-compiled for installation under the new /opt/jags directory.</li>
         <li><strong>JAGS-5.0.0-refBLAS-single-universal</strong> - a single-threaded build of JAGS statically compiled against Netlib's reference BLAS/LAPACK.</li>
         <li><strong>JAGS-5.0.0-vecLib-single-universal</strong> - a single-threaded build of JAGS compiled against Apple's Accelerate framework (vecLib).</li>
         <li><strong>JAGS-5.0.0-vecLib-gcd-universal</strong> - a multi-threaded build of JAGS using Apple's Grand Central Dispatch and Accelerate frameworks.</li>
@@ -68,32 +68,20 @@
 
     <p><strong>Important notes</strong></p>
 
-•	It is NOT necessary to re-install rjags version 5 if switching between builds of JAGS version 5.x, but switching between JAGS versions 4.x and 5.x will require re-installation of the appropriate version of rjags.  Note that the CRAN builds of rjags_4-x are not compatible with any of the builds provided by this installer:  see the JAGS discussion forum at https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d/ for more details.
-	
-  •	If you interface JAGS and R using the rjags package (or other packages using the rjags interface), then it is extremely important to ensure that your builds of R and JAGS are fully binary compatible.  Official builds of JAGS are binary compatible with the “Big Sur” and “Sonoma” releases of R for macOS (version 4.3.0 and later), but NOT previous versions of R for macOS (version 4.2.x and earlier).
-  	•	If your builds of R and JAGS are NOT binary compatible, then you may see unexpected crashes and segmentation faults when using rjags.  This applies to mixing up official builds, as well as to using other builds of JAGS that may or may not be binary compatible with the official build of R.  We therefore strongly recommend using the official build of JAGS corresponding to the official build of R that you have installed.
-  
-	•	Before installation, a script will be run to remove any existing installation of JAGS either in /usr/local and/or in /opt/R/arm64 - this is necessary to avoid potential linkage problems with R.  If you have also manually installed JAGS in another location (for example using homebrew) then it is strongly recommended to also remove these.
-	•	As part of the installation process, you will be asked to authenticate as an administrative user. The first user you create when setting up macOS has administrator privileges by default.
-	•	Once the installation is complete, you can safely delete the installer.  Note that there is no GUI associated with JAGS, so you will not find anything in Applications after the installation.  If you wish to test the JAGS installation you should open a terminal window (Applications/Utilities/Terminal) and type /opt/jags/bin/jags (type exit to leave JAGS again).
-	•	The rjags and runjags packages for current versions of R are available from CRAN for the previous release of JAGS 4.3.2.  Version 5.x of JAGS requires version 5-x of the rjags package, which is not yet on CRAN.  However, we have provided pre-built binaries of the rjags-4 and rjags-5 package for macOS that are compatible with the JAGS binaries provided in this installer: see the JAGS discussion forum at https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d/ for more details.
-	•	Source code for these packages and more information can be found at the JAGS website: http://mcmc-jags.sourceforge.net
-  
-	•	This build is being provided to you “as is”, with no warranties or guarantees of any kind. Should you encounter any problems with this installer, please contact us through the JAGS discussion forum at https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d/ 
-	•	WHEN SUPPLYING FEEDBACK: If the problem is a crash, bad code generation, incorrect error message etc., the most valuable information you can provide is full and complete instructions on how to reproduce the problem.  
-
-      
     <ul>
-        <li></li>
-        <li>At least 50 MB of free disk space</li>
-        <li>Either a x86_64 or arm64 processor</li>
+        <li>It is NOT necessary to re-install rjags version 5 if switching between builds of JAGS version 5.x, but switching between JAGS versions 4.x and 5.x will require re-installation of the appropriate version of rjags.  Note that the CRAN builds of rjags_4-x are not compatible with any of the builds provided by this installer:  see the JAGS discussion forum at https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d/ for more details.</li>
+        <li>If you interface JAGS and R using the rjags package (or other packages using the rjags interface), then it is extremely important to ensure that your builds of R and JAGS are fully binary compatible.  Official builds of JAGS are binary compatible with the “Big Sur” and “Sonoma” releases of R for macOS (version 4.3.0 and later), but NOT previous versions of R for macOS (version 4.2.x and earlier).</li>
+        <li>If your builds of R and JAGS are NOT binary compatible, then you may see unexpected crashes and segmentation faults when using rjags.  This applies to mixing up official builds, as well as to using other builds of JAGS that may or may not be binary compatible with the official build of R.  We therefore strongly recommend using the official build of JAGS corresponding to the official build of R that you have installed.</li>
+        <li>Before installation, a script will be run to remove any existing installation of JAGS either in /usr/local and/or in /opt/R/arm64 - this is necessary to avoid potential linkage problems with R.  If you have also manually installed JAGS in another location (for example using homebrew) then it is strongly recommended to also remove these.</li>
+        <li>As part of the installation process, you will be asked to authenticate as an administrative user. The first user you create when setting up macOS has administrator privileges by default.</li>
+        <li>Once the installation is complete, you can safely delete the installer.  Note that there is no GUI associated with JAGS, so you will not find anything in Applications after the installation.  If you wish to test the JAGS installation you should open a terminal window (Applications/Utilities/Terminal) and type /opt/jags/bin/jags (type exit to leave JAGS again).</li>
+        <li>The rjags and runjags packages for current versions of R are available from CRAN for the previous release of JAGS 4.3.2.  Version 5.x of JAGS requires version 5-x of the rjags package, which is not yet on CRAN.  However, we have provided pre-built binaries of the rjags-4 and rjags-5 package for macOS that are compatible with the JAGS binaries provided in this installer: see the JAGS discussion forum at https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d/ for more details.</li>
+        <li>Source code for these packages and more information can be found at the JAGS website: http://mcmc-jags.sourceforge.net</li>
+        <li>This build is being provided to you “as is”, with no warranties or guarantees of any kind. Should you encounter any problems with this installer, please contact us through the JAGS discussion forum at https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d/ </li>
+        <li>WHEN SUPPLYING FEEDBACK: If the problem is a crash, bad code generation, incorrect error message etc., the most valuable information you can provide is full and complete instructions on how to reproduce the problem.  </li>
     </ul>
+      
+    <p>Please click <strong>Continue</strong> to review the software license agreement (GNU GENERAL PUBLIC LICENSE Version 2, June 1991) and proceed with the installation process (administrator password will be required).</p>
     
-    <p>The standard installation includes all of the above, but it is possible to customise the installation via this installer.</p>
-
-    <p>Please click <strong>Continue</strong> to review the software license agreement (GNU GENERAL PUBLIC LICENSE Version 2, June 1991) and proceed with the installation process.</p>
-    
-    <p class="note">Note: you may be prompted to enter your administrator password during the installation process.</p>
-
 </body>
 </html>

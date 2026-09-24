@@ -21,9 +21,10 @@
     <choices-outline>
         <line choice="utils"/>
         <line choice="transition"/>
-        <line choice="jags-rsu"/>
-        <line choice="jags-vsu"/>
-        <line choice="jags-vgu"/>
+        <line choice="jags-4-vsu"/>
+        <line choice="jags-5-rsu"/>
+        <line choice="jags-5-vsu"/>
+        <line choice="jags-5-vgu"/>
     </choices-outline>
 
     <choice
@@ -39,46 +40,46 @@
     <choice
         id="transition"
         title="JAGS transition"
-        description="Transition framework from JAGS 4.x to 5.x (includes JAGS 4.3.2-vecLib-single-universal)"
+        description="Transition framework from JAGS 4.x to 5.x"
         visible="true"
         selected="true" >
         <pkg-ref id="com.matthewdenwood.jags-transition"/>
     </choice>
 
     <choice
-        id="jags-4"
+        id="jags-4-vsu"
         title="JAGS 4.3.2-vecLib-single-universal"
         description="JAGS 4.3.2 re-compiled for use within the new /opt/jags/ installation directory"
         visible="true"
         selected="true" >
-        <pkg-ref id="com.matthewdenwood.jags-transition"/>
+        <pkg-ref id="com.matthewdenwood.jags-4-vsu"/>
     </choice>
 
     <choice
-        id="jags-rsu"
+        id="jags-5-rsu"
         title="JAGS 5.0.0-refBLAS-single-universal"
         description="JAGS built with reference BLAS/LAPACK and single threading"
         visible="true"
         selected="true" >
-        <pkg-ref id="com.matthewdenwood.jags-rsu"/>
+        <pkg-ref id="com.matthewdenwood.jags-5-rsu"/>
     </choice>
 
     <choice
-        id="jags-vsu"
+        id="jags-5-vsu"
         title="JAGS 5.0.0-vecLib-single-universal"
         description="JAGS built with Apple's Accelerate framework and single threading"
         visible="true"
         selected="true" >
-        <pkg-ref id="com.matthewdenwood.jags-vsu"/>
+        <pkg-ref id="com.matthewdenwood.jags-5-vsu"/>
     </choice>
     
     <choice
-        id="jags-vgu"
+        id="jags-5-vgu"
         title="JAGS 5.0.0-vecLib-gcd-universal"
         description="JAGS built with Apple's Accelerate framework and multi-threading using Grand Central Dispatch (GCD)"
         visible="true"
         selected="true" >
-        <pkg-ref id="com.matthewdenwood.jags-vgu"/>
+        <pkg-ref id="com.matthewdenwood.jags-5-vgu"/>
     </choice>
     
     <pkg-ref
@@ -94,25 +95,25 @@
     </pkg-ref>
 
     <pkg-ref
-        id="com.matthewdenwood.jags4-vsu"
+        id="com.matthewdenwood.jags-4-vsu"
         version="4.3.2" >
         JAGS-4.3.2-vecLib-single-universal.pkg
     </pkg-ref>
 
     <pkg-ref
-        id="com.matthewdenwood.jags5-rsu"
+        id="com.matthewdenwood.jags-5-rsu"
         version="5.0.0" >
         JAGS-5.0.0-refBLAS-single-universal.pkg
     </pkg-ref>
 
     <pkg-ref
-        id="com.matthewdenwood.jags5-vsu"
+        id="com.matthewdenwood.jags-5-vsu"
         version="5.0.0" >
         pkg/JAGS-5.0.0-vecLib-single-universal.pkg
     </pkg-ref>
 
     <pkg-ref
-        id="com.matthewdenwood.jags5-vgu"
+        id="com.matthewdenwood.jags-5-vgu"
         version="5.0.0" >
         pkg/JAGS-5.0.0-vecLib-gcd-universal.pkg
     </pkg-ref>
