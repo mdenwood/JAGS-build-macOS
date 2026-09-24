@@ -337,8 +337,8 @@ if [[ -f "/opt/jags/lib/pkgconfig-$majvers/jags.pc" ]]; then
 fi
 
 # Update active version:
-ln -Fs "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/default"
-ln -Fs "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/current-$majvers"
+ln -Fsh "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/default"
+ln -Fsh "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/current-$majvers"
 
 echo "JAGS build $target is now current-$majvers & default"
 exit $EX_OK

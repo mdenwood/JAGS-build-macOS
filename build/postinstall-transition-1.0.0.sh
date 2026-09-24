@@ -91,7 +91,7 @@ ln -fs "/opt/jags/lib/pkgconfig/jags.pc" "/usr/local/lib/pkgconfig/jags.pc"
 ln -fs "/opt/jags/share/man/man1/jags.1" "/usr/local/share/man/man1/jags.1" 
 
 # For compatibility with the CRAN build of rjags-4:
-ln -Fs "/opt/jags/versions/jags/current-4/lib/JAGS" "/usr/local/lib/JAGS"
+ln -Fsh "/opt/jags/versions/jags/current-4/lib/JAGS" "/usr/local/lib/JAGS"
 ln -fs "/opt/jags/versions/jags/current-4/lib/libjags.dylib" "/usr/local/lib/libjags.dylib"
 ln -fs "/opt/jags/versions/jags/current-4/lib/libjags.4.dylib" "/usr/local/lib/libjags.4.dylib"
 ln -fs "/opt/jags/versions/jags/current-4/lib/libjrmath.dylib" "/usr/local/lib/libjrmath.dylib"

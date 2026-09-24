@@ -95,8 +95,8 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 # Create symlink to latest:
-ln -Fs "/opt/jags/versions/utils/$latest" "/opt/jags/versions/utils/current"
-ln -Fs "/opt/jags/versions/pkgconf-lite/$pkglatest" "/opt/jags/versions/pkgconf-lite/current"
+ln -Fsh "/opt/jags/versions/utils/$latest" "/opt/jags/versions/utils/current"
+ln -Fsh "/opt/jags/versions/pkgconf-lite/$pkglatest" "/opt/jags/versions/pkgconf-lite/current"
 
 # Create symlinks under /opt/jags
 mkdir -p "/opt/jags/bin"

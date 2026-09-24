@@ -86,7 +86,7 @@ cp COPYING "$WDIR/tools/pkgconf-lite/$VERSION/doc/"
 echo "This is pkgconf-lite version $VERSION - see https://github.com/pkgconf/pkgconf for source code\n" > "$WDIR/tools/pkgconf-lite/$VERSION/doc/notes.txt"
 
 ## Just for ease of use with building JAGS:
-ln -Fs "$WDIR/tools/pkgconf-lite/$VERSION/bin/pkg-config" "$WDIR/tools/pkgconf-lite/bin/pkg-config"
+ln -Fsh "$WDIR/tools/pkgconf-lite/$VERSION/bin/pkg-config" "$WDIR/tools/pkgconf-lite/bin/pkg-config"
 
 touch "$WDIR/tools/pkgconf-lite/.stamp"
 exit 0
