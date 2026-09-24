@@ -37,12 +37,12 @@ https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d/
 SHA-256 checksums for each installer are provided below: 
 
 - JAGS-5.0.0-universal.pkg:
-  489609326115e174cb4ad4445c9c95d6758a4ac1bfe6d26339ad8059a0cda1fd
+	73cf95c80ec58e9c99122739bca1128186f1b6b96958d18ff7cc6d0058f1823c
 
-- JAGS-5.0.0-vecLib-single-aarch64.pkg
-  f8b5b7c8f3949c53e6dd6475b7b0f4d2b3d672319fe3697c3ff961f5cdc4e421
+- JAGS-5.0.0-vecLib-single-aarch64.pkg:
+	35bed77a094a69e7b4869f22b71efa248be3072006da9e127397d077b8341596
 
-- JAGS-5.0.0-vecLib-single-x86_64.pkg
-  f7a98167cd8ac92ea85393a1a155234d1444578ce45645c775895e56a2f23fbe
+- JAGS-5.0.0-vecLib-single-x86_64.pkg:
+	bdab759c9f98a9eedb881b901e8c29812dfed3a95504e53b21dc08eaa23ed26f
 
 Last updated by Matt Denwood, 24th September 2026
