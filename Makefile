@@ -24,6 +24,11 @@ releases: release/checksums.txt
 clean:
 	rm -rf sources tmp tools tgz sign pkg release
 
+## Fresh
+.PHONY: fresh
+clean:
+	rm -rf tmp tgz sign pkg release
+
 ## Create folders
 
 .PHONY: mkdirs
