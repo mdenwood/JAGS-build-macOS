@@ -26,7 +26,7 @@ clean:
 
 ## Fresh
 .PHONY: fresh
-clean:
+fresh:
 	rm -rf tmp tgz sign pkg release
 
 ## Create folders
