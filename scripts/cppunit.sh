@@ -93,9 +93,9 @@ exit $EX_OK
 
 # For possible installation to /opt
 #cd universal
-#ln -s $IDIR opt/cppunit/current
+#lns $IDIR opt/cppunit/current
 #mkdir -p usr/local/lib/pkgconfig
-#ln -s /opt/cppunit/current/lib/pkgconfig/cppunit.pc usr/local/lib/pkgconfig/cppunit.pc
+#lns /opt/cppunit/current/lib/pkgconfig/cppunit.pc usr/local/lib/pkgconfig/cppunit.pc
 #tar zcf "../cppunit-universal-1.15.1.tar.gz" opt usr
 #cd ../
 #sudo tar -xvf cppunit-universal-1.15.1.tar.gz -C /

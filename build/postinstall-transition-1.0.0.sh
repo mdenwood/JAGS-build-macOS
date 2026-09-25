@@ -17,6 +17,18 @@ if [ $(id -u) -ne 0 ]; then
     exit $EX_USAGE
 fi
 
+# Utility to safely create a symlink, even if the target exists as a file/folder/symlink:
+lns() {
+    if [[ -z "$1" || -z "$2" ]]; then
+        echo "Error: Missing arguments." >&2
+        echo "Usage: lnsf <source_path> <target_path>" >&2
+        return $EX_USAGE
+    fi
+    local src="$1"
+    local tgt="$2"
+    rm -rf "$tgt" && ln -sfh "$src" "$tgt"
+}
+
 # Remove arm64 JAGS 4.x
 rm -rf /opt/R/arm64/bin/jags
 rm -rf /opt/R/arm64/bin/jags-uninstall
@@ -36,6 +48,8 @@ rm -rf /usr/local/bin/jags-uninstall
 rm -rf /usr/local/libexec/jags-terminal
 rm -rf /usr/local/include/JAGS/
 rm -rf /usr/local/lib/libjags.4.dylib
+rm -rf /usr/local/lib/libjags.5.dylib
+rm -rf /usr/local/lib/libjags.dylib
 rm -rf /usr/local/lib/pkgconfig/jags.pc
 rm -rf /usr/local/lib/JAGS/
 rm -rf /usr/local/lib/libjrmath.0.dylib
@@ -63,37 +77,37 @@ fi
 mkdir -p "/opt/jags/bin"
 mkdir -p "/opt/jags/lib/pkgconfig"
 mkdir -p "/opt/jags/share/man/man1"
-ln -fs "/opt/jags/versions/jags/default/bin/jags" "/opt/jags/bin/jags"
-ln -fs "/opt/jags/versions/jags/default/lib/pkgconfig/jags.pc" "/opt/jags/lib/pkgconfig/jags.pc"
-ln -fs "/opt/jags/versions/jags/default/share/man/man1/jags.1" "/opt/jags/share/man/man1/jags.1"
+lns "/opt/jags/versions/jags/default/bin/jags" "/opt/jags/bin/jags"
+lns "/opt/jags/versions/jags/default/lib/pkgconfig/jags.pc" "/opt/jags/lib/pkgconfig/jags.pc"
+lns "/opt/jags/versions/jags/default/share/man/man1/jags.1" "/opt/jags/share/man/man1/jags.1"
 
 # If we have utils installed then re-create those symlinks:
 if [ -d "/opt/jags/versions/utils/current" ]; then
   # Note: jags-4 and jags-5 are not included as the build option doesn't work
-  # ln -fs "/opt/jags/versions/utils/current/bin/jags-4" "/opt/jags/bin/jags-4"
-  # ln -fs "/opt/jags/versions/utils/current/bin/jags-5" "/opt/jags/bin/jags-5"
-  ln -fs "/opt/jags/versions/utils/current/bin/jags-uninstall" "/opt/jags/bin/jags-uninstall"
-  ln -fs "/opt/jags/versions/utils/current/bin/jags-version" "/opt/jags/bin/jags-version"
-  ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags.1" "/opt/jags/share/man/man1/jags.1"
+  # lns "/opt/jags/versions/utils/current/bin/jags-4" "/opt/jags/bin/jags-4"
+  # lns "/opt/jags/versions/utils/current/bin/jags-5" "/opt/jags/bin/jags-5"
+  lns "/opt/jags/versions/utils/current/bin/jags-uninstall" "/opt/jags/bin/jags-uninstall"
+  lns "/opt/jags/versions/utils/current/bin/jags-version" "/opt/jags/bin/jags-version"
+  lns "/opt/jags/versions/utils/current/share/man/man1/jags.1" "/opt/jags/share/man/man1/jags.1"
   # Note: jags-4 and jags-5 are not included as the build option doesn't work
-  # ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-4.1" "/opt/jags/share/man/man1/jags-4.1"
-  # ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-5.1" "/opt/jags/share/man/man1/jags-5.1"
-  ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-uninstall.1" "/opt/jags/share/man/man1/jags-uninstall.1"
-  ln -fs "/opt/jags/versions/utils/current/share/man/man1/jags-version.1" "/opt/jags/share/man/man1/jags-version.1"
+  # lns "/opt/jags/versions/utils/current/share/man/man1/jags-4.1" "/opt/jags/share/man/man1/jags-4.1"
+  # lns "/opt/jags/versions/utils/current/share/man/man1/jags-5.1" "/opt/jags/share/man/man1/jags-5.1"
+  lns "/opt/jags/versions/utils/current/share/man/man1/jags-uninstall.1" "/opt/jags/share/man/man1/jags-uninstall.1"
+  lns "/opt/jags/versions/utils/current/share/man/man1/jags-version.1" "/opt/jags/share/man/man1/jags-version.1"
 fi
 
 # Create symlinks under /usr/local
 mkdir -p "/usr/local/bin"
 mkdir -p "/usr/local/lib/pkgconfig"
 mkdir -p "/usr/local/share/man/man1"
-ln -fs "/opt/jags/bin/jags" "/usr/local/bin/jags" 
-ln -fs "/opt/jags/lib/pkgconfig/jags.pc" "/usr/local/lib/pkgconfig/jags.pc" 
-ln -fs "/opt/jags/share/man/man1/jags.1" "/usr/local/share/man/man1/jags.1" 
+lns "/opt/jags/bin/jags" "/usr/local/bin/jags" 
+lns "/opt/jags/lib/pkgconfig/jags.pc" "/usr/local/lib/pkgconfig/jags.pc" 
+lns "/opt/jags/share/man/man1/jags.1" "/usr/local/share/man/man1/jags.1" 
 
 # For compatibility with the CRAN build of rjags-4:
-ln -Fsh "/opt/jags/versions/jags/current-4/lib/JAGS" "/usr/local/lib/JAGS"
-ln -fs "/opt/jags/versions/jags/current-4/lib/libjags.dylib" "/usr/local/lib/libjags.dylib"
-ln -fs "/opt/jags/versions/jags/current-4/lib/libjags.4.dylib" "/usr/local/lib/libjags.4.dylib"
-ln -fs "/opt/jags/versions/jags/current-4/lib/libjrmath.dylib" "/usr/local/lib/libjrmath.dylib"
+lns "/opt/jags/versions/jags/current-4/lib/JAGS" "/usr/local/lib/JAGS"
+lns "/opt/jags/versions/jags/current-4/lib/libjags.dylib" "/usr/local/lib/libjags.dylib"
+lns "/opt/jags/versions/jags/current-4/lib/libjags.4.dylib" "/usr/local/lib/libjags.4.dylib"
+lns "/opt/jags/versions/jags/current-4/lib/libjrmath.dylib" "/usr/local/lib/libjrmath.dylib"
 
 exit $EX_OK

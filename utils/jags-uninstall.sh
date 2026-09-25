@@ -247,6 +247,7 @@ if [[ $jags_usr -eq 1 ]]; then
   rm -rf /usr/local/libexec/jags-terminal
   rm -rf /usr/local/include/JAGS
   rm -rf /usr/local/lib/libjags.4.dylib
+  rm -rf /usr/local/lib/libjags.5.dylib
   rm -rf /usr/local/lib/libjags.dylib
   rm -rf /usr/local/lib/pkgconfig/jags.pc
   rm -rf /usr/local/lib/JAGS

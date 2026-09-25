@@ -82,7 +82,7 @@ exit $EX_OK
 
 # # For possible installation to /opt
 # mkdir -p "opt/lapack/$lapackvers/lib/"
-# ln -s "/opt/lapack/$lapackvers/" "opt/lapack/current"
+# lns "/opt/lapack/$lapackvers/" "opt/lapack/current"
 # lipo "$bdir/librefblas-aarch64.a" "$bdir/librefblas-x86_64.a" -create -output "$bdir/lapack-$lapackvers/opt/lapack/$lapackvers/lib/librefblas.a"
 # lipo "$bdir/liblapack-aarch64.a" "$bdir/liblapack-x86_64.a" -create -output "$bdir/lapack-$lapackvers/opt/lapack/$lapackvers/lib/liblapack.a"
 # tar -zcf "../lapack-$lapackvers.tgz" opt

@@ -45,6 +45,18 @@ EX_USAGE=64
 EX_SOFTWARE=70
 EX_NOPERM=77
 
+# Utility to safely create a symlink, even if the target exists as a file/folder/symlink:
+lns() {
+    if [[ -z "$1" || -z "$2" ]]; then
+        echo "Error: Missing arguments." >&2
+        echo "Usage: lnsf <source_path> <target_path>" >&2
+        return $EX_USAGE
+    fi
+    local src="$1"
+    local tgt="$2"
+    rm -rf "$tgt" && ln -sfh "$src" "$tgt"
+}
+
 ## Check we are on macOS >= 11:
 if [ "`echo $OSTYPE | grep 'darwin'`" = "" ]; then
 	echo "This script requires macOS" 1>&2 
@@ -267,7 +279,7 @@ for ff ("bin/jags" "share/man/man1/jags.1"); do
           exit $EX_USAGE
       fi            
       # echo "Making symlink for /opt/jags/$ff"
-      ln -fs "/opt/jags/versions/jags/default/$ff" "/opt/jags/$ff"
+      lns "/opt/jags/versions/jags/default/$ff" "/opt/jags/$ff"
     fi
 done
 if [[ ! "$(readlink -n "/opt/jags/lib/pkgconfig/jags.pc")" == "/opt/jags/versions/jags/default/lib/pkgconfig/jags.pc" ]]; then
@@ -277,7 +289,7 @@ if [[ ! "$(readlink -n "/opt/jags/lib/pkgconfig/jags.pc")" == "/opt/jags/version
       exit $EX_USAGE
   fi            
   # echo "Making symlink for /opt/jags/lib/pkgconfig/jags.pc"
-  ln -fs "/opt/jags/versions/jags/default/lib/pkgconfig/jags.pc" "/opt/jags/lib/pkgconfig/jags.pc"
+  lns "/opt/jags/versions/jags/default/lib/pkgconfig/jags.pc" "/opt/jags/lib/pkgconfig/jags.pc"
 fi
 for vv ("$majvers"); do
   if [[ ! "$(readlink -n "/opt/jags/lib/pkgconfig-$vv/jags.pc")" == "/opt/jags/versions/jags/current-$vv/lib/pkgconfig/jags.pc" ]]; then
@@ -287,7 +299,7 @@ for vv ("$majvers"); do
         exit $EX_USAGE
     fi            
     # echo "Making symlink for /opt/jags/lib/pkgconfig-$vv/jags.pc"
-    ln -fs "/opt/jags/versions/jags/current-$vv/lib/pkgconfig/jags.pc" "/opt/jags/lib/pkgconfig-$vv/jags.pc"
+    lns "/opt/jags/versions/jags/current-$vv/lib/pkgconfig/jags.pc" "/opt/jags/lib/pkgconfig-$vv/jags.pc"
   fi
 done
 # Fix utils installation if needed and present:
@@ -301,7 +313,7 @@ for ff ("bin/jags-uninstall" "bin/jags-version" "share/man/man1/jags-uninstall.1
           exit $EX_USAGE
       fi            
       # echo "Making symlink for /opt/jags/$ff"
-      ln -fs "/opt/jags/versions/utils/latest/$ff" "/opt/jags/$ff"
+      lns "/opt/jags/versions/utils/latest/$ff" "/opt/jags/$ff"
     fi
   fi
 done
@@ -337,8 +349,8 @@ if [[ -f "/opt/jags/lib/pkgconfig-$majvers/jags.pc" ]]; then
 fi
 
 # Update active version:
-ln -Fsh "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/default"
-ln -Fsh "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/current-$majvers"
+lns "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/default"
+lns "/opt/jags/versions/jags/$target" "/opt/jags/versions/jags/current-$majvers"
 
 echo "JAGS build $target is now current-$majvers & default"
 exit $EX_OK

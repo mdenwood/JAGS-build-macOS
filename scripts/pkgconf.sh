@@ -12,6 +12,18 @@ EX_USAGE=64
 EX_SOFTWARE=70
 EX_CONFIG=78
 
+# Utility to safely create a symlink, even if the target exists as a file/folder/symlink:
+lns() {
+    if [[ -z "$1" || -z "$2" ]]; then
+        echo "Error: Missing arguments." >&2
+        echo "Usage: lnsf <source_path> <target_path>" >&2
+        return $EX_USAGE
+    fi
+    local src="$1"
+    local tgt="$2"
+    rm -rf "$tgt" && ln -sfh "$src" "$tgt"
+}
+
 # Note: this script is intended to be run from the root directory (by the Makefile)
 ./scripts/check_deps.sh
 
@@ -86,7 +98,7 @@ cp COPYING "$WDIR/tools/pkgconf-lite/$VERSION/doc/"
 echo "This is pkgconf-lite version $VERSION - see https://github.com/pkgconf/pkgconf for source code\n" > "$WDIR/tools/pkgconf-lite/$VERSION/doc/notes.txt"
 
 ## Just for ease of use with building JAGS:
-ln -Fsh "$WDIR/tools/pkgconf-lite/$VERSION/bin/pkg-config" "$WDIR/tools/pkgconf-lite/bin/pkg-config"
+lns "$WDIR/tools/pkgconf-lite/$VERSION/bin/pkg-config" "$WDIR/tools/pkgconf-lite/bin/pkg-config"
 
 touch "$WDIR/tools/pkgconf-lite/.stamp"
 exit 0
