@@ -14,9 +14,11 @@
         hostArchitectures="arm64,x86_64"
         rootVolumeOnly="true" />
     
-    <allowed-os-versions>
-        <os-version min="11.0.0"/>
-    </allowed-os-versions>
+    <volume-check>
+      <allowed-os-versions>
+        <os-version min="11.0"/>
+      </allowed-os-versions>
+    </volume-check>
  
     <choices-outline>
         <line choice="utils"/>
