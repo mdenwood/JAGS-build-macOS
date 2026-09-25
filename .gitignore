@@ -1,4 +1,3 @@
-# Source files
 sources/*
 tmp/*
 tools/*
@@ -6,3 +5,5 @@ tgz/*
 sign/*
 pkg/*
 release/*
+
+**/.DS_Store
