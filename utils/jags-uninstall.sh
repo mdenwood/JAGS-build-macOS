@@ -133,12 +133,12 @@ else
 fi
 
 # Check for legacy/custom JAGS installations:
-if [[ $custom -eq 1 ]] && [[ -d "/usr/local/lib/JAGS/" ]]; then
+if [[ $custom -eq 1 ]] && [[ -f "/usr/local/libexec/jags-terminal" ]]; then
   jags_usr=1
 else
   jags_usr=0  
 fi
-if [[ $custom -eq 1 ]] && [[ -d "/opt/R/arm64/lib/JAGS/" ]]; then
+if [[ $custom -eq 1 ]] && [[ -f "/opt/R/arm64/libexec/jags-terminal" ]]; then
   jags_optR=1
 else
   jags_optR=0
@@ -216,6 +216,17 @@ if [[ $jags_sym -eq 1 ]]; then
   rm -rf "/usr/local/bin/jags-uninstall"
   rm -rf "/usr/local/bin/jags-switch"
   rm -rf "/usr/local/bin/jags-version"
+  if [[ -h "/usr/local/include/JAGS" ]]; then
+    rm -f "/usr/local/include/JAGS"
+  fi
+  if [[ -h "/usr/local/lib/JAGS" ]]; then
+    rm -f "/usr/local/lib/JAGS"
+  fi
+  rm -rf "/usr/local/lib/libjags.4.dylib"
+  rm -rf "/usr/local/lib/libjags.5.dylib"
+  rm -rf "/usr/local/lib/libjags.dylib"
+  rm -rf "/usr/local/lib/libjrmath.dylib"
+  rm -rf "/usr/local/lib/libjrmath.0.dylib"
   rm -rf "/usr/local/lib/pkgconfig/jags.pc"
   rm -rf "/usr/local/share/man/man1/jags.1"  
   rm -rf "/usr/local/share/man/man1/jags-uninstall.1"  
@@ -245,12 +256,16 @@ if [[ $jags_usr -eq 1 ]]; then
   rm -rf /usr/local/bin/jags
   rm -rf /usr/local/bin/jags-uninstall
   rm -rf /usr/local/libexec/jags-terminal
-  rm -rf /usr/local/include/JAGS
+  if [[ ! -h "/usr/local/include/JAGS" ]]; then
+    rm -rf /usr/local/include/JAGS/
+  fi
   rm -rf /usr/local/lib/libjags.4.dylib
   rm -rf /usr/local/lib/libjags.5.dylib
   rm -rf /usr/local/lib/libjags.dylib
   rm -rf /usr/local/lib/pkgconfig/jags.pc
-  rm -rf /usr/local/lib/JAGS
+  if [[ ! -h "/usr/local/lib/JAGS" ]]; then
+    rm -rf /usr/local/lib/JAGS/
+  fi
   rm -rf /usr/local/lib/libjrmath.dylib
   rm -rf /usr/local/lib/libjrmath.0.dylib
   rm -rf /usr/local/lib/libjrmath.la
