@@ -15,14 +15,14 @@ VERSMAJ = $(word 1,$(subst ., ,$(JAGSVERSION)))
 ## Save all intermediate targets even when not mentioned explicitly:
 .SECONDARY:
 	
-## Complete build
-.PHONY: all
-all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp
-# all: tools tmp/JAGS-$(JAGSVERSION)-vecLib-single-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-gcd-x86_64/.stamp tmp/JAGS-$(JAGSVERSION)-vecLib-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-aarch64/.stamp tmp/JAGS-$(JAGSVERSION)-refBLAS-single-x86_64/.stamp
-# all: build/JAGS-$(JAGSVERSION)-vecLib-gcd-universal.pkg
-# all: tmp/JAGS-$(JAGSVERSION)-vecLib-single-universal/.stamp
-# all: sign/utils-$(UTILSVERSION).pkg utils/man/jags-4.1 utils/man/jags-5.1 sign/transition-$(UTILSVERSION).pkg sign/JAGS-$(JAGSVERSION)-vecLib-gcd-aarch64.pkg
+## Build releases
+.PHONY: releases
+releases: release/checksums.txt
 
+## Clean
+.PHONY: clean
+clean:
+	rm -rf sources tmp tools tgz sign pkg release
 
 ## Create folders
 
@@ -166,8 +166,3 @@ release/JAGS-%.pkg: scripts/staple.sh pkg/JAGS-%.pkg | release
 release/checksums.txt: scripts/checksums.sh release/JAGS-$(JAGSVERSION)-universal.pkg release/JAGS-$(JAGSVERSION)-vecLib-single-aarch64.pkg release/JAGS-$(JAGSVERSION)-vecLib-single-x86_64.pkg
 	./scripts/checksums.sh
 
-
-## All releases:
-
-.PHONY: releases
-releases: release/checksums.txt
