@@ -13,9 +13,9 @@ of JAGS 4.3.2 that is provided for backwards compatibility.
 The installer includes detailed descriptions of the included
 builds and utilities on the welcome page - please do read this.
 
-The following architecture and build specific installers are
-also provided:
+The following build-specific installers are also provided:
 
+- JAGS-5.0.0-vecLib-single-universal.pkg
 - JAGS-5.0.0-vecLib-single-aarch64.pkg
 - JAGS-5.0.0-vecLib-single-x86_64.pkg
 
@@ -37,12 +37,15 @@ https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/115edca29d/
 SHA-256 checksums for each installer are provided below: 
 
 - JAGS-5.0.0-universal.pkg:
-	73cf95c80ec58e9c99122739bca1128186f1b6b96958d18ff7cc6d0058f1823c
+	49753af665f4ebe309c4b1b7b7d53fd10009b5b19ed766e040e5581842772316
+
+- JAGS-5.0.0-vecLib-single-universal.pkg:
+	06230b16fcef74cbeab7784c7d6d7c8128d802ce2f9edf3c4f4268e44e7bb3f4
 
 - JAGS-5.0.0-vecLib-single-aarch64.pkg:
-	35bed77a094a69e7b4869f22b71efa248be3072006da9e127397d077b8341596
+	134f380f1a945ccfd29342d542761febeff990ab7736cbbaf29ddf3aee2ee148
 
 - JAGS-5.0.0-vecLib-single-x86_64.pkg:
-	bdab759c9f98a9eedb881b901e8c29812dfed3a95504e53b21dc08eaa23ed26f
+	03e899aaf4ed9e14138fbfaf2872b93260f995e44b02dd011f9453952016991b
 
 Last updated by Matt Denwood, 24th September 2026
