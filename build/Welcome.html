@@ -39,7 +39,7 @@
     
     <p>JAGS (Just Another Gibbs Sampler) is a program for analysis of Bayesian Graphical models by Gibbs Sampling written by Martyn Plummer, with contributions from Matt Denwood. The functionality of JAGS is based on the BUGS program created by the MRC Biostatistics Unit (http://www.mrc-bsu.cam.ac.uk). There is a short manual that describes the differences between JAGS and BUGS.</p>
 
-    <p>This package will install 64-bit universal (arm64 + x86_64) official builds of JAGS 5.0.0, built for binary compatibility with “Big Sur” and “Sonoma” releases of R for macOS (versions 4.3.0 and onwards), along with macOS-specific utilities that are designed to help manage multiple JAGS installations. This official binary is notarised/signed by Matt Denwood (the maintainer of macOS binaries of JAGS). The JAGS code has no dependencies on R and will work on its own, although most users will want to use JAGS via the rjags and/or runjags packages in R.</p>
+    <p>This package will install 64-bit universal (arm64 + x86_64) official builds of JAGS 5.0.1, built for binary compatibility with “Big Sur” and “Sonoma” releases of R for macOS (versions 4.3.0 and onwards), along with macOS-specific utilities that are designed to help manage multiple JAGS installations. This official binary is notarised/signed by Matt Denwood (the maintainer of macOS binaries of JAGS). The JAGS code has no dependencies on R and will work on its own, although most users will want to use JAGS via the rjags and/or runjags packages in R.</p>
 
     <p>The official macOS builds of JAGS 5.x and later install to /opt/jags, which is set up with subdirectories for different builds of JAGS along with symbolic links that allow a user to set the currently active version using the included utilities. You may wish to add /opt/jags/bin to your PATH so that the installed binaries and utilities (along with pkg-config files and man entries) are available from the command line.</p>
       
@@ -59,9 +59,9 @@
         <li><strong>JAGS utils</strong> - the jags-version and jags-uninstall utilities, along with pkgconf-lite.</li>
         <li><strong>JAGS transition</strong> - symlinks under /usr/local that allow compiling against JAGS 5.x in the same way as for JAGS 4.x, as well as allowing the CRAN build of rjags 4.x to work with the JAGS-4.3.2-vecLib-single-universal build. Note that this also removes any existing versions of JAGS 4.x (and earlier).</li>
         <li><strong>JAGS-4.3.2-vecLib-single-universal</strong> - the previous JAGS 4.3.2 release re-compiled for installation under the new /opt/jags directory.</li>
-        <li><strong>JAGS-5.0.0-refBLAS-single-universal</strong> - a single-threaded build of JAGS statically compiled against Netlib's reference BLAS/LAPACK.</li>
-        <li><strong>JAGS-5.0.0-vecLib-single-universal</strong> - a single-threaded build of JAGS compiled against Apple's Accelerate framework (vecLib).</li>
-        <li><strong>JAGS-5.0.0-vecLib-gcd-universal</strong> - a multi-threaded build of JAGS using Apple's Grand Central Dispatch and Accelerate frameworks.</li>
+        <li><strong>JAGS-5.0.1-refBLAS-single-universal</strong> - a single-threaded build of JAGS statically compiled against Netlib's reference BLAS/LAPACK.</li>
+        <li><strong>JAGS-5.0.1-vecLib-single-universal</strong> - a single-threaded build of JAGS compiled against Apple's Accelerate framework (vecLib).</li>
+        <li><strong>JAGS-5.0.1-vecLib-gcd-universal</strong> - a multi-threaded build of JAGS using Apple's Grand Central Dispatch and Accelerate frameworks.</li>
     </ul>
     
     <p>The standard installation includes all of the above, but it is possible to customise the installation via this installer.  The active JAGS installation will be the last build selected - this can be altered after installation using the jags-version utility.  To remove JAGS installations use the jags-uninstall utility.</p>
