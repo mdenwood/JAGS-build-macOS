@@ -62,7 +62,7 @@
 
     <choice
         id="jags-5-rsu"
-        title="JAGS 5.0.0-refBLAS-single-universal"
+        title="JAGS 5.0.1-refBLAS-single-universal"
         description="JAGS built with reference BLAS/LAPACK and single threading"
         visible="true"
         exclusive="false"
@@ -72,7 +72,7 @@
 
     <choice
         id="jags-5-vsu"
-        title="JAGS 5.0.0-vecLib-single-universal"
+        title="JAGS 5.0.1-vecLib-single-universal"
         description="JAGS built with Apple's Accelerate framework and single threading"
         visible="true"
         exclusive="false"
@@ -82,7 +82,7 @@
     
     <choice
         id="jags-5-vgu"
-        title="JAGS 5.0.0-vecLib-gcd-universal"
+        title="JAGS 5.0.1-vecLib-gcd-universal"
         description="JAGS built with Apple's Accelerate framework and multi-threading using Grand Central Dispatch (GCD)"
         visible="true"
         exclusive="false"
@@ -110,20 +110,20 @@
 
     <pkg-ref
         id="com.matthewdenwood.jags-5-rsu"
-        version="5.0.0" >
-        JAGS-5.0.0-refBLAS-single-universal.pkg
+        version="5.0.1" >
+        JAGS-5.0.1-refBLAS-single-universal.pkg
     </pkg-ref>
 
     <pkg-ref
         id="com.matthewdenwood.jags-5-vsu"
-        version="5.0.0" >
-        pkg/JAGS-5.0.0-vecLib-single-universal.pkg
+        version="5.0.1" >
+        pkg/JAGS-5.0.1-vecLib-single-universal.pkg
     </pkg-ref>
 
     <pkg-ref
         id="com.matthewdenwood.jags-5-vgu"
-        version="5.0.0" >
-        pkg/JAGS-5.0.0-vecLib-gcd-universal.pkg
+        version="5.0.1" >
+        pkg/JAGS-5.0.1-vecLib-gcd-universal.pkg
     </pkg-ref>
 
 </installer-gui-script>
