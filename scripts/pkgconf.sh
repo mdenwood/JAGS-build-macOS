@@ -52,6 +52,12 @@ if [[ "$VERSION" == "3.0.5" ]]; then
     echo "Invalid SHA256 checksum for pkgconf version $VERSION" >&2
     exit $EX_USAGE
   fi
+elif [[ "$VERSION" == "3.0.10" ]]; then
+  if [[ ! $(shasum -a 256 "sources/pkgconf-$VERSION.tar.gz" | awk '{print $1}') ==  
+        "11818a25f2730132f3b258ac8be4e82f83b9db03a1a99a6c29cd01b94fc9d310" ]]; then
+    echo "Invalid SHA256 checksum for pkgconf version $VERSION" >&2
+    exit $EX_USAGE
+  fi
 else
   for ff in $(ls "sources"); do
     echo "$ff: $(shasum -a 256 "sources/$ff" | awk '{print $1}')"

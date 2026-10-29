@@ -127,15 +127,21 @@ if ! [ -f sources/JAGS-$VERSION.tar.gz ]; then
 fi
 
 # Verify checksum:
-if [[ "$VERSION" == "5.0.0" ]]; then
+if [[ "$VERSION" == "4.3.2" ]]; then
+  if [[ ! $(shasum -a 256 "sources/JAGS-$VERSION.tar.gz" | awk '{print $1}') ==  
+        "871f556af403a7c2ce6a0f02f15cf85a572763e093d26658ebac55c4ab472fc8" ]]; then
+    echo "Invalid SHA256 checksum for JAGS version $VERSION" >&2
+    exit $EX_USAGE
+  fi
+elif [[ "$VERSION" == "5.0.0" ]]; then
   if [[ ! $(shasum -a 256 "sources/JAGS-$VERSION.tar.gz" | awk '{print $1}') ==  
         "64fcd4883b8a8ee907722f49366cc9f277477a0647ada61356f17568f84ffff8" ]]; then
     echo "Invalid SHA256 checksum for JAGS version $VERSION" >&2
     exit $EX_USAGE
   fi
-elif [[ "$VERSION" == "4.3.2" ]]; then
+elif [[ "$VERSION" == "5.0.1" ]]; then
   if [[ ! $(shasum -a 256 "sources/JAGS-$VERSION.tar.gz" | awk '{print $1}') ==  
-        "871f556af403a7c2ce6a0f02f15cf85a572763e093d26658ebac55c4ab472fc8" ]]; then
+        "0888571b1812c8ce076ad6326c66f96a0ae7762497c346cd7eb32d35a62105d4" ]]; then
     echo "Invalid SHA256 checksum for JAGS version $VERSION" >&2
     exit $EX_USAGE
   fi

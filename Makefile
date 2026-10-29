@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 ## Versions of JAGS, CPPUNIT and LAPACK to use
-JAGSVERSION := 5.0.0
+JAGSVERSION := 5.0.1
 UTILSVERSION := 1.0.0
 CPPUNITVERS := 1.15.1
 LAPACKVERS := 3.12.1
-PKGCONFVERS := 3.0.5
+PKGCONFVERS := 3.0.10
 PKGCONFIGVERS := 0.29.2
 
 ## Extract JAGS major version from full version
